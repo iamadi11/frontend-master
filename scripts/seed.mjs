@@ -2429,6 +2429,526 @@ async function seed() {
       console.log("✓ Resource 6 topic already exists");
     }
 
+    // Check if Resource 7 topic exists
+    const existingTopic7 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "testing-strategy",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic7.docs.length === 0) {
+      const testingStrategyLabDemoConfig = {
+        demoType: "testingStrategyLab",
+        defaults: {
+          mode: "PYRAMID",
+          teamSize: "MEDIUM",
+          releaseCadence: "DAILY",
+          apiChange: "NONE",
+          consumerStrictness: "STRICT",
+          baseline: {
+            layout: "A",
+            color: "A",
+            spacing: "A",
+          },
+          current: {
+            layout: "A",
+            color: "A",
+            spacing: "A",
+          },
+        },
+        rules: [
+          {
+            teamSize: "SMALL",
+            releaseCadence: "WEEKLY",
+            recommendedMix: {
+              unitPct: 60,
+              integrationPct: 30,
+              e2ePct: 10,
+            },
+            pyramidNotes: [
+              "Small teams benefit from higher unit test coverage for fast feedback.",
+              "Weekly releases allow time for integration tests.",
+              "Minimal E2E tests focus on critical user flows.",
+            ],
+            eventLines: [
+              "Small team + weekly cadence → prioritize unit tests for fast feedback.",
+            ],
+          },
+          {
+            teamSize: "SMALL",
+            releaseCadence: "DAILY",
+            recommendedMix: {
+              unitPct: 70,
+              integrationPct: 20,
+              e2ePct: 10,
+            },
+            pyramidNotes: [
+              "Daily releases require fast feedback - unit tests are fastest.",
+              "Reduced integration tests to maintain speed.",
+              "E2E tests kept minimal to avoid flakiness slowing releases.",
+            ],
+            eventLines: [
+              "Small team + daily cadence → maximize unit tests, minimize slower tests.",
+            ],
+          },
+          {
+            teamSize: "MEDIUM",
+            releaseCadence: "WEEKLY",
+            recommendedMix: {
+              unitPct: 50,
+              integrationPct: 35,
+              e2ePct: 15,
+            },
+            pyramidNotes: [
+              "Medium teams can balance all test types effectively.",
+              "Weekly cadence allows comprehensive integration testing.",
+              "E2E tests cover key user journeys without slowing releases.",
+            ],
+            eventLines: [
+              "Medium team + weekly cadence → balanced test pyramid.",
+            ],
+          },
+          {
+            teamSize: "MEDIUM",
+            releaseCadence: "DAILY",
+            recommendedMix: {
+              unitPct: 60,
+              integrationPct: 30,
+              e2ePct: 10,
+            },
+            pyramidNotes: [
+              "Daily releases favor unit tests for speed.",
+              "Integration tests remain important for API contracts.",
+              "E2E tests limited to prevent flakiness from blocking releases.",
+            ],
+            eventLines: [
+              "Medium team + daily cadence → unit-heavy with solid integration coverage.",
+            ],
+          },
+          {
+            teamSize: "LARGE",
+            releaseCadence: "WEEKLY",
+            recommendedMix: {
+              unitPct: 40,
+              integrationPct: 40,
+              e2ePct: 20,
+            },
+            pyramidNotes: [
+              "Large teams need integration tests to catch cross-team issues.",
+              "Weekly cadence allows comprehensive E2E coverage.",
+              "More E2E tests increase confidence but require maintenance.",
+            ],
+            eventLines: [
+              "Large team + weekly cadence → balanced pyramid with more E2E coverage.",
+            ],
+          },
+          {
+            teamSize: "LARGE",
+            releaseCadence: "DAILY",
+            recommendedMix: {
+              unitPct: 50,
+              integrationPct: 35,
+              e2ePct: 15,
+            },
+            pyramidNotes: [
+              "Daily releases in large teams require fast feedback.",
+              "Integration tests catch cross-team contract issues.",
+              "E2E tests focus on critical paths to avoid blocking releases.",
+            ],
+            eventLines: [
+              "Large team + daily cadence → balanced mix with emphasis on speed.",
+            ],
+          },
+          {
+            teamSize: "LARGE",
+            releaseCadence: "CONTINUOUS",
+            recommendedMix: {
+              unitPct: 60,
+              integrationPct: 30,
+              e2ePct: 10,
+            },
+            pyramidNotes: [
+              "Continuous deployment requires fastest feedback loops.",
+              "Unit tests provide immediate feedback on code changes.",
+              "Minimal E2E tests prevent flakiness from blocking deployments.",
+            ],
+            eventLines: [
+              "Large team + continuous cadence → unit-heavy for speed, minimal E2E.",
+            ],
+          },
+        ],
+        contractRules: [
+          {
+            apiChange: "NONE",
+            contractResult: {
+              pass: true,
+              breakingReasons: [],
+            },
+            eventLines: ["No API changes → contract check passes."],
+          },
+          {
+            apiChange: "ADD_FIELD",
+            consumerStrictness: "LENIENT",
+            contractResult: {
+              pass: true,
+              breakingReasons: [],
+            },
+            eventLines: [
+              "Adding field → backward compatible, lenient consumer accepts.",
+            ],
+          },
+          {
+            apiChange: "ADD_FIELD",
+            consumerStrictness: "STRICT",
+            contractResult: {
+              pass: true,
+              breakingReasons: [],
+            },
+            eventLines: [
+              "Adding field → backward compatible, strict consumer accepts.",
+            ],
+          },
+          {
+            apiChange: "REMOVE_FIELD",
+            consumerStrictness: "LENIENT",
+            contractResult: {
+              pass: true,
+              breakingReasons: [],
+            },
+            eventLines: [
+              "Removing field → lenient consumer ignores missing fields, passes.",
+            ],
+          },
+          {
+            apiChange: "REMOVE_FIELD",
+            consumerStrictness: "STRICT",
+            contractResult: {
+              pass: false,
+              breakingReasons: [
+                "Field 'name' was removed but consumer requires it.",
+                "Strict schema validation fails on missing required field.",
+              ],
+            },
+            eventLines: [
+              "Removing field → breaking for strict consumer, fails contract check.",
+            ],
+          },
+          {
+            apiChange: "RENAME_FIELD",
+            consumerStrictness: "LENIENT",
+            contractResult: {
+              pass: false,
+              breakingReasons: [
+                "Field 'name' renamed to 'fullName' - consumer expects 'name'.",
+              ],
+            },
+            eventLines: [
+              "Renaming field → breaking change, lenient consumer still fails.",
+            ],
+          },
+          {
+            apiChange: "RENAME_FIELD",
+            consumerStrictness: "STRICT",
+            contractResult: {
+              pass: false,
+              breakingReasons: [
+                "Field 'name' renamed to 'fullName' - consumer requires 'name'.",
+                "Strict schema validation fails on missing field.",
+              ],
+            },
+            eventLines: [
+              "Renaming field → breaking for strict consumer, fails contract check.",
+            ],
+          },
+          {
+            apiChange: "TYPE_CHANGE",
+            consumerStrictness: "LENIENT",
+            contractResult: {
+              pass: false,
+              breakingReasons: [
+                "Field 'id' type changed from string to number - type mismatch.",
+              ],
+            },
+            eventLines: [
+              "Type change → breaking change, lenient consumer fails on type mismatch.",
+            ],
+          },
+          {
+            apiChange: "TYPE_CHANGE",
+            consumerStrictness: "STRICT",
+            contractResult: {
+              pass: false,
+              breakingReasons: [
+                "Field 'id' type changed from string to number - consumer expects string.",
+                "Strict schema validation fails on type mismatch.",
+              ],
+            },
+            eventLines: [
+              "Type change → breaking for strict consumer, fails contract check.",
+            ],
+          },
+        ],
+        visualRules: [
+          {
+            visualDiff: {
+              changed: [],
+              severity: "LOW",
+            },
+            eventLines: ["No visual changes detected."],
+          },
+          {
+            baseline: { layout: "A", color: "A", spacing: "A" },
+            current: { layout: "B", color: "A", spacing: "A" },
+            visualDiff: {
+              changed: ["layout"],
+              severity: "HIGH",
+            },
+            eventLines: [
+              "Layout changed → likely breaking visual regression for key pages.",
+            ],
+          },
+          {
+            baseline: { layout: "A", color: "A", spacing: "A" },
+            current: { layout: "A", color: "B", spacing: "A" },
+            visualDiff: {
+              changed: ["color"],
+              severity: "LOW",
+            },
+            eventLines: [
+              "Color changed → low severity, may be intentional design update.",
+            ],
+          },
+          {
+            baseline: { layout: "A", color: "A", spacing: "A" },
+            current: { layout: "A", color: "A", spacing: "B" },
+            visualDiff: {
+              changed: ["spacing"],
+              severity: "MEDIUM",
+            },
+            eventLines: [
+              "Spacing changed → medium severity, may affect layout on different screen sizes.",
+            ],
+          },
+          {
+            baseline: { layout: "A", color: "A", spacing: "A" },
+            current: { layout: "B", color: "B", spacing: "B" },
+            visualDiff: {
+              changed: ["layout", "color", "spacing"],
+              severity: "HIGH",
+            },
+            eventLines: [
+              "Multiple visual changes → high severity, likely breaking regression.",
+            ],
+          },
+        ],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Testing Strategy for Frontend Systems",
+          slug: "testing-strategy",
+          order: 7,
+          difficulty: "intermediate",
+          summary:
+            "Learn unit, integration, E2E testing trade-offs, contract testing for API compatibility, and visual regression testing. Master testing strategies that balance speed, confidence, and maintenance.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [
+                    { text: "Testing Strategy for Frontend Systems" },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Effective testing strategies balance speed, confidence, and maintenance. This topic covers the test pyramid (unit/integration/E2E), contract testing for API compatibility, and visual regression testing.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Test Pyramid" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "The test pyramid recommends a mix of unit tests (fast, many), integration tests (moderate speed, moderate count), and E2E tests (slow, few). Team size and release cadence influence the optimal mix. Small teams with daily releases favor unit tests for speed. Large teams with weekly releases can afford more E2E tests for confidence.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Contract Testing" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Contract testing ensures API compatibility between consumers and providers. It detects breaking changes like field removal, renaming, or type changes. Strict consumers fail on missing fields, while lenient consumers may ignore missing optional fields. Contract tests catch breaking changes before deployment.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Visual Regression Testing" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Visual regression testing compares baseline screenshots with current renders to detect unintended visual changes. Layout changes are high severity (likely breaking), spacing changes are medium severity (may affect responsive design), and color changes are low severity (may be intentional). Severity determines whether to block releases.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "Testing Trophy and Test Pyramid",
+              url: "https://kentcdodds.com/blog/the-testing-trophy-and-testing-classifications",
+              note: "Test pyramid and testing classifications (placeholder - verify content)",
+              claimIds: "test-pyramid",
+            },
+            {
+              label: "Contract Testing with Pact",
+              url: "https://docs.pact.io/",
+              note: "Contract testing patterns and tools (placeholder - verify content)",
+              claimIds: "contract-testing",
+            },
+            {
+              label: "Visual Regression Testing",
+              url: "https://www.chromatic.com/docs/visual-testing",
+              note: "Visual regression testing strategies (placeholder - verify content)",
+              claimIds: "visual-regression",
+            },
+          ],
+          practiceDemo: testingStrategyLabDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore Test Pyramid",
+              body: "Switch to Pyramid mode. Adjust the Team Size and Release Cadence selectors. Watch the animated pyramid segments (Unit, Integration, E2E) morph to show the recommended test mix. Notice how small teams with daily releases favor unit tests, while large teams with weekly releases can afford more E2E tests. Read the trade-off notes below the pyramid.",
+              focusTarget: "pyramid",
+            },
+            {
+              title: "Understand Trade-offs",
+              body: "Change team size from Small to Large while keeping release cadence at Daily. Observe how the pyramid shifts - more E2E tests increase confidence but slow feedback and increase flakiness risk. The event log records the reasoning for each recommendation.",
+              focusTarget: "pyramid",
+            },
+            {
+              title: "Experiment with Release Cadence",
+              body: "Keep team size at Medium and switch between Weekly, Daily, and Continuous release cadence. Notice how faster cadences favor unit tests for speed, while slower cadences allow more comprehensive integration and E2E coverage.",
+              focusTarget: "pyramid",
+            },
+            {
+              title: "Test Contract Checking",
+              body: "Switch to Contract mode. Select different API changes (None, Add Field, Remove Field, Rename Field, Type Change) and consumer strictness (Lenient, Strict). Click 'Run contract check' to see if the contract passes or fails. Watch the animated flow from Consumer Schema → Contract → Provider Response.",
+              focusTarget: "contract.flow",
+            },
+            {
+              title: "Understand Breaking Changes",
+              body: "Try 'Remove Field' with 'Strict' consumer - this should fail because strict consumers require all fields. Then try 'Remove Field' with 'Lenient' consumer - this passes because lenient consumers ignore missing fields. Understand when breaking changes occur.",
+              focusTarget: "contract.flow",
+            },
+            {
+              title: "Explore Visual Regression",
+              body: "Switch to Visual Regression mode. Adjust the Baseline and Current state dropdowns (Layout, Color, Spacing). Click 'Compare' to see the visual diff. Notice how layout changes are marked as HIGH severity, spacing as MEDIUM, and color as LOW.",
+              focusTarget: "visual.diff",
+            },
+            {
+              title: "Test Visual Diff Severity",
+              body: "Change only the Layout from A to B in Current (keep Baseline at A). Click Compare - this shows HIGH severity. Then change Layout back to A and change only Color to B. Click Compare - this shows LOW severity. Understand how different visual changes have different severity levels.",
+              focusTarget: "visual.diff",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see a chronological record of all pyramid recommendations, contract checks, and visual comparisons. This helps you understand how testing strategies adapt to team size, release cadence, API changes, and visual regressions.",
+              focusTarget: "eventlog",
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "Pick a test mix for daily releases and large team. Justify your choice considering speed, confidence, and maintenance trade-offs.",
+              expectedAnswer:
+                "For daily releases with a large team, I recommend: 50% unit tests, 35% integration tests, 15% E2E tests. Justification: Daily releases require fast feedback, so unit tests (50%) provide immediate validation. Large teams need integration tests (35%) to catch cross-team contract issues. E2E tests (15%) focus on critical paths to avoid flakiness blocking releases. This balances speed (unit-heavy) with confidence (integration for contracts) while minimizing maintenance (limited E2E).",
+              explanation:
+                "Daily releases favor speed, so unit tests dominate. Large teams need integration tests for cross-team compatibility. E2E tests are kept minimal to prevent flakiness from blocking fast releases. The mix balances all three concerns.",
+            },
+            {
+              prompt:
+                "Handle API rename without breaking consumers. Propose steps for a safe migration.",
+              expectedAnswer:
+                "Steps: 1) Add new field alongside old field (additive change, backward compatible). 2) Update consumers to use new field gradually. 3) Monitor contract tests to ensure both fields work. 4) Once all consumers migrated, mark old field as deprecated. 5) After deprecation period, remove old field. This uses additive changes (non-breaking) followed by gradual migration, avoiding breaking changes that fail contract tests.",
+              explanation:
+                "API renames are breaking changes. The safe approach is additive: add new field, migrate consumers gradually, then remove old field. Contract tests catch breaking changes, so additive changes pass while renames fail.",
+            },
+            {
+              prompt:
+                "Decide if visual diff severity warrants blocking the release. When would you block vs allow?",
+              expectedAnswer:
+                "Block release for: HIGH severity (layout changes) on critical pages (checkout, login, payment) - these likely break user flows. Allow with review for: HIGH severity on non-critical pages, MEDIUM severity (spacing) that may be intentional responsive design improvements, LOW severity (color) that may be intentional design updates. Decision factors: page criticality, whether change is intentional, impact on user flows, and whether visual diff matches expected design changes.",
+              explanation:
+                "Severity alone isn't enough - page criticality and intent matter. Layout changes on critical pages are blocking. Spacing and color changes may be intentional and non-blocking. Always consider context.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 7 topic (testing-strategy)");
+    } else {
+      console.log("✓ Resource 7 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);

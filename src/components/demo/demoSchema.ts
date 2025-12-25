@@ -295,6 +295,89 @@ export const releaseDeliveryLabConfigSchema = z.object({
   notes: z.array(z.string()).optional(),
 });
 
+// Resource 7: Testing Strategy Lab
+export const testingStrategyLabConfigSchema = z.object({
+  demoType: z.literal("testingStrategyLab"),
+  defaults: z.object({
+    mode: z.enum(["PYRAMID", "CONTRACT", "VISUAL"]),
+    teamSize: z.enum(["SMALL", "MEDIUM", "LARGE"]),
+    releaseCadence: z.enum(["WEEKLY", "DAILY", "CONTINUOUS"]),
+    apiChange: z.enum([
+      "NONE",
+      "ADD_FIELD",
+      "REMOVE_FIELD",
+      "RENAME_FIELD",
+      "TYPE_CHANGE",
+    ]),
+    consumerStrictness: z.enum(["LENIENT", "STRICT"]),
+    baseline: z.object({
+      layout: z.enum(["A", "B"]),
+      color: z.enum(["A", "B"]),
+      spacing: z.enum(["A", "B"]),
+    }),
+    current: z.object({
+      layout: z.enum(["A", "B"]),
+      color: z.enum(["A", "B"]),
+      spacing: z.enum(["A", "B"]),
+    }),
+  }),
+  rules: z.array(
+    z.object({
+      teamSize: z.enum(["SMALL", "MEDIUM", "LARGE"]).optional(),
+      releaseCadence: z.enum(["WEEKLY", "DAILY", "CONTINUOUS"]).optional(),
+      recommendedMix: z.object({
+        unitPct: z.number().min(0).max(100),
+        integrationPct: z.number().min(0).max(100),
+        e2ePct: z.number().min(0).max(100),
+      }),
+      pyramidNotes: z.array(z.string()),
+      eventLines: z.array(z.string()),
+    })
+  ),
+  contractRules: z.array(
+    z.object({
+      apiChange: z
+        .enum([
+          "NONE",
+          "ADD_FIELD",
+          "REMOVE_FIELD",
+          "RENAME_FIELD",
+          "TYPE_CHANGE",
+        ])
+        .optional(),
+      consumerStrictness: z.enum(["LENIENT", "STRICT"]).optional(),
+      contractResult: z.object({
+        pass: z.boolean(),
+        breakingReasons: z.array(z.string()),
+      }),
+      eventLines: z.array(z.string()),
+    })
+  ),
+  visualRules: z.array(
+    z.object({
+      baseline: z
+        .object({
+          layout: z.enum(["A", "B"]),
+          color: z.enum(["A", "B"]),
+          spacing: z.enum(["A", "B"]),
+        })
+        .optional(),
+      current: z
+        .object({
+          layout: z.enum(["A", "B"]),
+          color: z.enum(["A", "B"]),
+          spacing: z.enum(["A", "B"]),
+        })
+        .optional(),
+      visualDiff: z.object({
+        changed: z.array(z.string()),
+        severity: z.enum(["LOW", "MEDIUM", "HIGH"]),
+      }),
+      eventLines: z.array(z.string()),
+    })
+  ),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
@@ -303,6 +386,7 @@ export const demoConfigSchema = z.discriminatedUnion("demoType", [
   performanceBudgetLabConfigSchema,
   uiArchitectureLabConfigSchema,
   releaseDeliveryLabConfigSchema,
+  testingStrategyLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -321,6 +405,9 @@ export type UIArchitectureLabConfig = z.infer<
 >;
 export type ReleaseDeliveryLabConfig = z.infer<
   typeof releaseDeliveryLabConfigSchema
+>;
+export type TestingStrategyLabConfig = z.infer<
+  typeof testingStrategyLabConfigSchema
 >;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;
