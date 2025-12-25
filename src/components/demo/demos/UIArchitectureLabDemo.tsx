@@ -32,6 +32,9 @@ export function UIArchitectureLabDemo({
   const { reduced } = useMotionPrefs();
   const [mode, setMode] = useState<Mode>("TOKENS");
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
 
   // Token mode state
@@ -641,6 +644,8 @@ export function UIArchitectureLabDemo({
           preloadRemotes={preloadRemotes}
           onPlayLoad={handlePlayLoad}
           focusTarget={focusTarget}
+          cameraPreset={cameraPreset}
+          onCameraPresetChange={setCameraPreset}
         />
       </ThreeCanvasShell>
     </div>
