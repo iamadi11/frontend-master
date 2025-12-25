@@ -11,6 +11,9 @@ import {
   type LargeScaleUXLabConfig,
 } from "../demoSchema";
 import { z } from "zod";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import { UXMegacityScene } from "../../three/UXMegacityScene";
+import { Fallback2D } from "../../three/Fallback2D";
 
 interface LargeScaleUXLabDemoProps {
   demoConfig: unknown;
@@ -48,6 +51,7 @@ export function LargeScaleUXLabDemo({
   focusTarget,
 }: LargeScaleUXLabDemoProps) {
   const { reduced } = useMotionPrefs();
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const [mode, setMode] = useState<Mode>("VIRTUALIZATION");
 
   // Virtualization state
@@ -422,6 +426,33 @@ export function LargeScaleUXLabDemo({
   const renderControls = () => {
     return (
       <div className="space-y-6">
+        {/* View Mode Toggle (2D / 3D) */}
+        <div>
+          <label className="block text-sm font-medium mb-2">View Mode</label>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode("2D")}
+              className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                viewMode === "2D"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+              }`}
+            >
+              2D
+            </button>
+            <button
+              onClick={() => setViewMode("3D")}
+              className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                viewMode === "3D"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+              }`}
+            >
+              3D
+            </button>
+          </div>
+        </div>
+
         {/* Mode selector */}
         <div>
           <label className="block text-sm font-medium mb-2">Mode</label>
@@ -1123,6 +1154,88 @@ export function LargeScaleUXLabDemo({
     return null;
   };
 
+  // Render 3D visualization
+  const renderVisualization3D = () => {
+    return (
+      <ThreeCanvasShell
+        className="w-full h-[600px] rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700"
+        fallback={
+          <Fallback2D message="3D unavailable, showing 2D view">
+            {renderVisualization()}
+          </Fallback2D>
+        }
+      >
+        <UXMegacityScene
+          mode={mode}
+          focusTarget={focusTarget}
+          renderMode={renderMode}
+          itemCount={itemCount}
+          rowHeight={rowHeight}
+          overscan={overscan}
+          scrollTop={scrollTop}
+          perfStats={virtualizationStats}
+          strategy={strategy}
+          currentPage={currentPage}
+          totalPages={paginationStats.totalPages}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          searchRequests={searchRequests}
+          cancellation={cancellation}
+          queryLatencyMs={queryLatencyMs}
+          autosaveEvents={autosaveEvents}
+          offline={offline}
+          recovery={recovery}
+          queuedCount={queuedSavesRef.current.length}
+          lastSaved={lastSaved}
+          onScroll={() => {
+            // Trigger scroll animation
+            setScrollTop((prev) => Math.min(prev + 100, itemCount * rowHeight));
+          }}
+          onNextPage={() => {
+            setCurrentPage((p) => Math.min(paginationStats.totalPages, p + 1));
+          }}
+          onLoadMore={() => {
+            setCurrentPage((p) => p + 1);
+          }}
+          onRequestBurst={() => {
+            const demoQuery =
+              typingSpeed === "FAST" ? "react hooks" : "r...e...a...c...t...";
+            let currentQuery = "";
+            const chars = demoQuery.split("");
+            chars.forEach((char, i) => {
+              setTimeout(
+                () => {
+                  currentQuery += char;
+                  setSearchQuery(currentQuery);
+                  handleSearch(currentQuery);
+                },
+                i * (typingSpeed === "FAST" ? 100 : 300)
+              );
+            });
+          }}
+          onEditField={() => {
+            setFormData((prev) => ({
+              ...prev,
+              name: prev.name + "x",
+            }));
+          }}
+          onSimulateRefresh={() => {
+            if (recovery && lastSaved) {
+              // Simulate recovery
+              setFormData({
+                name: "Recovered",
+                email: "recovered@example.com",
+                message: "Recovered message",
+              });
+            }
+          }}
+          onGoOffline={() => setOffline(true)}
+          onGoOnline={() => setOffline(false)}
+        />
+      </ThreeCanvasShell>
+    );
+  };
+
   if (!config) {
     return (
       <div className="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -1135,7 +1248,9 @@ export function LargeScaleUXLabDemo({
     <Spotlight targetId={focusTarget || null}>
       <DemoShell
         controls={renderControls()}
-        visualization={renderVisualization()}
+        visualization={
+          viewMode === "3D" ? renderVisualization3D() : renderVisualization()
+        }
         eventLog={<EventLog entries={eventLog} />}
       />
     </Spotlight>
