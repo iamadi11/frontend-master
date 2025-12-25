@@ -476,6 +476,57 @@ export const securityPrivacyLabConfigSchema = z.object({
   eventLines: z.array(z.string()),
 });
 
+// Resource 10: Real-time Systems Lab
+export const realtimeSystemsLabConfigSchema = z.object({
+  demoType: z.literal("realtimeSystemsLab"),
+  defaults: z.object({
+    protocol: z.enum(["SSE", "WEBSOCKET"]),
+    network: z.enum(["STABLE", "FLAKY", "DISCONNECTED"]),
+    msgRatePerSec: z.number().min(1).max(200),
+    payloadSize: z.enum(["SMALL", "MEDIUM", "LARGE"]),
+    backpressure: z.enum([
+      "NONE",
+      "BATCH",
+      "THROTTLE",
+      "DROP_OLD",
+      "ACK_WINDOW",
+    ]),
+    batchWindowMs: z.number().min(0).max(2000),
+    reconnectStrategy: z.enum([
+      "NONE",
+      "AUTO_RECONNECT",
+      "RECONNECT_WITH_REPLAY",
+    ]),
+    replayWindow: z.number().min(0).max(500),
+    syncModel: z.enum(["PUSH_ONLY", "PUSH_PULL", "CLIENT_PREDICT"]),
+    conflictMode: z.enum(["NONE", "LAST_WRITE_WINS", "MANUAL_MERGE"]),
+  }),
+  rules: z.array(
+    z.object({
+      protocol: z.enum(["SSE", "WEBSOCKET"]).optional(),
+      network: z.enum(["STABLE", "FLAKY", "DISCONNECTED"]).optional(),
+      backpressure: z
+        .enum(["NONE", "BATCH", "THROTTLE", "DROP_OLD", "ACK_WINDOW"])
+        .optional(),
+      reconnectStrategy: z
+        .enum(["NONE", "AUTO_RECONNECT", "RECONNECT_WITH_REPLAY"])
+        .optional(),
+      syncModel: z
+        .enum(["PUSH_ONLY", "PUSH_PULL", "CLIENT_PREDICT"])
+        .optional(),
+      conflictMode: z
+        .enum(["NONE", "LAST_WRITE_WINS", "MANUAL_MERGE"])
+        .optional(),
+      flowEvents: z.array(z.string()),
+      droppedMsgsPct: z.number(),
+      latencyMs: z.number(),
+      bufferDepth: z.number(),
+      conflictEvents: z.array(z.string()),
+      notes: z.array(z.string()),
+    })
+  ),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
@@ -487,6 +538,7 @@ export const demoConfigSchema = z.discriminatedUnion("demoType", [
   testingStrategyLabConfigSchema,
   observabilityLabConfigSchema,
   securityPrivacyLabConfigSchema,
+  realtimeSystemsLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -514,6 +566,9 @@ export type ObservabilityLabConfig = z.infer<
 >;
 export type SecurityPrivacyLabConfig = z.infer<
   typeof securityPrivacyLabConfigSchema
+>;
+export type RealtimeSystemsLabConfig = z.infer<
+  typeof realtimeSystemsLabConfigSchema
 >;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;

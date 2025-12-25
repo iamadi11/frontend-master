@@ -3622,6 +3622,484 @@ async function seed() {
       console.log("✓ Resource 9 topic already exists");
     }
 
+    // Check if Resource 10 topic exists
+    const existingTopic10 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "realtime-systems",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic10.docs.length === 0) {
+      const realtimeSystemsLabDemoConfig = {
+        demoType: "realtimeSystemsLab",
+        defaults: {
+          protocol: "SSE",
+          network: "STABLE",
+          msgRatePerSec: 10,
+          payloadSize: "SMALL",
+          backpressure: "NONE",
+          batchWindowMs: 500,
+          reconnectStrategy: "AUTO_RECONNECT",
+          replayWindow: 50,
+          syncModel: "PUSH_ONLY",
+          conflictMode: "NONE",
+        },
+        rules: [
+          {
+            protocol: "SSE",
+            flowEvents: [
+              "SSE connection established",
+              "Server sends event stream",
+              "Client receives messages one-way",
+              "Client updates via separate POST requests",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 50,
+            bufferDepth: 0,
+            conflictEvents: [],
+            notes: [
+              "SSE is server→client only; client updates are separate requests.",
+              "SSE uses HTTP/1.1 long-polling; simpler than WebSocket but unidirectional.",
+            ],
+          },
+          {
+            protocol: "WEBSOCKET",
+            flowEvents: [
+              "WebSocket handshake (HTTP upgrade)",
+              "Bidirectional channel established",
+              "Messages flow both directions",
+              "Full-duplex communication",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 30,
+            bufferDepth: 0,
+            conflictEvents: [],
+            notes: [
+              "WebSocket supports bidirectional communication.",
+              "Lower latency than SSE due to persistent connection.",
+            ],
+          },
+          {
+            backpressure: "BATCH",
+            flowEvents: [
+              "Messages accumulate in batch buffer",
+              "Batch window timer expires",
+              "Batch delivered as single unit",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 500,
+            bufferDepth: 5,
+            conflictEvents: [],
+            notes: [
+              "Batching reduces overhead but increases latency within window.",
+              "Trade-off: lower overhead vs higher latency.",
+            ],
+          },
+          {
+            backpressure: "THROTTLE",
+            flowEvents: [
+              "Incoming rate exceeds capacity",
+              "Messages dropped when buffer full",
+              "Rate clamped to prevent overflow",
+            ],
+            droppedMsgsPct: 15,
+            latencyMs: 100,
+            bufferDepth: 10,
+            conflictEvents: [],
+            notes: [
+              "Throttling drops messages when buffer is full.",
+              "Prevents memory overflow but loses messages.",
+            ],
+          },
+          {
+            backpressure: "DROP_OLD",
+            flowEvents: [
+              "Buffer reaches capacity",
+              "Oldest message removed",
+              "New message added",
+            ],
+            droppedMsgsPct: 5,
+            latencyMs: 80,
+            bufferDepth: 20,
+            conflictEvents: [],
+            notes: [
+              "Drop old strategy removes oldest messages first.",
+              "Preserves recent messages but loses historical data.",
+            ],
+          },
+          {
+            backpressure: "ACK_WINDOW",
+            flowEvents: [
+              "Messages sent with sequence IDs",
+              "Client acks received messages",
+              "Window slides as acks arrive",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 60,
+            bufferDepth: 50,
+            conflictEvents: [],
+            notes: [
+              "Ack window bounds memory but can drop if client too slow.",
+              "Requires sequence IDs and ack mechanism.",
+            ],
+          },
+          {
+            reconnectStrategy: "AUTO_RECONNECT",
+            flowEvents: [
+              "Connection lost detected",
+              "Reconnect attempts initiated",
+              "Connection restored",
+              "Stream resumes",
+            ],
+            droppedMsgsPct: 10,
+            latencyMs: 100,
+            bufferDepth: 0,
+            conflictEvents: [],
+            notes: [
+              "Auto reconnect resumes stream but may miss messages during disconnect.",
+            ],
+          },
+          {
+            reconnectStrategy: "RECONNECT_WITH_REPLAY",
+            flowEvents: [
+              "Connection lost detected",
+              "Last event ID stored",
+              "Reconnect with lastEventId",
+              "Server replays missed messages",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 120,
+            bufferDepth: 0,
+            conflictEvents: [],
+            notes: [
+              "Replay avoids missing messages after reconnect but needs cursor/ids.",
+              "Requires server to maintain message history.",
+            ],
+          },
+          {
+            syncModel: "PUSH_PULL",
+            flowEvents: [
+              "Push updates from server",
+              "Periodic pull refresh",
+              "Ensures consistency",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 70,
+            bufferDepth: 0,
+            conflictEvents: [],
+            notes: [
+              "Push-pull combines real-time updates with periodic consistency checks.",
+            ],
+          },
+          {
+            syncModel: "CLIENT_PREDICT",
+            flowEvents: [
+              "Client applies optimistic update",
+              "Server confirms or corrects",
+              "Reconciliation if needed",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 40,
+            bufferDepth: 0,
+            conflictEvents: [],
+            notes: [
+              "Client predict enables instant UI updates with server reconciliation.",
+            ],
+          },
+          {
+            conflictMode: "LAST_WRITE_WINS",
+            flowEvents: [
+              "Client A edits field",
+              "Client B edits same field",
+              "Last write overwrites previous",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 50,
+            bufferDepth: 0,
+            conflictEvents: ["A overwritten by B"],
+            notes: [
+              "Last-write-wins is simple but may lose data.",
+            ],
+          },
+          {
+            conflictMode: "MANUAL_MERGE",
+            flowEvents: [
+              "Conflict detected",
+              "User presented with both values",
+              "User chooses or merges",
+              "Resolution applied",
+            ],
+            droppedMsgsPct: 0,
+            latencyMs: 200,
+            bufferDepth: 0,
+            conflictEvents: ["Conflict: A vs B", "User resolved"],
+            notes: [
+              "Manual merge preserves all data but requires user interaction.",
+            ],
+          },
+        ],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Real-time Frontend Systems",
+          slug: "realtime-systems",
+          order: 10,
+          difficulty: "intermediate",
+          summary:
+            "Learn WebSockets vs SSE, sync models, conflict handling, backpressure strategies, and resilience patterns for real-time frontend systems.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [
+                    {
+                      text: "Real-time Frontend Systems",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Real-time systems require careful protocol selection, backpressure handling, reconnection strategies, and conflict resolution. This resource covers WebSockets vs Server-Sent Events (SSE), sync models, and resilience patterns.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Protocols: SSE vs WebSocket",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Server-Sent Events (SSE) provides one-way server-to-client streaming over HTTP/1.1. It's simpler than WebSocket but unidirectional. WebSocket provides full-duplex bidirectional communication with lower latency. Choose SSE for server-push scenarios (live dashboards, notifications). Choose WebSocket for interactive applications (chat, collaborative editing).",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Backpressure Strategies",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "When message rate exceeds processing capacity, backpressure strategies prevent buffer overflow: Batching groups messages to reduce overhead (trade-off: latency). Throttling drops messages when buffer is full. Drop-old removes oldest messages first. Ack-window limits unacked messages using sequence IDs. Each strategy has trade-offs between latency, memory, and message loss.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Reconnection and Replay",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Network disconnections require reconnection strategies. Auto-reconnect resumes stream but may miss messages. Reconnect-with-replay uses lastEventId/cursor to replay missed messages, avoiding gaps but requiring server-side message history. Replay window size balances memory vs completeness.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Sync Models",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Push-only relies solely on server push. Push-pull combines real-time updates with periodic pull refreshes for consistency. Client-predict applies optimistic updates locally and reconciles with server, enabling instant UI feedback.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Conflict Handling",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "When multiple clients edit shared state, conflicts occur. Last-write-wins is simple but may lose data. Manual merge presents both values to the user for resolution, preserving data but requiring interaction. Operational Transform (OT) and Conflict-free Replicated Data Types (CRDTs) provide automatic conflict resolution for collaborative editing.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "MDN: Server-Sent Events",
+              url: "https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events",
+              note: "MDN documentation on SSE (placeholder - verify content)",
+              claimIds: "sse",
+            },
+            {
+              label: "MDN: WebSocket API",
+              url: "https://developer.mozilla.org/en-US/docs/Web/API/WebSocket",
+              note: "MDN documentation on WebSocket (placeholder - verify content)",
+              claimIds: "websocket",
+            },
+            {
+              label: "CRDTs Explained",
+              url: "https://crdt.tech/",
+              note: "Conflict-free Replicated Data Types (placeholder - verify content)",
+              claimIds: "crdt",
+            },
+          ],
+          practiceDemo: realtimeSystemsLabDemoConfig,
+          practiceSteps: [
+            {
+              title: "Compare SSE vs WebSocket",
+              body: "Switch between SSE and WebSocket protocols. Watch the message flow visualization: SSE shows one-way server→client stream with separate POST for client updates, while WebSocket shows bidirectional channel. Notice the directionality difference and when each is appropriate.",
+              focusTarget: "flow",
+            },
+            {
+              title: "Explore Backpressure Strategies",
+              body: "Increase message rate to 100+ msg/s. Try different backpressure strategies: None (buffer grows), Batch (messages group), Throttle (drops when full), Drop Old (removes oldest), Ack Window (limits unacked). Watch buffer depth, dropped messages %, and latency. Each strategy has trade-offs.",
+              focusTarget: "buffer",
+            },
+            {
+              title: "Test Reconnection Strategies",
+              body: "Click 'Simulate disconnect'. With Auto Reconnect, watch reconnect attempts. With Reconnect with Replay, notice how lastEventId is used to replay missed messages. Replay avoids gaps but requires server-side history.",
+              focusTarget: "reconnect",
+            },
+            {
+              title: "Understand Sync Models",
+              body: "Try different sync models: Push-only (server updates only), Push-pull (periodic refresh), Client-predict (optimistic updates). Watch how each affects latency and consistency. Client-predict enables instant UI but requires reconciliation.",
+              focusTarget: "reconnect",
+            },
+            {
+              title: "Handle Conflicts",
+              body: "Set Conflict Mode to Last-write-wins or Manual merge. Click 'Send edit (Client A)' then 'Send edit (Client B)'. With LWW, B overwrites A. With Manual merge, see conflict UI where you choose A, B, or merge. Manual merge preserves data but requires interaction.",
+              focusTarget: "conflict",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see chronological records of protocol changes, backpressure effects, reconnection attempts, sync model behavior, and conflict resolutions. This helps understand how real-time system decisions affect behavior.",
+              focusTarget: "eventlog",
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "Choose SSE vs WebSocket for live dashboard vs collaborative editor; justify.",
+              expectedAnswer:
+                "For a live dashboard, I would use SSE because it's server-push only (dashboard updates come from server), simpler to implement, and works over HTTP/1.1. For a collaborative editor, I would use WebSocket because it requires bidirectional communication (users send edits, server broadcasts to others), lower latency for real-time collaboration, and full-duplex support. SSE is unidirectional (server→client only), so client updates would require separate POST requests, which is inefficient for collaborative editing.",
+              explanation:
+                "SSE is ideal for server-push scenarios like dashboards. WebSocket is better for bidirectional interactive applications like collaborative editing.",
+            },
+            {
+              prompt:
+                "Pick backpressure strategy for 200 msg/s on mobile; explain trade-offs.",
+              expectedAnswer:
+                "For 200 msg/s on mobile, I would use Ack Window strategy. Mobile devices have limited processing power and memory. Ack Window limits unacked messages (e.g., 50-100), preventing memory overflow while ensuring message delivery. Trade-offs: Ack Window requires sequence IDs and ack mechanism (more complex), but bounds memory usage and prevents buffer overflow. Alternatives: Batch increases latency (bad for real-time), Throttle drops messages (loses data), Drop Old loses historical data. Ack Window balances memory safety with message delivery.",
+              explanation:
+                "Ack Window is best for high message rates on resource-constrained devices because it bounds memory while ensuring delivery through acknowledgments.",
+            },
+            {
+              prompt:
+                "Design reconnect strategy to avoid missed updates.",
+              expectedAnswer:
+                "I would use Reconnect with Replay strategy. When connection is lost, store the lastEventId (or cursor/sequence number) of the last received message. On reconnect, send lastEventId to server. Server maintains message history (e.g., last 100-500 messages) and replays all messages after lastEventId. This ensures no missed updates. Implementation: client stores lastEventId, server maintains message buffer, reconnect includes lastEventId in handshake, server replays missed messages. Trade-off: requires server-side message history (memory cost) but guarantees completeness.",
+              explanation:
+                "Reconnect with Replay uses lastEventId/cursor to replay missed messages, avoiding gaps but requiring server-side message history. This is essential for applications where missing updates is unacceptable.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 10 topic (realtime-systems)");
+    } else {
+      console.log("✓ Resource 10 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);
