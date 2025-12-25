@@ -127,12 +127,53 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(handleFetch(event.request));
+  // Handle navigation preload for navigation requests
+  if (event.request.mode === "navigate" && event.preloadResponse) {
+    const preloadPromise = event.preloadResponse;
+
+    event.respondWith(
+      (async () => {
+        try {
+          // Wait for preload response to settle
+          const preloadResponse = await preloadPromise;
+          if (preloadResponse) {
+            return handleFetch(event.request, preloadResponse);
+          }
+        } catch (error) {
+          console.log("[ServiceWorker] Preload failed, falling back:", error);
+        }
+        return handleFetch(event.request);
+      })()
+    );
+
+    // Ensure preload promise settles (prevents cancellation warning)
+    event.waitUntil(preloadPromise.catch(() => {}));
+  } else {
+    event.respondWith(handleFetch(event.request));
+  }
 });
 
 // Main fetch handler
-async function handleFetch(request) {
+async function handleFetch(request, preloadResponse = null) {
   const url = new URL(request.url);
+
+  // If we have a preload response, use it for navigation requests
+  if (preloadResponse && request.mode === "navigate") {
+    try {
+      // Check if preload response is valid
+      if (preloadResponse.ok) {
+        // Cache it for offline use
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, preloadResponse.clone());
+        return preloadResponse;
+      }
+    } catch (error) {
+      console.log(
+        "[ServiceWorker] Preload response invalid, falling back:",
+        error
+      );
+    }
+  }
 
   // Find matching strategy
   const route = ROUTE_STRATEGIES.find((r) => r.pattern.test(url.href));
