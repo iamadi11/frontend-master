@@ -2949,6 +2949,357 @@ async function seed() {
       console.log("✓ Resource 7 topic already exists");
     }
 
+    // Check if Resource 8 topic exists
+    const existingTopic8 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "observability",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic8.docs.length === 0) {
+      const observabilityLabDemoConfig = {
+        demoType: "observabilityLab",
+        defaults: {
+          mode: "PIPELINE",
+          signal: "LOG",
+          sampleRate: 1.0,
+          redactPII: false,
+          replayEnabled: false,
+          errorType: "NONE",
+          boundaryStrategy: "NONE",
+          volume: "LOW",
+        },
+        pipelineSteps: [
+          {
+            step: "Capture",
+            status: "PENDING",
+            note: "Client captures event",
+          },
+          {
+            step: "Buffer",
+            status: "PENDING",
+            note: "Events buffered locally",
+          },
+          {
+            step: "Send",
+            status: "PENDING",
+            note: "Events sent to backend",
+          },
+          {
+            step: "Ingest",
+            status: "PENDING",
+            note: "Backend ingests events",
+          },
+          {
+            step: "Store",
+            status: "PENDING",
+            note: "Events stored in database",
+          },
+          {
+            step: "Query",
+            status: "PENDING",
+            note: "Events queryable via API",
+          },
+          {
+            step: "Alert",
+            status: "PENDING",
+            note: "Alerts triggered if needed",
+          },
+        ],
+        droppedEventsPct: 0,
+        privacyNotes: [],
+        errorFlow: [
+          {
+            phase: "crash",
+            uiState: "Error occurred",
+            note: "Component throws error",
+          },
+          {
+            phase: "fallback",
+            uiState: "Fallback UI shown",
+            note: "Error boundary catches and shows fallback",
+          },
+          {
+            phase: "retry",
+            uiState: "User clicks retry",
+            note: "User attempts recovery",
+          },
+          {
+            phase: "recover",
+            uiState: "UI recovered",
+            note: "Error cleared, normal operation resumed",
+          },
+          {
+            phase: "current",
+            uiState: "Normal",
+            note: "Current state",
+          },
+        ],
+        recommendedSetup: [
+          "Use traces for latency root-cause analysis",
+          "Use metrics for performance monitoring",
+          "Use logs for debugging and audit trails",
+          "Set sample rate based on volume and cost constraints",
+          "Enable PII redaction for production logs",
+          "Use widget-level boundaries to minimize blast radius",
+        ],
+        eventLines: [
+          "Event captured and sent through pipeline",
+          "Pipeline processes event through all stages",
+        ],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Observability for Frontend Systems",
+          slug: "observability",
+          order: 8,
+          difficulty: "intermediate",
+          summary:
+            "Learn logging, metrics, tracing, session replay considerations, error boundaries, and monitoring strategy. Master observability patterns that balance debugging capability, cost, and privacy.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [{ text: "Observability for Frontend Systems" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Observability enables understanding system behavior through logs, metrics, and traces. This topic covers telemetry pipeline design, sampling and privacy trade-offs, error boundaries, and monitoring strategies.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Logs, Metrics, and Traces" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Logs are high-cardinality text messages useful for debugging and audit trails. Metrics are aggregated numerical values (counters, gauges) useful for performance monitoring. Traces are distributed request flows with spans showing parent/child relationships, useful for latency root-cause analysis. Each signal type serves different purposes in the observability stack.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Telemetry Pipeline" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "The telemetry pipeline flows from client capture → local buffering → network send → backend ingest → storage → query → alerting. Each stage can introduce latency, buffering, or failures. Design the pipeline to handle high volume, network failures, and cost constraints.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Sampling and Privacy" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Sampling reduces telemetry volume and cost but may miss rare errors. Sample rates (0-1) determine what percentage of events are kept. PII redaction masks sensitive fields (email, phone, SSN) in logs but reduces debugging detail. Session replay captures user interactions for debugging but requires GDPR compliance and sensitive field masking.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Error Boundaries" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Error boundaries catch render errors and event handler errors in React components. Widget-level boundaries contain errors to specific components, minimizing blast radius. Page-level boundaries catch errors for entire pages. Async errors (promises, setTimeout) are not automatically caught by boundaries and must be reported manually. Recovery flows: crash → fallback UI → retry → recover.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Monitoring Strategy" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Effective monitoring combines logs (debugging), metrics (performance), and traces (latency analysis). Set up alerts for error rates, latency p95/p99, and critical user flows. Use sampling to balance cost and coverage. Enable PII redaction for production. Use error boundaries strategically to minimize blast radius and maintain user experience.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "OpenTelemetry Documentation",
+              url: "https://opentelemetry.io/docs/",
+              note: "OpenTelemetry observability standards (placeholder - verify content)",
+              claimIds: "opentelemetry",
+            },
+            {
+              label: "React Error Boundaries",
+              url: "https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary",
+              note: "React error boundary patterns (placeholder - verify content)",
+              claimIds: "error-boundaries",
+            },
+            {
+              label: "Session Replay Privacy",
+              url: "https://www.datadoghq.com/knowledge-center/session-replay/privacy/",
+              note: "Session replay privacy considerations (placeholder - verify content)",
+              claimIds: "session-replay",
+            },
+          ],
+          practiceDemo: observabilityLabDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore Telemetry Pipeline",
+              body: "Switch to Pipeline mode. Select different signal types (Log, Metric, Trace) and click 'Send Event' to see events flow through the pipeline: Capture → Buffer → Send → Ingest → Store → Query → Alert. Notice how different signal types have different visual tags. Try 'Burst x10' to see multiple events flowing simultaneously.",
+              focusTarget: "pipeline",
+            },
+            {
+              title: "Understand Signal Types",
+              body: "Switch between Log, Metric, and Trace signals. Logs are high-cardinality messages useful for debugging. Metrics are aggregated counters/gauges useful for performance monitoring. Traces are spans with parent/child relationships useful for latency root-cause analysis. The event log explains when to use each type.",
+              focusTarget: "pipeline",
+            },
+            {
+              title: "Experiment with Volume",
+              body: "Change the Volume selector (Low, Medium, High) and send events. Higher volume increases pipeline load and may affect processing speed. Observe how the pipeline handles different volumes.",
+              focusTarget: "pipeline",
+            },
+            {
+              title: "Explore Sampling",
+              body: "Switch to Sampling & Privacy mode. Adjust the Sample Rate slider (0-100%). Watch the visualization show kept events (green) vs dropped events (red). Lower sample rates reduce cost but may miss rare errors. The dropped percentage shows the trade-off.",
+              focusTarget: "sampling",
+            },
+            {
+              title: "Understand Privacy Trade-offs",
+              body: "Toggle 'Redact PII' on and off. When enabled, PII fields (email, phone, SSN) are redacted in logs - safer but less debugging detail. Toggle 'Session Replay Enabled' - when enabled, a privacy risk badge appears with guidance notes. Session replay captures user interactions and requires GDPR compliance.",
+              focusTarget: "privacy.panel",
+            },
+            {
+              title: "Test Error Boundaries",
+              body: "Switch to Error Boundaries mode. Select an error type (Render Error, Event Handler Error, Async Error) and a boundary strategy (None, Page Boundary, Widget Boundary). Click 'Trigger Error' to see how errors are handled. Notice how widget boundaries contain errors to specific components while page boundaries catch entire pages.",
+              focusTarget: "error.sim",
+            },
+            {
+              title: "Compare Boundary Strategies",
+              body: "Try different boundary strategies with the same error type. 'None' shows an uncaught error that crashes the page. 'Page Boundary' shows a page-level fallback UI. 'Widget Boundary' shows a widget-level fallback while other widgets continue working. Widget boundaries minimize blast radius.",
+              focusTarget: "error.sim",
+            },
+            {
+              title: "Test Recovery Flow",
+              body: "After triggering an error, click 'Retry' to see the recovery flow: crash → fallback → retry → recover. The error flow visualization shows each phase. Notice how async errors require manual reporting since boundaries don't catch them automatically.",
+              focusTarget: "error.sim",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see a chronological record of all pipeline events, sampling changes, privacy toggles, and error handling. This helps you understand how observability decisions affect debugging capability, cost, and privacy.",
+              focusTarget: "eventlog",
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "Pick a signal type for measuring checkout latency. Explain why you chose that signal type and how it helps with root-cause analysis.",
+              expectedAnswer:
+                "I would use Traces for measuring checkout latency. Traces show distributed request flows with spans that have parent/child relationships, making it easy to identify which part of the checkout flow (API call, database query, payment gateway) is causing latency. Traces provide end-to-end visibility across services, unlike logs (which are point-in-time messages) or metrics (which are aggregated values without context). For root-cause analysis, traces show the exact path and timing of each operation in the checkout flow.",
+              explanation:
+                "Traces are ideal for latency root-cause analysis because they show the full request flow with timing for each span. Logs and metrics don't provide the same end-to-end context needed to identify which specific operation in a distributed system is causing latency.",
+            },
+            {
+              prompt:
+                "Set sampling and redaction for a high-volume app. Justify your trade-offs between cost, debugging capability, and privacy.",
+              expectedAnswer:
+                "For a high-volume app, I would set: Sample Rate: 0.1 (10%) to reduce cost while still capturing enough events for debugging. Redact PII: ON for production to protect user privacy and comply with GDPR. Trade-offs: Lower sample rate (10%) reduces cost significantly but may miss rare errors (90% of events dropped). PII redaction protects privacy but reduces debugging detail - I'd use a separate debug environment with redaction OFF for detailed investigation. For critical errors, I'd use a higher sample rate (50-100%) or targeted sampling based on error type.",
+              explanation:
+                "High-volume apps require sampling to manage cost. 10% sample rate balances cost reduction with coverage. PII redaction is essential for production privacy compliance. The trade-off is managed by using different configurations for production (redacted, sampled) vs debug environments (full logs, higher sampling).",
+            },
+            {
+              prompt:
+                "Choose boundary placement to minimize blast radius. When would you use widget-level vs page-level boundaries?",
+              expectedAnswer:
+                "I would use widget-level boundaries for most components to minimize blast radius. Widget boundaries contain errors to specific components, allowing the rest of the page to continue working. Use page-level boundaries only for critical single-purpose pages (like checkout) where an error in any component should show a fallback for the entire page. Widget boundaries are preferred because they: 1) Minimize blast radius (only the failing widget shows fallback), 2) Maintain user experience (other widgets continue working), 3) Allow partial page functionality. Page boundaries are appropriate when the entire page is a single cohesive flow that shouldn't continue if any part fails.",
+              explanation:
+                "Widget-level boundaries minimize blast radius by containing errors to specific components. Page-level boundaries are appropriate for critical single-purpose flows. The choice depends on whether the page can function partially (use widget boundaries) or must function as a whole (use page boundaries).",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 8 topic (observability)");
+    } else {
+      console.log("✓ Resource 8 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);

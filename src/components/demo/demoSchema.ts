@@ -378,6 +378,44 @@ export const testingStrategyLabConfigSchema = z.object({
   ),
 });
 
+// Resource 8: Observability Lab
+export const observabilityLabConfigSchema = z.object({
+  demoType: z.literal("observabilityLab"),
+  defaults: z.object({
+    mode: z.enum(["PIPELINE", "SAMPLING_PRIVACY", "ERROR_BOUNDARY"]),
+    signal: z.enum(["LOG", "METRIC", "TRACE"]),
+    sampleRate: z.number().min(0).max(1),
+    redactPII: z.boolean(),
+    replayEnabled: z.boolean(),
+    errorType: z.enum([
+      "NONE",
+      "RENDER_ERROR",
+      "EVENT_HANDLER_ERROR",
+      "ASYNC_ERROR",
+    ]),
+    boundaryStrategy: z.enum(["NONE", "PAGE_BOUNDARY", "WIDGET_BOUNDARY"]),
+    volume: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  }),
+  pipelineSteps: z.array(
+    z.object({
+      step: z.string(),
+      status: z.enum(["PENDING", "PROCESSING", "COMPLETE", "ERROR"]),
+      note: z.string(),
+    })
+  ),
+  droppedEventsPct: z.number().min(0).max(100),
+  privacyNotes: z.array(z.string()),
+  errorFlow: z.array(
+    z.object({
+      phase: z.string(),
+      uiState: z.string(),
+      note: z.string(),
+    })
+  ),
+  recommendedSetup: z.array(z.string()),
+  eventLines: z.array(z.string()),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
@@ -387,6 +425,7 @@ export const demoConfigSchema = z.discriminatedUnion("demoType", [
   uiArchitectureLabConfigSchema,
   releaseDeliveryLabConfigSchema,
   testingStrategyLabConfigSchema,
+  observabilityLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -408,6 +447,9 @@ export type ReleaseDeliveryLabConfig = z.infer<
 >;
 export type TestingStrategyLabConfig = z.infer<
   typeof testingStrategyLabConfigSchema
+>;
+export type ObservabilityLabConfig = z.infer<
+  typeof observabilityLabConfigSchema
 >;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;
