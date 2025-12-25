@@ -4,10 +4,10 @@ A backend-driven, CMS-powered learning platform for Frontend System Design. Buil
 
 ## Tech Stack
 
-- **Next.js 15** (App Router) + TypeScript + Tailwind CSS
+- **Next.js 16** (App Router) + TypeScript + Tailwind CSS
 - **Payload CMS v3** (admin panel integrated)
 - **MongoDB** (via Payload's MongoDB adapter)
-- **PWA Support** (Serwist service worker)
+- **PWA Support** (service worker)
 - **UI Utilities**: next-themes, framer-motion, clsx, tailwind-merge, lucide-react, zod
 
 ## Local Setup

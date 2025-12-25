@@ -77,24 +77,27 @@ export function TopicPageClient({
       : null;
 
   return (
-    <article className="space-y-8 max-w-5xl">
-      <div>
-        <h1 className="text-4xl font-bold mb-3">{topic.title}</h1>
+    <article className="space-y-8">
+      {/* Header */}
+      <div className="space-y-3">
+        <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+          {topic.title}
+        </h1>
         {topic.summary && (
-          <p className="text-lg text-gray-600 dark:text-gray-400">
+          <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
             {topic.summary}
           </p>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-800">
-        <nav className="flex gap-4">
+      <div className="border-b border-gray-200 dark:border-gray-800 -mx-4 sm:mx-0 px-4 sm:px-0">
+        <nav className="flex gap-4 sm:gap-6">
           <button
             onClick={() => setActiveTab("theory")}
-            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+            className={`px-2 py-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${
               activeTab === "theory"
-                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                ? "border-blue-600 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }`}
           >
@@ -102,9 +105,9 @@ export function TopicPageClient({
           </button>
           <button
             onClick={() => setActiveTab("practice")}
-            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+            className={`px-2 py-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${
               activeTab === "practice"
-                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                ? "border-blue-600 text-blue-600 dark:text-blue-400"
                 : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             }`}
           >
@@ -121,12 +124,12 @@ export function TopicPageClient({
         transition={reduced ? {} : { duration: 0.3 }}
       >
         {activeTab === "theory" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,_72ch)_250px] gap-8 xl:gap-12">
             <div className="space-y-8 min-w-0">
               {topic.theory ? (
-                <Prose>
+                <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:scroll-mt-24 prose-a:text-blue-600 dark:prose-a:text-blue-400">
                   <RichTextRenderer content={topic.theory} />
-                </Prose>
+                </div>
               ) : (
                 <EmptyState
                   title="Theory content not available"
@@ -135,30 +138,38 @@ export function TopicPageClient({
               )}
 
               {/* References */}
-              <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
-                <h2 className="text-2xl font-bold mb-4">References</h2>
+              <div className="border-t border-gray-200 dark:border-gray-800 pt-8 space-y-4">
+                <h2 className="text-3xl font-bold">References</h2>
                 {topic.references && topic.references.length > 0 ? (
-                  <ul className="space-y-3">
+                  <ul className="space-y-4">
                     {topic.references.map((ref, i) => (
-                      <li key={i} className="text-sm">
+                      <li
+                        key={i}
+                        className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-800"
+                      >
                         <a
                           href={ref.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                          className="text-blue-600 dark:text-blue-400 hover:underline font-medium text-lg"
                         >
                           {ref.label}
                         </a>
                         {ref.note && (
-                          <span className="text-gray-600 dark:text-gray-400 ml-2">
-                            — {ref.note}
-                          </span>
+                          <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
+                            {ref.note}
+                          </p>
+                        )}
+                        {ref.claimIds && (
+                          <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                            Supports: {ref.claimIds}
+                          </p>
                         )}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500 dark:text-gray-400 italic text-sm">
+                  <p className="text-gray-500 dark:text-gray-400 italic">
                     References not added yet.
                   </p>
                 )}
@@ -172,7 +183,7 @@ export function TopicPageClient({
 
             {/* Table of Contents - Desktop */}
             <aside className="hidden lg:block">
-              <div className="sticky top-24">
+              <div className="sticky top-24 space-y-6">
                 <TableOfContents content={topic.theory} />
               </div>
             </aside>

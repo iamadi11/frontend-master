@@ -4,12 +4,14 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConsoleErrorSuppressor } from "@/components/console-error-suppressor";
 import { MotionPrefsProvider } from "@/components/motion/MotionPrefsProvider";
+import { SWRegister } from "@/components/sw-register";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-geist-sans" });
 
 export const metadata: Metadata = {
-  title: "Learning Content",
-  description: "A distraction-free learning content website",
+  title: "Frontend System Design | Master System Design Through Practice",
+  description:
+    "Learn frontend system design through structured theory and hands-on practice. Master rendering strategies, state management, performance, architecture, and more.",
 };
 
 export default function RootLayout({
@@ -21,6 +23,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.variable} suppressHydrationWarning>
         <ConsoleErrorSuppressor />
+        <SWRegister />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <MotionPrefsProvider>{children}</MotionPrefsProvider>
         </ThemeProvider>
