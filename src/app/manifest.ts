@@ -2,9 +2,10 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Learning Content",
-    short_name: "Learning",
-    description: "A distraction-free learning content website",
+    name: "Frontend System Design Learning",
+    short_name: "Frontend Design",
+    description:
+      "Learn Frontend System Design through structured theory and interactive 2D examples",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

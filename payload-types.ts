@@ -72,7 +72,6 @@ export interface Config {
     resources: Resource;
     curriculum_modules: CurriculumModule;
     animated_examples: AnimatedExample;
-    topics: Topic;
     "payload-kv": PayloadKv;
     "payload-locked-documents": PayloadLockedDocument;
     "payload-preferences": PayloadPreference;
@@ -89,7 +88,6 @@ export interface Config {
     animated_examples:
       | AnimatedExamplesSelect<false>
       | AnimatedExamplesSelect<true>;
-    topics: TopicsSelect<false> | TopicsSelect<true>;
     "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>;
     "payload-locked-documents":
       | PayloadLockedDocumentsSelect<false>
@@ -335,53 +333,6 @@ export interface AnimatedExample {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "topics".
- */
-export interface Topic {
-  id: string;
-  title: string;
-  slug: string;
-  order: number;
-  difficulty: "beginner" | "intermediate" | "advanced";
-  summary?: string | null;
-  theory?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ("ltr" | "rtl") | null;
-      format: "left" | "start" | "center" | "right" | "end" | "justify" | "";
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  theoryAnimations?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  references?:
-    | {
-        label: string;
-        url: string;
-        note?: string | null;
-        claimIds?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -423,10 +374,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: "animated_examples";
         value: string | AnimatedExample;
-      } | null)
-    | ({
-        relationTo: "topics";
-        value: string | Topic;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -589,30 +536,6 @@ export interface AnimatedExamplesSelect<T extends boolean = true> {
         id?: T;
       };
   spec?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "topics_select".
- */
-export interface TopicsSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  order?: T;
-  difficulty?: T;
-  summary?: T;
-  theory?: T;
-  theoryAnimations?: T;
-  references?:
-    | T
-    | {
-        label?: T;
-        url?: T;
-        note?: T;
-        claimIds?: T;
-        id?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
 }

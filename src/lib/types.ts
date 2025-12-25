@@ -1,4 +1,3 @@
-import type { Topic as PayloadTopic } from "../../payload-types";
 // Note: CurriculumModule and AnimatedExample types will be available after running payload generate:types
 // For now, we define them manually below
 import type { SerializedEditorState } from "lexical";
@@ -103,8 +102,7 @@ export type TopicListItem = {
   difficulty?: "beginner" | "intermediate" | "advanced" | null;
 };
 
-// Server-side topic type (from Payload)
-export type ServerTopic = PayloadTopic;
+// Server-side topic type removed - use CurriculumModule instead
 
 // Lexical node types for RichTextRenderer
 export interface LexicalNode {

@@ -119,18 +119,10 @@ function validateTheory(theory) {
       })
     );
 
-    // Check for 3D Mental Model section (case-insensitive)
-    const has3DMentalModel = headingTexts.some(h => {
-      const normalized = h.toLowerCase();
-      return normalized.includes("3d mental model") || 
-             (normalized.includes("3d") && normalized.includes("mental"));
-    });
-
     return { 
       valid: totalTextLength >= 100, 
       charCount: totalTextLength,
       missingHeadings: missingHeadings.length > 0 ? missingHeadings : null,
-      has3DMentalModel,
       headings: headings.length
     };
   }
@@ -185,62 +177,74 @@ async function audit() {
   const payload = await getPayload({ config });
 
   try {
-    // Fetch all topics
-    const result = await payload.find({
-      collection: "topics",
-      limit: 100,
-      sort: "order",
-    });
-
-    const topics = result.docs;
+    // Skip legacy topics collection audit - focus on curriculum_modules
+    // Fetch all topics (legacy - may not exist)
+    let topics = [];
+    try {
+      const result = await payload.find({
+        collection: "topics",
+        limit: 100,
+        sort: "order",
+      });
+      topics = result.docs;
+    } catch (e) {
+      // topics collection may not exist - that's fine
+      console.log("Note: 'topics' collection not found (using curriculum_modules instead)");
+    }
 
     // Validation results
     const issues = [];
     const warnings = [];
 
-    // Check count
-    if (topics.length !== 12) {
-      issues.push(
-        `❌ Expected 12 topics, found ${topics.length}`
+    // Check count (only if topics collection exists)
+    if (topics.length > 0) {
+      if (topics.length !== 12) {
+        issues.push(
+          `❌ Expected 12 topics, found ${topics.length}`
+        );
+      } else {
+        console.log(`✓ Found 12 topics (legacy collection)\n`);
+      }
+    } else {
+      console.log(`⊘ No legacy 'topics' collection found (using curriculum_modules instead)\n`);
+    }
+
+    // Validate legacy topics collection (if it exists)
+    if (topics.length > 0) {
+      // Check orders (1-12 with no gaps/duplicates)
+      const orders = topics.map((t) => t.order).sort((a, b) => a - b);
+      const expectedOrders = Array.from({ length: 12 }, (_, i) => i + 1);
+      const orderMismatches = expectedOrders.filter(
+        (expected, idx) => orders[idx] !== expected
       );
-    } else {
-      console.log(`✓ Found 12 topics\n`);
-    }
+      if (orderMismatches.length > 0) {
+        issues.push(
+          `❌ Order gaps/duplicates detected. Expected [1-12], got [${orders.join(", ")}]`
+        );
+      } else {
+        console.log(`✓ Orders are correct (1-12, no gaps)\n`);
+      }
 
-    // Check orders (1-12 with no gaps/duplicates)
-    const orders = topics.map((t) => t.order).sort((a, b) => a - b);
-    const expectedOrders = Array.from({ length: 12 }, (_, i) => i + 1);
-    const orderMismatches = expectedOrders.filter(
-      (expected, idx) => orders[idx] !== expected
-    );
-    if (orderMismatches.length > 0) {
-      issues.push(
-        `❌ Order gaps/duplicates detected. Expected [1-12], got [${orders.join(", ")}]`
+      // Check for duplicate slugs
+      const slugs = topics.map((t) => t.slug);
+      const duplicateSlugs = slugs.filter(
+        (slug, index) => slugs.indexOf(slug) !== index
       );
-    } else {
-      console.log(`✓ Orders are correct (1-12, no gaps)\n`);
-    }
+      if (duplicateSlugs.length > 0) {
+        issues.push(`❌ Duplicate slugs: ${duplicateSlugs.join(", ")}`);
+      } else {
+        console.log(`✓ All slugs are unique\n`);
+      }
 
-    // Check for duplicate slugs
-    const slugs = topics.map((t) => t.slug);
-    const duplicateSlugs = slugs.filter(
-      (slug, index) => slugs.indexOf(slug) !== index
-    );
-    if (duplicateSlugs.length > 0) {
-      issues.push(`❌ Duplicate slugs: ${duplicateSlugs.join(", ")}`);
-    } else {
-      console.log(`✓ All slugs are unique\n`);
-    }
+      // Table header
+      console.log("─".repeat(160));
+      console.log(
+        `${"Order".padEnd(6)} | ${"Slug".padEnd(25)} | ${"Title Match".padEnd(12)} | ${"Theory".padEnd(20)} | ${"Refs".padEnd(5)} | Issues`
+      );
+      console.log("─".repeat(160));
 
-    // Table header
-    console.log("─".repeat(160));
-    console.log(
-      `${"Order".padEnd(6)} | ${"Slug".padEnd(25)} | ${"Title Match".padEnd(12)} | ${"Theory".padEnd(20)} | ${"Refs".padEnd(5)} | ${"Steps".padEnd(6)} | ${"Tasks".padEnd(6)} | ${"Animations".padEnd(10)} | Issues`
-    );
-    console.log("─".repeat(160));
-
-    // Validate each topic
-    for (const topic of topics) {
+      // Validate each topic
+      for (const topic of topics) {
       const topicIssues = [];
       const topicWarnings = [];
 
@@ -260,7 +264,7 @@ async function audit() {
         }
       }
 
-      // Theory validation
+      // Theory validation (legacy topics collection - skip if using curriculum_modules)
       const theoryValidation = validateTheory(topic.theory);
       let theoryStatus = "";
       if (theoryValidation.valid) {
@@ -268,10 +272,6 @@ async function audit() {
         if (theoryValidation.missingHeadings && theoryValidation.missingHeadings.length > 0) {
           statusParts.push(`Missing: ${theoryValidation.missingHeadings.slice(0, 2).join(", ")}${theoryValidation.missingHeadings.length > 2 ? "..." : ""}`);
           topicWarnings.push(`Missing headings: ${theoryValidation.missingHeadings.join(", ")}`);
-        }
-        if (!theoryValidation.has3DMentalModel) {
-          statusParts.push("No 3D Mental Model");
-          topicWarnings.push("Missing '3D Mental Model' section");
         }
         theoryStatus = statusParts.join("; ");
       } else {
@@ -289,51 +289,12 @@ async function audit() {
         topicWarnings.push(`Only ${refsCount} references (need ≥2)`);
       }
 
-      // Practice demo validation
-      if (!topic.practiceDemo) {
-        topicIssues.push("Missing practiceDemo");
-      } else if (!topic.practiceDemo.demoType) {
-        topicIssues.push("practiceDemo missing demoType");
-      }
+      // Practice sections removed - learning-only site
+      const stepsStatus = "N/A";
+      const tasksStatus = "N/A";
 
-      // Practice steps validation
-      const stepsCount = topic.practiceSteps?.length || 0;
-      const stepsStatus = stepsCount >= 4 ? `✓ ${stepsCount}` : `⚠ ${stepsCount}`;
-      if (stepsCount < 4) {
-        topicWarnings.push(`Only ${stepsCount} steps (recommended ≥4)`);
-      }
-
-      // Practice tasks validation
-      const tasksCount = topic.practiceTasks?.length || 0;
-      const tasksStatus = tasksCount >= 2 ? `✓ ${tasksCount}` : `⚠ ${tasksCount}`;
-      if (tasksCount < 2) {
-        topicWarnings.push(`Only ${tasksCount} tasks (need ≥2)`);
-      }
-
-      // Theory animations validation
-      const animationsCount = Array.isArray(topic.theoryAnimations) ? topic.theoryAnimations.length : 0;
-      const animationsStatus = animationsCount >= 2 && animationsCount <= 6 ? `✓ ${animationsCount}` : animationsCount < 2 ? `⚠ ${animationsCount}` : `⚠ ${animationsCount} (>6)`;
-      if (animationsCount < 2) {
-        topicWarnings.push(`Only ${animationsCount} theory animations (need 2-6)`);
-      } else if (animationsCount > 6) {
-        topicWarnings.push(`${animationsCount} theory animations (recommended ≤6)`);
-      } else if (animationsCount > 0) {
-        // Validate each block structure
-        topic.theoryAnimations.forEach((block, idx) => {
-          if (!block.title) {
-            topicWarnings.push(`Animation block ${idx + 1} missing title`);
-          }
-          if (!block.kind) {
-            topicWarnings.push(`Animation block ${idx + 1} missing kind`);
-          }
-          if (!block.description) {
-            topicWarnings.push(`Animation block ${idx + 1} missing description`);
-          }
-          if (!Array.isArray(block.whatToNotice) || block.whatToNotice.length < 3) {
-            topicWarnings.push(`Animation block ${idx + 1} has <3 whatToNotice items`);
-          }
-        });
-      }
+      // Animated examples are now in curriculum_modules sections (embeddedExamples)
+      const animationsStatus = "N/A";
 
       // Combine issues for display
       const allIssuesStr =
@@ -343,26 +304,23 @@ async function audit() {
           ? `⚠ ${topicWarnings.join("; ")}`
           : "None";
 
-      // Theory animations status
-      const animationsCount = Array.isArray(topic.theoryAnimations) ? topic.theoryAnimations.length : 0;
-      const animationsStatus = animationsCount >= 2 && animationsCount <= 6 ? `✓ ${animationsCount}` : animationsCount < 2 ? `⚠ ${animationsCount}` : `⚠ ${animationsCount}`;
+        // Print row
+        console.log(
+          `${String(topic.order).padEnd(6)} | ${topic.slug.padEnd(25)} | ${titleMatchStr.padEnd(12)} | ${theoryStatus.padEnd(20)} | ${refsStatus.padEnd(5)} | ${allIssuesStr}`
+        );
 
-      // Print row
-      console.log(
-        `${String(topic.order).padEnd(6)} | ${topic.slug.padEnd(25)} | ${titleMatchStr.padEnd(12)} | ${theoryStatus.padEnd(20)} | ${refsStatus.padEnd(5)} | ${stepsStatus.padEnd(6)} | ${tasksStatus.padEnd(6)} | ${animationsStatus.padEnd(10)} | ${allIssuesStr}`
-      );
+        // Collect global issues/warnings
+        if (topicIssues.length > 0) {
+          issues.push(`Topic ${topic.order} (${topic.slug}): ${topicIssues.join(", ")}`);
+        }
+        if (topicWarnings.length > 0) {
+          warnings.push(`Topic ${topic.order} (${topic.slug}): ${topicWarnings.join(", ")}`);
+        }
+      }
 
-      // Collect global issues/warnings
-      if (topicIssues.length > 0) {
-        issues.push(`Topic ${topic.order} (${topic.slug}): ${topicIssues.join(", ")}`);
-      }
-      if (topicWarnings.length > 0) {
-        warnings.push(`Topic ${topic.order} (${topic.slug}): ${topicWarnings.join(", ")}`);
-      }
+      console.log("─".repeat(140));
+      console.log();
     }
-
-    console.log("─".repeat(140));
-    console.log();
 
     // Summary
     if (issues.length === 0 && warnings.length === 0) {

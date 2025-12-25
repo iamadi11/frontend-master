@@ -157,6 +157,11 @@ self.addEventListener("fetch", (event) => {
 async function handleFetch(request, preloadResponse = null) {
   const url = new URL(request.url);
 
+  // Exclude Payload admin and API routes from caching
+  if (url.pathname.startsWith("/admin") || url.pathname.startsWith("/api/")) {
+    return fetch(request);
+  }
+
   // If we have a preload response, use it for navigation requests
   if (preloadResponse && request.mode === "navigate") {
     try {
