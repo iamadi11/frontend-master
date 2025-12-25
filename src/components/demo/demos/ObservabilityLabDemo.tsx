@@ -37,6 +37,9 @@ export function ObservabilityLabDemo({
 }: ObservabilityLabDemoProps) {
   const { reduced } = useMotionPrefs();
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [mode, setMode] = useState<Mode>("PIPELINE");
   const [signal, setSignal] = useState<Signal>("LOG");
   const [volume, setVolume] = useState<Volume>("LOW");
@@ -585,6 +588,8 @@ export function ObservabilityLabDemo({
           focusTarget={focusTarget}
           onPacketComplete={handlePacketComplete}
           onSamplingComplete={handleSamplingComplete}
+          cameraPreset={cameraPreset}
+          onCameraPresetChange={setCameraPreset}
         />
       </ThreeCanvasShell>
     ) : (

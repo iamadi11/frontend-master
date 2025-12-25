@@ -1,12 +1,29 @@
 "use client";
 
-import { useMemo } from "react";
-import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
+import { useMemo, useEffect } from "react";
+import { PerspectiveCamera, Html } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import { useReducedMotion3D } from "./useReducedMotion3D";
 import { TelemetryPipeline3D } from "./TelemetryPipeline3D";
 import { SamplingRain3D } from "./SamplingRain3D";
 import { ErrorBoundaryContainment3D } from "./ErrorBoundaryContainment3D";
 import type { ObservabilityLabConfig } from "../demo/demoSchema";
+
+export type CameraPreset = "overview" | "closeup" | "side";
+
+// Camera preset positions for observability control room view
+const CAMERA_PRESETS: Record<
+  CameraPreset,
+  { position: [number, number, number]; lookAt: [number, number, number] }
+> = {
+  overview: { position: [0, 3, 10], lookAt: [0, 0, 0] },
+  closeup: { position: [0, 2, 6], lookAt: [0, 0, 0] },
+  side: { position: [8, 3, 6], lookAt: [0, 0, 0] },
+};
+
+function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * t;
+}
 
 type Mode = "PIPELINE" | "SAMPLING_PRIVACY" | "ERROR_BOUNDARY";
 type Signal = "LOG" | "METRIC" | "TRACE";
@@ -27,6 +44,8 @@ interface ObservabilityControlRoomSceneProps {
   focusTarget?: string | null;
   onPacketComplete?: (packetId: string) => void;
   onSamplingComplete?: () => void;
+  cameraPreset?: CameraPreset;
+  onCameraPresetChange?: (preset: CameraPreset) => void;
 }
 
 /**
@@ -48,8 +67,11 @@ export function ObservabilityControlRoomScene({
   focusTarget,
   onPacketComplete,
   onSamplingComplete,
+  cameraPreset = "overview",
+  onCameraPresetChange,
 }: ObservabilityControlRoomSceneProps) {
   const reducedMotion = useReducedMotion3D();
+  const { camera } = useThree();
 
   // Compute pipeline steps from config
   const pipelineSteps = useMemo(() => {
@@ -99,6 +121,40 @@ export function ObservabilityControlRoomScene({
     });
   }, [config, hasError, boundaryStrategy]);
 
+  // Camera preset positioning (locked camera, no free movement)
+  useEffect(() => {
+    const preset = CAMERA_PRESETS[cameraPreset];
+    if (preset) {
+      if (reducedMotion) {
+        // Instant positioning in reduced motion
+        camera.position.set(...preset.position);
+        camera.lookAt(...preset.lookAt);
+      } else {
+        // Smooth transition to preset position
+        const startX = camera.position.x;
+        const startY = camera.position.y;
+        const startZ = camera.position.z;
+        const [targetX, targetY, targetZ] = preset.position;
+
+        let progress = 0;
+        const animate = () => {
+          progress += 0.05;
+          if (progress < 1) {
+            camera.position.x = lerp(startX, targetX, progress);
+            camera.position.y = lerp(startY, targetY, progress);
+            camera.position.z = lerp(startZ, targetZ, progress);
+            camera.lookAt(...preset.lookAt);
+            requestAnimationFrame(animate);
+          } else {
+            camera.position.set(...preset.position);
+            camera.lookAt(...preset.lookAt);
+          }
+        };
+        animate();
+      }
+    }
+  }, [cameraPreset, reducedMotion, camera]);
+
   // Determine which sub-scene to show based on mode
   const isPipelineFocused =
     focusTarget === "pipeline" || focusTarget === null || focusTarget === "";
@@ -112,16 +168,6 @@ export function ObservabilityControlRoomScene({
       <ambientLight intensity={0.6} />
       <directionalLight position={[5, 5, 5]} intensity={0.8} />
       <directionalLight position={[-5, 3, -5]} intensity={0.4} />
-
-      {!reducedMotion && (
-        <OrbitControls
-          enablePan={false}
-          minDistance={6}
-          maxDistance={12}
-          minPolarAngle={Math.PI / 6}
-          maxPolarAngle={Math.PI / 2.2}
-        />
-      )}
 
       {mode === "PIPELINE" && (
         <TelemetryPipeline3D
