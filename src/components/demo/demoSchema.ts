@@ -60,10 +60,55 @@ export const renderingStrategyLabConfigSchema = z.object({
   ),
 });
 
+// Resource 3: State at Scale Lab
+export const stateAtScaleLabConfigSchema = z.object({
+  demoType: z.literal("stateAtScaleLab"),
+  defaults: z.object({
+    network: z.enum(["ONLINE", "FLAKY", "OFFLINE"]),
+    serverLatencyMs: z.number().min(200).max(2000),
+    failureRate: z.number().min(0).max(1),
+    cacheMode: z.enum(["FRESH_ONLY", "STALE_WHILE_REVALIDATE"]),
+    optimistic: z.boolean(),
+    conflictMode: z.enum(["NONE", "LAST_WRITE_WINS", "MANUAL_MERGE"]),
+  }),
+  entity: z.object({
+    id: z.string(),
+    value: z.string(),
+    version: z.number(),
+  }),
+  serverState: z.object({
+    value: z.string(),
+    version: z.number(),
+  }),
+  timelinePhases: z.array(z.string()),
+  rules: z.array(
+    z.object({
+      network: z.enum(["ONLINE", "FLAKY", "OFFLINE"]).optional(),
+      optimistic: z.boolean().optional(),
+      cacheMode: z.enum(["FRESH_ONLY", "STALE_WHILE_REVALIDATE"]).optional(),
+      conflictMode: z
+        .enum(["NONE", "LAST_WRITE_WINS", "MANUAL_MERGE"])
+        .optional(),
+      phaseDurations: z.record(z.string(), z.number()),
+      notes: z.array(z.string()),
+      cacheEvents: z.array(z.string()),
+      stateSnapshots: z.array(
+        z.object({
+          label: z.string(),
+          clientValue: z.string(),
+          serverValue: z.string(),
+          status: z.string(),
+        })
+      ),
+    })
+  ),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
   renderingStrategyLabConfigSchema,
+  stateAtScaleLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -73,5 +118,6 @@ export type RequirementsToArchitectureConfig = z.infer<
 export type RenderingStrategyLabConfig = z.infer<
   typeof renderingStrategyLabConfigSchema
 >;
+export type StateAtScaleLabConfig = z.infer<typeof stateAtScaleLabConfigSchema>;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;

@@ -946,6 +946,420 @@ async function seed() {
       console.log("✓ Resource 2 topic already exists");
     }
 
+    // Check if Resource 3 topic exists
+    const existingTopic3 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "state-management-at-scale",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic3.docs.length === 0) {
+      const stateAtScaleDemoConfig = {
+        demoType: "stateAtScaleLab",
+        defaults: {
+          network: "ONLINE",
+          serverLatencyMs: 500,
+          failureRate: 0,
+          cacheMode: "FRESH_ONLY",
+          optimistic: true,
+          conflictMode: "NONE",
+        },
+        entity: {
+          id: "entity-1",
+          value: "Initial value",
+          version: 1,
+        },
+        serverState: {
+          value: "Initial value",
+          version: 1,
+        },
+        timelinePhases: [
+          "ACTION",
+          "OPTIMISTIC_APPLY",
+          "QUEUE",
+          "REQUEST",
+          "SERVER_APPLY",
+          "RESPONSE",
+          "CACHE_UPDATE",
+          "ROLLBACK_OR_CONFIRM",
+          "RENDER",
+        ],
+        rules: [
+          {
+            network: "ONLINE",
+            optimistic: true,
+            cacheMode: "FRESH_ONLY",
+            phaseDurations: {
+              ACTION: 100,
+              OPTIMISTIC_APPLY: 200,
+              REQUEST: 100,
+              SERVER_APPLY: 250,
+              RESPONSE: 250,
+              CACHE_UPDATE: 200,
+              ROLLBACK_OR_CONFIRM: 100,
+              RENDER: 100,
+            },
+            notes: [
+              "Optimistic ON: UI updated immediately before server confirmation.",
+              "Cache updated after server confirms mutation.",
+            ],
+            cacheEvents: [
+              "Cache: FRESH",
+              "Optimistic update applied",
+              "Server confirmed → cache updated",
+            ],
+            stateSnapshots: [
+              {
+                label: "Before",
+                clientValue: "Initial value",
+                serverValue: "Initial value",
+                status: "synced",
+              },
+              {
+                label: "After optimistic",
+                clientValue: "New value",
+                serverValue: "Initial value",
+                status: "optimistic",
+              },
+              {
+                label: "After confirm",
+                clientValue: "New value",
+                serverValue: "New value",
+                status: "synced",
+              },
+            ],
+          },
+          {
+            network: "ONLINE",
+            optimistic: false,
+            cacheMode: "FRESH_ONLY",
+            phaseDurations: {
+              ACTION: 100,
+              REQUEST: 100,
+              SERVER_APPLY: 250,
+              RESPONSE: 250,
+              CACHE_UPDATE: 200,
+              ROLLBACK_OR_CONFIRM: 100,
+              RENDER: 100,
+            },
+            notes: [
+              "Optimistic OFF: UI waits for server confirmation before updating.",
+              "User sees loading state until server responds.",
+            ],
+            cacheEvents: [
+              "Cache: FRESH",
+              "Waiting for server response",
+              "Server confirmed → cache updated",
+            ],
+            stateSnapshots: [
+              {
+                label: "Before",
+                clientValue: "Initial value",
+                serverValue: "Initial value",
+                status: "synced",
+              },
+              {
+                label: "Loading",
+                clientValue: "Initial value",
+                serverValue: "Initial value",
+                status: "pending",
+              },
+              {
+                label: "After confirm",
+                clientValue: "New value",
+                serverValue: "New value",
+                status: "synced",
+              },
+            ],
+          },
+          {
+            network: "OFFLINE",
+            optimistic: true,
+            phaseDurations: {
+              ACTION: 100,
+              OPTIMISTIC_APPLY: 200,
+              QUEUE: 300,
+            },
+            notes: [
+              "Offline: mutation queued; will replay when online.",
+              "UI updated optimistically; queue holds mutation for later.",
+            ],
+            cacheEvents: [
+              "Cache: STALE",
+              "Network offline",
+              "Mutation queued for replay",
+            ],
+            stateSnapshots: [
+              {
+                label: "Before",
+                clientValue: "Initial value",
+                serverValue: "Initial value",
+                status: "synced",
+              },
+              {
+                label: "After optimistic",
+                clientValue: "New value",
+                serverValue: "Initial value",
+                status: "queued",
+              },
+            ],
+          },
+          {
+            network: "ONLINE",
+            optimistic: true,
+            cacheMode: "STALE_WHILE_REVALIDATE",
+            phaseDurations: {
+              ACTION: 100,
+              OPTIMISTIC_APPLY: 200,
+              REQUEST: 100,
+              SERVER_APPLY: 250,
+              RESPONSE: 250,
+              CACHE_UPDATE: 200,
+              ROLLBACK_OR_CONFIRM: 100,
+              RENDER: 100,
+            },
+            notes: [
+              "SWR: served stale cache then revalidated in background.",
+              "User sees content immediately; cache updates in background.",
+            ],
+            cacheEvents: [
+              "Cache: STALE (served)",
+              "Background revalidation started",
+              "Cache updated in background",
+            ],
+            stateSnapshots: [
+              {
+                label: "Stale served",
+                clientValue: "Cached value",
+                serverValue: "Server value",
+                status: "stale",
+              },
+              {
+                label: "After revalidate",
+                clientValue: "Server value",
+                serverValue: "Server value",
+                status: "fresh",
+              },
+            ],
+          },
+        ],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "State Management at Scale: Server State vs Client State, Async Orchestration, Optimistic Updates, and Offline",
+          slug: "state-management-at-scale",
+          order: 3,
+          difficulty: "intermediate",
+          summary: "Learn how to manage state at scale: distinguish between server and client state, implement optimistic updates, handle offline scenarios, and resolve conflicts. Understand async orchestration patterns for robust state management.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [{ text: "State Management at Scale" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Managing state effectively at scale requires understanding the distinction between server state and client state, implementing robust async patterns, and handling edge cases like offline scenarios and conflicts.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Server State vs Client State" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Server state comes from backend APIs and represents the source of truth. Client state is ephemeral UI state that exists only in the browser. Understanding this distinction is crucial for building reliable applications.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Optimistic Updates" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Optimistic updates improve perceived performance by updating the UI immediately, before the server confirms the mutation. If the server rejects the change, the UI must rollback to the previous state.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Offline Support and Queue Management" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "When the network is unavailable, mutations must be queued and replayed when connectivity is restored. This requires careful conflict resolution strategies to handle cases where multiple clients modify the same data.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Cache Strategies" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Effective caching balances freshness with performance. Strategies like stale-while-revalidate serve cached content immediately while updating in the background, improving perceived performance.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "React Query: Server State Management",
+              url: "https://tanstack.com/query/latest",
+              note: "TanStack Query patterns for server state (placeholder - verify content)",
+              claimIds: "server-state",
+            },
+            {
+              label: "SWR: Stale-While-Revalidate",
+              url: "https://swr.vercel.app/",
+              note: "SWR caching strategy documentation (placeholder - verify content)",
+              claimIds: "swr",
+            },
+            {
+              label: "MDN: Service Workers",
+              url: "https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API",
+              note: "Service Workers for offline support (placeholder - verify content)",
+              claimIds: "offline",
+            },
+          ],
+          practiceDemo: stateAtScaleDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore Server State vs Client State",
+              body: "Notice the Cache & Server State panel showing both cached value and server value. The cache represents what the client knows, while server value is the source of truth. Try clicking Refetch to sync them.",
+              focusTarget: "cache.panel",
+            },
+            {
+              title: "Understand Optimistic Updates",
+              body: "With Optimistic Updates enabled, click 'Edit Value', enter a new value, and click 'Save Mutation'. Watch the timeline - the UI updates immediately (OPTIMISTIC_APPLY) before the server confirms.",
+              focusTarget: "timeline",
+            },
+            {
+              title: "Observe Cache Behavior",
+              body: "After a successful mutation, watch the cache panel update. The cache status changes from stale to fresh, and the cached value matches the server value. Check the cache events below to see the flow.",
+              focusTarget: "cache.panel",
+            },
+            {
+              title: "Test Failure and Rollback",
+              body: "Increase the Failure Rate slider to ~30%, then try saving a mutation. When the server rejects it, you'll see a rollback - the optimistic update is reverted, and the UI returns to the previous state.",
+              focusTarget: "timeline",
+            },
+            {
+              title: "Experience Offline Queue",
+              body: "Set Network to OFFLINE, then try saving a mutation. Notice it gets added to the Offline Queue with status 'queued'. The UI updates optimistically, but the mutation waits in the queue.",
+              focusTarget: "queue.panel",
+            },
+            {
+              title: "Watch Queue Replay",
+              body: "While offline, add a mutation to the queue. Then set Network back to ONLINE. Watch the queue item change from 'queued' → 'replaying' → 'acked' (or 'failed' if it fails). The mutation replays automatically.",
+              focusTarget: "queue.panel",
+            },
+            {
+              title: "Compare Cache Modes",
+              body: "Switch Cache Mode between 'Fresh Only' and 'Stale-While-Revalidate'. In SWR mode, you'll see the cache serve stale data immediately while revalidating in the background. Check the event log for details.",
+              focusTarget: "cache.panel",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see a chronological record of all state changes, cache updates, and queue operations. This helps you understand the complete flow of state management operations.",
+              focusTarget: null,
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt: "Given offline + optimistic ON, what should user see after clicking Save?",
+              expectedAnswer: "The user should see the UI update immediately with the new value (optimistic update), and the mutation should be added to the offline queue with status 'queued'. When the network comes back online, the mutation will automatically replay and update the server.",
+              explanation: "Optimistic updates provide immediate feedback even when offline. The mutation is queued for later replay, ensuring it eventually reaches the server when connectivity is restored.",
+            },
+            {
+              prompt: "If server rejects mutation, what happens to UI and cache?",
+              expectedAnswer: "If optimistic updates are enabled, the UI rolls back to the previous cached value. The cache remains unchanged (still has the old value). If optimistic updates are disabled, the UI never changed in the first place, so there's nothing to rollback.",
+              explanation: "Rollback is necessary when optimistic updates are enabled because the UI was updated before server confirmation. The cache must remain consistent with the server's actual state.",
+            },
+            {
+              prompt: "When is SWR beneficial and what's the trade-off?",
+              expectedAnswer: "SWR (Stale-While-Revalidate) is beneficial when you want to show content immediately (from cache) while fetching fresh data in the background. The trade-off is that users might briefly see stale data, but they get faster perceived performance and the cache updates automatically.",
+              explanation: "SWR prioritizes perceived performance by serving cached content immediately. Users see data faster, but there's a brief period where the data might be slightly outdated. For most use cases, this trade-off is acceptable and improves user experience.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 3 topic (state-management-at-scale)");
+    } else {
+      console.log("✓ Resource 3 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);
