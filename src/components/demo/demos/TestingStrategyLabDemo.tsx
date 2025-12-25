@@ -10,6 +10,9 @@ import {
   testingStrategyLabConfigSchema,
   type TestingStrategyLabConfig,
 } from "../demoSchema";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import { TestingLabScene } from "../../three/TestingLabScene";
+import { Fallback2D } from "../../three/Fallback2D";
 
 interface TestingStrategyLabDemoProps {
   demoConfig: unknown;
@@ -34,6 +37,7 @@ export function TestingStrategyLabDemo({
 }: TestingStrategyLabDemoProps) {
   const { reduced } = useMotionPrefs();
   const [activeMode, setActiveMode] = useState<Mode>("PYRAMID");
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
 
   // Pyramid mode state
@@ -225,28 +229,45 @@ export function TestingStrategyLabDemo({
     <div className="space-y-4">
       <SpotlightTarget id="controls.mode">
         <div className="border-b border-gray-200 dark:border-gray-700">
-          <div className="flex gap-2 flex-wrap">
-            {(["PYRAMID", "CONTRACT", "VISUAL"] as const).map((mode) => (
+          <div className="flex gap-2 flex-wrap items-center justify-between">
+            <div className="flex gap-2 flex-wrap">
+              {(["PYRAMID", "CONTRACT", "VISUAL"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => {
+                    setActiveMode(mode);
+                    setContractChecked(false);
+                    setContractResult(null);
+                  }}
+                  className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
+                    activeMode === mode
+                      ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                      : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  }`}
+                >
+                  {mode === "PYRAMID"
+                    ? "Pyramid"
+                    : mode === "CONTRACT"
+                      ? "Contract"
+                      : "Visual Regression"}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                View:
+              </span>
               <button
-                key={mode}
-                onClick={() => {
-                  setActiveMode(mode);
-                  setContractChecked(false);
-                  setContractResult(null);
-                }}
-                className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
-                  activeMode === mode
-                    ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                onClick={() => setViewMode(viewMode === "2D" ? "3D" : "2D")}
+                className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                  viewMode === "3D"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                 }`}
               >
-                {mode === "PYRAMID"
-                  ? "Pyramid"
-                  : mode === "CONTRACT"
-                    ? "Contract"
-                    : "Visual Regression"}
+                {viewMode === "2D" ? "2D" : "3D"}
               </button>
-            ))}
+            </div>
           </div>
         </div>
       </SpotlightTarget>
@@ -482,7 +503,7 @@ export function TestingStrategyLabDemo({
     </div>
   );
 
-  const visualization = (
+  const visualization2D = (
     <div className="space-y-6">
       {/* Pyramid Mode Visualization */}
       {activeMode === "PYRAMID" && pyramidRule && (
@@ -791,11 +812,46 @@ export function TestingStrategyLabDemo({
     </div>
   );
 
+  // 3D Visualization
+  const visualization3D = (
+    <div className="h-[500px] w-full">
+      <ThreeCanvasShell
+        fallback={
+          <Fallback2D message="3D mode unavailable, showing 2D view">
+            {visualization2D}
+          </Fallback2D>
+        }
+      >
+        <TestingLabScene
+          mode={activeMode}
+          focusTarget={focusTarget}
+          recommendedMix={
+            activeMode === "PYRAMID" && pyramidRule
+              ? pyramidRule.recommendedMix
+              : undefined
+          }
+          pyramidNotes={
+            activeMode === "PYRAMID" && pyramidRule
+              ? pyramidRule.pyramidNotes
+              : undefined
+          }
+          contractResult={
+            activeMode === "CONTRACT" ? contractResult : undefined
+          }
+          apiChange={activeMode === "CONTRACT" ? apiChange : undefined}
+          visualDiff={activeMode === "VISUAL" ? visualDiff : undefined}
+          baseline={activeMode === "VISUAL" ? baseline : undefined}
+          current={activeMode === "VISUAL" ? current : undefined}
+        />
+      </ThreeCanvasShell>
+    </div>
+  );
+
   return (
     <Spotlight targetId={focusTarget || null}>
       <DemoShell
         controls={controls}
-        visualization={visualization}
+        visualization={viewMode === "3D" ? visualization3D : visualization2D}
         eventLog={<EventLog entries={eventLog} />}
       />
     </Spotlight>
