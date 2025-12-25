@@ -1,0 +1,28 @@
+---
+description: "Use local PDF/text extract as truth source without pasting large chunks; extract only what's needed per slice."
+alwaysApply: false
+globs:
+  - "scripts/**"
+  - "src/app/**/topics/**"
+  - "src/modules/**"
+  - "docs/**"
+---
+
+# PDF Reference Policy (Accuracy without Context Bloat)
+
+## Source of truth
+If present, treat these as authoritative:
+- docs/_source/frontend-system-design-curriculum.pdf
+- docs/_source/curriculum.txt
+
+## How to use
+- Consult PDF/extract to verify definitions, trade-offs, case studies, practice demo requirements.
+- Summarize into CMS fields in your own words.
+
+## Hard limits
+- Do NOT paste long PDF text into code, prompts, or repo files.
+- Do NOT generate entire curriculum in one go.
+- Extract the minimum needed for the current topic slice only.
+
+## If unclear
+Mark "Needs verification" in CMS and add placeholder reference.

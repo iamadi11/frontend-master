@@ -1,11 +1,16 @@
 ---
 description: "CMS rule: all learning content from Payload; thin routes; server-only data layer; empty states; env safety."
 alwaysApply: false
+globs:
+  - "payload.config.*"
+  - "src/lib/**"
+  - "src/app/**/admin/**"
+  - "scripts/**"
 ---
 
-# CMS-driven Content
+# CMS-driven Content Rule
 
 - All Theory + Practice + References live in Payload CMS (MongoDB).
-- Next routes must be thin: fetch via server-only lib layer and render via shared components.
+- Next routes must be thin: fetch via server-only lib/data layer, then render.
 - Handle empty CMS state gracefully (no crashes).
 - Never leak secrets to client; NEXT_PUBLIC_ only for safe values (e.g., site URL).

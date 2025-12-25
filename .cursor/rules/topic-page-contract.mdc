@@ -1,29 +1,32 @@
 ---
 description: "Topic pages: enforce Theory + Practice structure and required sections."
 alwaysApply: false
+globs:
+  - "src/app/**/topics/**"
+  - "src/app/**/resources/**"
 ---
 
 # Topic Page Contract
 
-Every topic page MUST render two sections/tabs:
+Every topic page MUST render exactly two primary sections/tabs:
 A) THEORY (detailed)
 B) PRACTICE (interactive)
 
-THEORY must include:
+## THEORY required headings
 - What you will learn
 - Prerequisites
-- Mental model
+- Mental model (simple -> deep)
 - Core concepts
 - Design process (step-by-step)
-- Trade-offs table
+- Trade-offs (table)
 - Common mistakes
 - Mini case study
 - Interview Q&A
 - References (stored in CMS; rendered on-page)
 
-PRACTICE must include:
+## PRACTICE required structure
 - Interactive demo + controls
 - Visualization (observable difference)
-- Timeline/event log
+- Timeline/event log ("what happened" + order)
 - Guided steps mode
-- Hands-on task + solution reveal
+- Hands-on task + solution reveal + explanation

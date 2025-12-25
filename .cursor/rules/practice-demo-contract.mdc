@@ -1,21 +1,29 @@
 ---
-description: "Practice demos: CMS-driven demo config + Zod validation + teaching animations."
+description: "Practice demos: CMS-driven config + Zod validation + teaching animations."
 alwaysApply: false
+globs:
+  - "src/modules/**"
+  - "src/components/demo/**"
+  - "src/app/**/topics/**"
 ---
 
 # Practice Demo Contract
 
-- Practice demo behavior must be CMS-driven (demoConfig JSON + steps + tasks + references).
-- Validate demoConfig with Zod at runtime.
-- If invalid/missing: show friendly fallback (no crash).
+## CMS-driven only
+- Practice demo behavior must come from CMS fields (demoConfig JSON + steps + tasks + references).
+- No hardcoded topic logic inside route files.
 
-Minimum demo UX:
+## Minimum demo UX
 - Controls (tabs/toggles/sliders)
 - Visualization panel
 - Timeline/event log
 - Guided steps (Step 1..N)
 - Task + solution reveal + explanation
 
-Teaching motion:
+## Validation + fallback
+- Validate demoConfig with Zod at runtime.
+- If invalid/missing: show friendly fallback ("Demo unavailable") and do not crash.
+
+## Teaching motion
 - Use heavy motion to visualize transitions/timelines/diffs.
 - Provide reduced-motion static alternative.

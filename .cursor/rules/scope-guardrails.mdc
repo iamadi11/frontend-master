@@ -1,21 +1,21 @@
 ---
-description: "Always apply: forbid scope creep."
+description: "Always apply: prevent scope creep."
 alwaysApply: true
 ---
 
-# Scope Guardrails
+# Scope Guardrails (Hard boundaries)
 
-Do NOT add unless explicitly requested:
+## Do NOT add unless explicitly requested
 - Learner accounts/login, comments, likes/ratings
 - Payments/subscriptions
 - Gamification (points/badges/leaderboards/streaks)
-- Notifications/community features
+- Notifications/community/community feeds
 - Complex search/recommendations/personalization
-- Over-architecture
+- Over-architecture/microservices
 
-Only build what supports learning:
+## Only build what supports learning
 - Topic pages (Theory + Practice)
 - CMS schema + rendering + interactive demos
-- Minimal navigation for learning flow
-- PWA/offline plumbing + performance basics
-- Vercel + MongoDB deployment hygiene
+- Minimal navigation needed for learning flow
+- PWA/offline basics + performance fundamentals
+- Deployment hygiene for Vercel + MongoDB

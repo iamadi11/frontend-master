@@ -1,11 +1,16 @@
 ---
 description: "Correctness: no hallucinations; claim-to-reference mapping; on-site completeness."
 alwaysApply: false
+globs:
+  - "src/app/**/topics/**"
+  - "src/modules/**"
+  - "scripts/**"
+  - "docs/**"
 ---
 
 # Content Correctness Policy
 
 - Do not invent browser behaviors, standards, metrics, or tool capabilities.
-- If uncertain: label "Needs verification" and store a placeholder reference in CMS.
+- If uncertain: label "Needs verification" and store placeholder reference in CMS.
 - Non-trivial claims must have references stored in CMS and rendered on the topic page.
 - Users should be able to learn without leaving the site (references are supplementary).

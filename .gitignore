@@ -38,3 +38,7 @@ next-env.d.ts
 
 # payload
 .media
+
+#dev-only
+.pdf
+docs/_source/frontend_system_design_curriculum.pdf

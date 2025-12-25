@@ -1,13 +1,13 @@
 ---
-description: "Always apply: mission, two-section topic contract, CMS-driven learning, correctness-first, Vercel-friendly, resumable slices."
+description: "Always apply: mission, topic flow, CMS-driven content, correctness-first, resumable slices, Vercel-safe."
 alwaysApply: true
 ---
 
-# Global Rules
+# Global Rules (Non-negotiable)
 
 ## Mission
 Build a backend-driven Frontend System Design learning website.
-Each topic page MUST have exactly:
+Every topic page MUST have exactly two primary sections:
 1) THEORY (very detailed, structured, reference-backed)
 2) PRACTICE (interactive learn-by-doing demos + hands-on tasks + solutions)
 
@@ -15,12 +15,16 @@ Users should not need other sites to learn. References are for credibility, not 
 
 ## Non-negotiables
 - Next.js App Router + TypeScript + Tailwind. Vercel-friendly.
-- Payload CMS + MongoDB. Learning content must be CMS-driven (no hardcoded lessons in route files).
-- Correctness-first: do not invent facts. If unsure, label "Needs verification" and store placeholder reference in CMS.
-- Server-first: keep client JS minimal; Server Components by default.
+- Payload CMS + MongoDB. Topic content must be CMS-driven (no hardcoded lessons in route files).
+- Correctness-first: do not invent facts. If unsure: label "Needs verification" + store placeholder reference in CMS.
+- Prefer Server Components; keep client JS minimal.
 - Secrets only via env vars; never expose secrets via NEXT_PUBLIC_.
+- If `docs/_source/curriculum.txt` or the PDF exists, use it to verify topic content (do not paste large chunks).
 
-## Resumable protocol (prevents context overflow)
-Implement in SMALL slices only.
-Each slice must end with: files changed + DoD checklist + next step.
-Do NOT paste large curriculum text into code; store content in CMS (seed minimal placeholders only).
+## Resumable slice protocol (prevents context overflow)
+Implement in SMALL slices only (one feature chunk).
+Each slice must end with:
+- files changed
+- Definition of Done checklist
+- next step
+Do NOT dump large curriculum text into repo; keep full content in CMS (seed minimal placeholders only).
