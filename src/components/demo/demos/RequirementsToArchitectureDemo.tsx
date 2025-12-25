@@ -46,7 +46,10 @@ export function RequirementsToArchitectureDemo({
   const { reduced } = useMotionPrefs();
   const [constraints, setConstraints] = useState<Record<string, string>>({});
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
-  const [viewMode, setViewMode] = useState<"2d" | "3d">("2d");
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [showPreviousState, setShowPreviousState] = useState(false);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [changedNodeIds, setChangedNodeIds] = useState<string[]>([]);
@@ -344,15 +347,17 @@ export function RequirementsToArchitectureDemo({
           focusedNodeIds={focusedNodeIds}
           showPreviousState={showPreviousState}
           onNodeClick={handleNodeClick}
+          cameraPreset={cameraPreset}
+          onCameraPresetChange={setCameraPreset}
         />
       </ThreeCanvasShell>
 
-      {/* View mode toggle */}
+      {/* 2D/3D toggle */}
       <div className="absolute top-2 right-2 flex gap-2 z-10">
         <button
-          onClick={() => setViewMode("2d")}
+          onClick={() => setViewMode("2D")}
           className={`px-3 py-1 text-xs rounded border ${
-            viewMode === "2d"
+            viewMode === "2D"
               ? "bg-blue-600 text-white border-blue-600"
               : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700"
           }`}
@@ -360,9 +365,9 @@ export function RequirementsToArchitectureDemo({
           2D
         </button>
         <button
-          onClick={() => setViewMode("3d")}
+          onClick={() => setViewMode("3D")}
           className={`px-3 py-1 text-xs rounded border ${
-            viewMode === "3d"
+            viewMode === "3D"
               ? "bg-blue-600 text-white border-blue-600"
               : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700"
           }`}
@@ -372,7 +377,7 @@ export function RequirementsToArchitectureDemo({
       </div>
 
       {/* Show previous state toggle (3D only) */}
-      {viewMode === "3d" && (
+      {viewMode === "3D" && (
         <div className="absolute top-2 left-2 z-10">
           <label className="flex items-center gap-2 px-3 py-1 text-xs bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-700 cursor-pointer">
             <input
@@ -450,7 +455,7 @@ export function RequirementsToArchitectureDemo({
     </div>
   );
 
-  const visualization = viewMode === "3d" ? visualization3D : visualization2D;
+  const visualization = viewMode === "3D" ? visualization3D : visualization2D;
 
   return (
     <DemoShell

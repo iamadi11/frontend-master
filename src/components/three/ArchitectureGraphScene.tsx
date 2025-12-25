@@ -13,6 +13,8 @@ import type {
   PulseState,
 } from "./types";
 
+export type CameraPreset = "overview" | "closeup" | "side";
+
 interface ArchitectureGraphSceneProps {
   nodes: GraphNode[];
   edges: GraphEdge[];
@@ -20,6 +22,8 @@ interface ArchitectureGraphSceneProps {
   focusedNodeIds: string[];
   showPreviousState?: boolean;
   onNodeClick?: (nodeId: string) => void;
+  cameraPreset?: CameraPreset;
+  onCameraPresetChange?: (preset: CameraPreset) => void;
 }
 
 /**
@@ -70,6 +74,16 @@ function bezierPoint(
   ];
 }
 
+// Camera preset positions
+const CAMERA_PRESETS: Record<
+  CameraPreset,
+  { position: [number, number, number]; lookAt: [number, number, number] }
+> = {
+  overview: { position: [0, 0, 8], lookAt: [0, 0, 0] },
+  closeup: { position: [0, 0, 4], lookAt: [0, 0, 0] },
+  side: { position: [6, 3, 6], lookAt: [0, 0, 0] },
+};
+
 export function ArchitectureGraphScene({
   nodes,
   edges,
@@ -77,6 +91,8 @@ export function ArchitectureGraphScene({
   focusedNodeIds,
   showPreviousState = false,
   onNodeClick,
+  cameraPreset = "overview",
+  onCameraPresetChange,
 }: ArchitectureGraphSceneProps) {
   const reducedMotion = useReducedMotion3D();
   const { camera } = useThree();
@@ -246,36 +262,38 @@ export function ArchitectureGraphScene({
       return updated;
     });
 
-    // Optional camera dolly (only if not reduced motion)
-    if (!reducedMotion && focusedNodeIds.length > 0) {
-      const focusedId = focusedNodeIds[0];
-      const focusedState = nodeStates.get(focusedId);
-      if (focusedState) {
-        // Gentle camera movement toward focused node
-        const targetX = focusedState.position[0] * 0.3;
-        const targetY = focusedState.position[1] * 0.3;
-        const targetZ = 8 + focusedState.position[2] * 0.2;
-
-        // Smooth camera transition
+    // Camera preset positioning (locked camera, no free movement)
+    const preset = CAMERA_PRESETS[cameraPreset];
+    if (preset) {
+      if (reducedMotion) {
+        // Instant positioning in reduced motion
+        camera.position.set(...preset.position);
+        camera.lookAt(...preset.lookAt);
+      } else {
+        // Smooth transition to preset position
         const startX = camera.position.x;
         const startY = camera.position.y;
         const startZ = camera.position.z;
+        const [targetX, targetY, targetZ] = preset.position;
 
         let progress = 0;
         const animate = () => {
-          progress += 0.02;
+          progress += 0.05;
           if (progress < 1) {
             camera.position.x = lerp(startX, targetX, progress);
             camera.position.y = lerp(startY, targetY, progress);
             camera.position.z = lerp(startZ, targetZ, progress);
-            camera.lookAt(0, 0, 0);
+            camera.lookAt(...preset.lookAt);
             requestAnimationFrame(animate);
+          } else {
+            camera.position.set(...preset.position);
+            camera.lookAt(...preset.lookAt);
           }
         };
         animate();
       }
     }
-  }, [focusedNodeIds, reducedMotion, nodes, nodeStates, camera]);
+  }, [cameraPreset, reducedMotion, camera]);
 
   // Animation loop for smooth transitions
   useFrame((state, delta) => {
@@ -534,6 +552,44 @@ export function ArchitectureGraphScene({
       {nodeMeshes}
       {edgeLines}
       {pulseMesh}
+
+      {/* Camera preset controls (rendered as HTML overlay) */}
+      {onCameraPresetChange && (
+        <Html position={[0, -4, 0]} center>
+          <div className="flex gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => onCameraPresetChange("overview")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "overview"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => onCameraPresetChange("closeup")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "closeup"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Close-up
+            </button>
+            <button
+              onClick={() => onCameraPresetChange("side")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "side"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Side
+            </button>
+          </div>
+        </Html>
+      )}
     </>
   );
 }
