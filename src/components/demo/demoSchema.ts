@@ -104,11 +104,68 @@ export const stateAtScaleLabConfigSchema = z.object({
   ),
 });
 
+// Resource 4: Performance Budget Lab
+export const performanceBudgetLabConfigSchema = z.object({
+  demoType: z.literal("performanceBudgetLab"),
+  defaults: z.object({
+    network: z.enum(["FAST_4G", "SLOW_4G"]),
+    device: z.enum(["DESKTOP", "MOBILE"]),
+    jsKb: z.number().min(0).max(800),
+    cssKb: z.number().min(0).max(300),
+    imageMode: z.enum(["UNOPTIMIZED_JPEG", "RESPONSIVE_WEBP", "AVIF"]),
+    imageCount: z.number().min(1).max(12),
+    video: z.enum(["NONE", "MP4", "HLS"]),
+    caching: z.enum(["NONE", "BROWSER", "CDN", "APP"]),
+    loading: z.enum([
+      "DEFAULT",
+      "PRELOAD_KEY_ASSET",
+      "DEFER_NONCRITICAL",
+      "ROUTE_SPLIT",
+    ]),
+    longTaskMs: z.number().min(0).max(2000),
+    clsRisk: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  }),
+  rules: z.array(
+    z.object({
+      network: z.enum(["FAST_4G", "SLOW_4G"]).optional(),
+      device: z.enum(["DESKTOP", "MOBILE"]).optional(),
+      imageMode: z
+        .enum(["UNOPTIMIZED_JPEG", "RESPONSIVE_WEBP", "AVIF"])
+        .optional(),
+      caching: z.enum(["NONE", "BROWSER", "CDN", "APP"]).optional(),
+      loading: z
+        .enum([
+          "DEFAULT",
+          "PRELOAD_KEY_ASSET",
+          "DEFER_NONCRITICAL",
+          "ROUTE_SPLIT",
+        ])
+        .optional(),
+      simulatedMetrics: z.object({
+        LCP_ms: z.number(),
+        INP_ms: z.number(),
+        CLS_score: z.number(),
+      }),
+      breakdown: z.object({
+        html_ms: z.number(),
+        css_ms: z.number(),
+        js_ms: z.number(),
+        images_ms: z.number(),
+        video_ms: z.number(),
+        mainThread_ms: z.number(),
+      }),
+      recommendations: z.array(z.string()),
+      eventLines: z.array(z.string()),
+    })
+  ),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
   renderingStrategyLabConfigSchema,
   stateAtScaleLabConfigSchema,
+  performanceBudgetLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -119,5 +176,8 @@ export type RenderingStrategyLabConfig = z.infer<
   typeof renderingStrategyLabConfigSchema
 >;
 export type StateAtScaleLabConfig = z.infer<typeof stateAtScaleLabConfigSchema>;
+export type PerformanceBudgetLabConfig = z.infer<
+  typeof performanceBudgetLabConfigSchema
+>;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;

@@ -1360,6 +1360,278 @@ async function seed() {
       console.log("✓ Resource 3 topic already exists");
     }
 
+    // Check if Resource 4 topic exists
+    const existingTopic4 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "performance-system-design",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic4.docs.length === 0) {
+      const performanceBudgetLabDemoConfig = {
+        demoType: "performanceBudgetLab",
+        defaults: {
+          network: "FAST_4G",
+          device: "DESKTOP",
+          jsKb: 200,
+          cssKb: 50,
+          imageMode: "UNOPTIMIZED_JPEG",
+          imageCount: 6,
+          video: "NONE",
+          caching: "NONE",
+          loading: "DEFAULT",
+          longTaskMs: 0,
+          clsRisk: "LOW",
+        },
+        rules: [],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Performance System Design",
+          slug: "performance-system-design",
+          order: 4,
+          difficulty: "intermediate",
+          summary:
+            "Learn how to measure and optimize web performance using Core Web Vitals, loading strategies, bundle optimization, caching, image/video optimization, and main-thread performance. Understand the trade-offs in performance budgets.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [{ text: "Performance System Design" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Performance is a critical aspect of frontend system design. This topic covers Core Web Vitals, loading strategies, bundle optimization, caching strategies, image and video optimization, and main-thread performance considerations.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Core Web Vitals" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Core Web Vitals are metrics that measure real-world user experience. LCP (Largest Contentful Paint) measures loading performance, INP (Interaction to Next Paint) measures interactivity, and CLS (Cumulative Layout Shift) measures visual stability.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Loading Strategies" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Loading strategies like preloading key assets, deferring non-critical JavaScript, and route-based code splitting can significantly improve performance by prioritizing critical resources and reducing initial bundle size.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Caching Strategies" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Effective caching at the browser, CDN, and application levels reduces load times for repeat visits. Understanding cache headers and invalidation strategies is essential for optimal performance.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Image and Video Optimization" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Modern image formats (WebP, AVIF) provide better compression than JPEG. Responsive images with proper sizing reduce wasted bandwidth. Video optimization involves format selection and lazy loading strategies.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Main Thread Performance" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Long tasks that block the main thread degrade interactivity. Breaking up heavy JavaScript work, using web workers, and optimizing bundle sizes help maintain responsive user experiences.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "Web.dev: Core Web Vitals",
+              url: "https://web.dev/vitals/",
+              note: "Core Web Vitals documentation (placeholder - verify content)",
+              claimIds: "core-web-vitals",
+            },
+            {
+              label: "Web.dev: Optimize Images",
+              url: "https://web.dev/fast/#optimize-your-images",
+              note: "Image optimization best practices (placeholder - verify content)",
+              claimIds: "image-optimization",
+            },
+            {
+              label: "MDN: Performance",
+              url: "https://developer.mozilla.org/en-US/docs/Web/Performance",
+              note: "Web performance fundamentals (placeholder - verify content)",
+              claimIds: "performance-fundamentals",
+            },
+          ],
+          practiceDemo: performanceBudgetLabDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore LCP Drivers",
+              body: "Adjust the Image Mode and Image Count controls to see how they affect LCP (Largest Contentful Paint). Notice how AVIF and responsive images reduce loading time compared to unoptimized JPEG.",
+              focusTarget: "metrics",
+            },
+            {
+              title: "Understand Image Optimization",
+              body: "Switch between JPEG, WebP, and AVIF formats while keeping image count constant. Observe how modern formats significantly improve LCP by reducing image byte size.",
+              focusTarget: "waterfall",
+            },
+            {
+              title: "Test Caching Impact",
+              body: "Change the Caching setting from None to CDN or Browser. Notice how caching improves repeat-visit performance (though first visit is unchanged). Check the event log for caching events.",
+              focusTarget: "cache.panel",
+            },
+            {
+              title: "Explore Loading Strategies",
+              body: "Try different Loading Strategy options (Preload key asset, Defer noncritical, Route split). Watch how they affect INP (Interaction to Next Paint) by reducing JavaScript blocking time.",
+              focusTarget: "controls.js",
+            },
+            {
+              title: "Observe Main Thread Blocking",
+              body: "Increase the Long Task slider and watch how it affects INP. Long tasks block the main thread and delay user interactions. Notice the visual representation in the Main Thread panel.",
+              focusTarget: "mainthread",
+            },
+            {
+              title: "Understand CLS Risk",
+              body: "Change the CLS Risk setting and observe how it affects the CLS score. High CLS risk typically comes from images without dimensions or dynamic content insertion causing layout shifts.",
+              focusTarget: "metrics",
+            },
+            {
+              title: "Analyze Waterfall Breakdown",
+              body: "Adjust multiple controls (JS size, CSS size, images) and watch the waterfall breakdown update. This shows how different resources contribute to total load time.",
+              focusTarget: "waterfall",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see a chronological record of all performance changes and their impacts. This helps you understand cause-and-effect relationships in performance optimization.",
+              focusTarget: "eventlog",
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "Bring LCP under 2500ms by adjusting only images and caching. What combination of settings achieves this?",
+              expectedAnswer:
+                "Use AVIF format (or WebP), reduce image count if possible, and enable CDN or Browser caching. AVIF provides the best compression, reducing image loading time significantly. Caching helps on repeat visits.",
+              explanation:
+                "LCP is primarily driven by image loading time for image-heavy pages. Modern formats like AVIF can reduce image size by 50-70% compared to JPEG. Caching reduces network requests on subsequent visits.",
+            },
+            {
+              prompt:
+                "Improve INP without changing images. What strategies work best?",
+              expectedAnswer:
+                "Reduce JavaScript bundle size, use Route Split loading strategy, defer non-critical JavaScript, and minimize long tasks. Smaller JS bundles parse and execute faster, improving interactivity.",
+              explanation:
+                "INP measures responsiveness to user interactions. JavaScript parsing, execution, and long tasks block the main thread, delaying responses. Code splitting and deferring non-critical JS reduces blocking time.",
+            },
+            {
+              prompt:
+                "What UI patterns cause CLS and how can you prevent them?",
+              expectedAnswer:
+                "Common CLS causes include: images without width/height attributes, dynamically inserted content, fonts with incorrect fallbacks, and ads/embeds without reserved space. Prevent by: setting image dimensions, using aspect-ratio CSS, reserving space for dynamic content, and using font-display: swap with proper fallbacks.",
+              explanation:
+                "CLS measures visual stability. Layout shifts occur when elements move after initial render, often due to missing dimensions or content loading asynchronously. Setting explicit dimensions and reserving space prevents shifts.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 4 topic (performance-system-design)");
+    } else {
+      console.log("✓ Resource 4 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);

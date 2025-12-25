@@ -5,6 +5,7 @@ import { RichTextRenderer } from "@/components/RichTextRenderer";
 import { RequirementsToArchitectureDemo } from "@/components/demo/demos/RequirementsToArchitectureDemo";
 import { RenderingStrategyLabDemo } from "@/components/demo/demos/RenderingStrategyLabDemo";
 import { StateAtScaleLabDemo } from "@/components/demo/demos/StateAtScaleLabDemo";
+import { PerformanceBudgetLabDemo } from "@/components/demo/demos/PerformanceBudgetLabDemo";
 import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 import { motion } from "framer-motion";
@@ -185,6 +186,17 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
                   return (
                     <Spotlight targetId={currentFocusTarget}>
                       <StateAtScaleLabDemo
+                        demoConfig={topic.practiceDemo}
+                        focusTarget={currentFocusTarget || undefined}
+                      />
+                    </Spotlight>
+                  );
+                }
+
+                if (demoType === "performanceBudgetLab") {
+                  return (
+                    <Spotlight targetId={currentFocusTarget}>
+                      <PerformanceBudgetLabDemo
                         demoConfig={topic.practiceDemo}
                         focusTarget={currentFocusTarget || undefined}
                       />
