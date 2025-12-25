@@ -24,7 +24,7 @@ export default function RootLayout({
       <body className={inter.variable} suppressHydrationWarning>
         <ConsoleErrorSuppressor />
         <SWRegister />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider>
           <MotionPrefsProvider>{children}</MotionPrefsProvider>
         </ThemeProvider>
       </body>
