@@ -6,6 +6,7 @@ import { RequirementsToArchitectureDemo } from "@/components/demo/demos/Requirem
 import { RenderingStrategyLabDemo } from "@/components/demo/demos/RenderingStrategyLabDemo";
 import { StateAtScaleLabDemo } from "@/components/demo/demos/StateAtScaleLabDemo";
 import { PerformanceBudgetLabDemo } from "@/components/demo/demos/PerformanceBudgetLabDemo";
+import { UIArchitectureLabDemo } from "@/components/demo/demos/UIArchitectureLabDemo";
 import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 import { motion } from "framer-motion";
@@ -197,6 +198,17 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
                   return (
                     <Spotlight targetId={currentFocusTarget}>
                       <PerformanceBudgetLabDemo
+                        demoConfig={topic.practiceDemo}
+                        focusTarget={currentFocusTarget || undefined}
+                      />
+                    </Spotlight>
+                  );
+                }
+
+                if (demoType === "uiArchitectureLab") {
+                  return (
+                    <Spotlight targetId={currentFocusTarget}>
+                      <UIArchitectureLabDemo
                         demoConfig={topic.practiceDemo}
                         focusTarget={currentFocusTarget || undefined}
                       />

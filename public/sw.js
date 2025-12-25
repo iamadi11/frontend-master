@@ -2131,14 +2131,6 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
   new eE({
     precacheEntries: [
       {
-        revision: "4493551e9e718ddc90a80bcc6ed03d8e",
-        url: "/_next/static/8uTOICFAEg2MGcrJnyeVG/_buildManifest.js",
-      },
-      {
-        revision: "b6652df95db52feb4daf4eca35380933",
-        url: "/_next/static/8uTOICFAEg2MGcrJnyeVG/_ssgManifest.js",
-      },
-      {
         revision: null,
         url: "/_next/static/chunks/4bd1b696-c023c6e3521b1417.js",
       },
@@ -2184,7 +2176,7 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
       },
       {
         revision: null,
-        url: "/_next/static/chunks/app/(site)/topics/%5Bslug%5D/page-c175592ea50cecb1.js",
+        url: "/_next/static/chunks/app/(site)/topics/%5Bslug%5D/page-0b940a5cb12efad1.js",
       },
       {
         revision: null,
@@ -2239,7 +2231,7 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
         revision: null,
         url: "/_next/static/chunks/webpack-55b3a8aae8bb752e.js",
       },
-      { revision: null, url: "/_next/static/css/5d3669202580747a.css" },
+      { revision: null, url: "/_next/static/css/6b3c5c351ba94b9b.css" },
       {
         revision: "9dda5cfc9a46f256d0e131bb535e46f8",
         url: "/_next/static/media/19cfc7226ec3afaa-s.woff2",
@@ -2267,6 +2259,14 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
       {
         revision: "65850a373e258f1c897a2b3d75eb74de",
         url: "/_next/static/media/e4af272ccee01ff0-s.p.woff2",
+      },
+      {
+        revision: "4493551e9e718ddc90a80bcc6ed03d8e",
+        url: "/_next/static/wrPzs04X_m2fzW20cS864/_buildManifest.js",
+      },
+      {
+        revision: "b6652df95db52feb4daf4eca35380933",
+        url: "/_next/static/wrPzs04X_m2fzW20cS864/_ssgManifest.js",
       },
       { revision: "f829b914fc47cfc9c0747c119c27cf1b", url: "/favicon.ico" },
       {

@@ -1632,6 +1632,528 @@ async function seed() {
       console.log("✓ Resource 4 topic already exists");
     }
 
+    // Check if Resource 5 topic exists
+    const existingTopic5 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "component-ui-architecture",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic5.docs.length === 0) {
+      const uiArchitectureLabDemoConfig = {
+        demoType: "uiArchitectureLab",
+        defaults: {
+          mode: "TOKENS",
+          tokenSetName: "Light",
+          showTokenDiff: false,
+          integrationType: "ROUTE_BASED",
+          sharedUI: false,
+          strictContractChecking: false,
+          sharedDepsSingleton: true,
+          sharedDepsStrictVersion: false,
+          network: "FAST",
+          preloadRemotes: false,
+        },
+        tokens: {
+          tokenSets: [
+            {
+              name: "Light",
+              tokens: {
+                color: {
+                  bg: "#ffffff",
+                  fg: "#1f2937",
+                  accent: "#3b82f6",
+                },
+                radius: {
+                  sm: "4px",
+                  md: "8px",
+                  lg: "12px",
+                },
+                space: {
+                  "1": "4px",
+                  "2": "8px",
+                  "3": "16px",
+                },
+                font: {
+                  size: {
+                    sm: "12px",
+                    md: "16px",
+                    lg: "24px",
+                  },
+                },
+              },
+            },
+            {
+              name: "Dark",
+              tokens: {
+                color: {
+                  bg: "#1f2937",
+                  fg: "#f9fafb",
+                  accent: "#60a5fa",
+                },
+                radius: {
+                  sm: "4px",
+                  md: "8px",
+                  lg: "12px",
+                },
+                space: {
+                  "1": "4px",
+                  "2": "8px",
+                  "3": "16px",
+                },
+                font: {
+                  size: {
+                    sm: "12px",
+                    md: "16px",
+                    lg: "24px",
+                  },
+                },
+              },
+            },
+            {
+              name: "Brand A",
+              tokens: {
+                color: {
+                  bg: "#fef3c7",
+                  fg: "#92400e",
+                  accent: "#f59e0b",
+                },
+                radius: {
+                  sm: "6px",
+                  md: "12px",
+                  lg: "16px",
+                },
+                space: {
+                  "1": "6px",
+                  "2": "12px",
+                  "3": "24px",
+                },
+                font: {
+                  size: {
+                    sm: "14px",
+                    md: "18px",
+                    lg: "28px",
+                  },
+                },
+              },
+            },
+          ],
+          components: ["Button", "Card", "Input", "Badge"],
+          diffRules: [
+            {
+              tokenPath: "color.accent",
+              highlightColor: "#3b82f6",
+            },
+            {
+              tokenPath: "radius.md",
+              highlightColor: "#10b981",
+            },
+          ],
+        },
+        microfrontends: {
+          mfes: [
+            {
+              name: "Checkout MFE",
+              routes: ["/checkout", "/checkout/review", "/checkout/complete"],
+              ownedComponents: ["CheckoutForm", "PaymentForm", "OrderSummary"],
+              apiContracts: ["POST /api/checkout", "GET /api/orders/:id"],
+            },
+            {
+              name: "Product MFE",
+              routes: ["/products", "/products/:id"],
+              ownedComponents: ["ProductList", "ProductDetail", "ProductCard"],
+              apiContracts: ["GET /api/products", "GET /api/products/:id"],
+            },
+            {
+              name: "User MFE",
+              routes: ["/profile", "/settings"],
+              ownedComponents: ["UserProfile", "SettingsForm"],
+              apiContracts: ["GET /api/user", "PUT /api/user"],
+            },
+          ],
+          integration: "ROUTE_BASED",
+          sharedUI: false,
+          riskNotes: [
+            "Route-based integration reduces runtime coupling but requires coordination on routes.",
+            "Shared UI library reduces inconsistency but adds coupling risk.",
+            "Component-based integration increases runtime coupling but enables better composition.",
+          ],
+        },
+        moduleFederation: {
+          remotes: [
+            {
+              name: "checkout",
+              exposes: ["./CheckoutForm", "./PaymentForm"],
+              deps: ["react", "react-dom"],
+            },
+            {
+              name: "products",
+              exposes: ["./ProductList", "./ProductDetail"],
+              deps: ["react", "react-dom", "react-query"],
+            },
+            {
+              name: "user",
+              exposes: ["./UserProfile"],
+              deps: ["react", "react-dom"],
+            },
+          ],
+          sharedDeps: [
+            {
+              pkg: "react",
+              singleton: true,
+              strictVersion: false,
+            },
+            {
+              pkg: "react-dom",
+              singleton: true,
+              strictVersion: false,
+            },
+            {
+              pkg: "react-query",
+              singleton: false,
+              strictVersion: false,
+            },
+          ],
+          rules: [
+            {
+              sharedDepsSingleton: true,
+              sharedDepsStrictVersion: false,
+              network: "FAST",
+              preloadRemotes: false,
+              estimatedBundleKb: {
+                host: 150,
+                remotes: {
+                  checkout: 80,
+                  products: 120,
+                  user: 60,
+                },
+              },
+              duplicationKb: 0,
+              loadOrderEvents: [
+                "Host loads",
+                "Shared deps resolved (singleton)",
+                "Remote 'checkout' loaded",
+                "Remote 'products' loaded",
+                "Remote 'user' loaded",
+              ],
+              pitfalls: [
+                "React singleton ensures single runtime; safe for hooks.",
+              ],
+            },
+            {
+              sharedDepsSingleton: false,
+              sharedDepsStrictVersion: false,
+              network: "FAST",
+              preloadRemotes: false,
+              estimatedBundleKb: {
+                host: 150,
+                remotes: {
+                  checkout: 120,
+                  products: 180,
+                  user: 100,
+                },
+              },
+              duplicationKb: 280,
+              loadOrderEvents: [
+                "Host loads",
+                "React duplicated in host",
+                "React duplicated in 'checkout'",
+                "React duplicated in 'products'",
+                "Risk: Multiple React instances may cause hooks issues",
+              ],
+              pitfalls: [
+                "React not singleton → duplicated runtime; risk of hooks mismatch.",
+              ],
+            },
+            {
+              sharedDepsSingleton: true,
+              sharedDepsStrictVersion: true,
+              network: "FAST",
+              preloadRemotes: false,
+              estimatedBundleKb: {
+                host: 150,
+                remotes: {
+                  checkout: 80,
+                  products: 120,
+                  user: 60,
+                },
+              },
+              duplicationKb: 0,
+              loadOrderEvents: [
+                "Host loads",
+                "Shared deps resolved (singleton, strict version)",
+                "Version check passed",
+                "Remote 'checkout' loaded",
+                "Remote 'products' loaded",
+              ],
+              pitfalls: [
+                "Strict version may block remote if version mismatch.",
+              ],
+            },
+            {
+              sharedDepsSingleton: true,
+              sharedDepsStrictVersion: false,
+              network: "SLOW",
+              preloadRemotes: false,
+              estimatedBundleKb: {
+                host: 150,
+                remotes: {
+                  checkout: 80,
+                  products: 120,
+                  user: 60,
+                },
+              },
+              duplicationKb: 0,
+              loadOrderEvents: [
+                "Host loads",
+                "Slow network detected",
+                "Waiting for shared deps...",
+                "Remote 'checkout' loading (slow)",
+                "Remote 'products' loading (slow)",
+              ],
+              pitfalls: [
+                "Slow network increases load time; consider preloading.",
+              ],
+            },
+            {
+              sharedDepsSingleton: true,
+              sharedDepsStrictVersion: false,
+              network: "FAST",
+              preloadRemotes: true,
+              estimatedBundleKb: {
+                host: 150,
+                remotes: {
+                  checkout: 80,
+                  products: 120,
+                  user: 60,
+                },
+              },
+              duplicationKb: 0,
+              loadOrderEvents: [
+                "Host loads",
+                "Preloading remotes...",
+                "Remote 'checkout' preloaded",
+                "Remote 'products' preloaded",
+                "Remote 'user' preloaded",
+                "Faster initial render, but higher initial bandwidth",
+              ],
+              pitfalls: [
+                "Preloading improves perceived performance but uses more bandwidth upfront.",
+              ],
+            },
+          ],
+        },
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Component & UI Architecture: Design Systems, Theming, Tokens, Micro-frontends, and Module Federation Trade-offs",
+          slug: "component-ui-architecture",
+          order: 5,
+          difficulty: "intermediate",
+          summary:
+            "Learn how to architect component systems using design tokens, implement theming, understand micro-frontend boundaries, and evaluate Module Federation trade-offs. Master design system propagation, MFE integration patterns, and shared dependency management.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [{ text: "Component & UI Architecture" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Building scalable UI systems requires understanding design tokens, theming strategies, micro-frontend architecture, and Module Federation patterns. This topic covers how to structure component libraries, manage design systems, and make integration decisions.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Design Systems & Tokens" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Design tokens are the atomic values that define a design system (colors, spacing, typography, etc.). Tokens enable consistent theming and make it easy to switch between themes or brand variants. When tokens change, components automatically update across the system.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Micro-frontends" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Micro-frontends break large applications into smaller, independently deployable frontend applications. Route-based integration routes traffic to different MFEs, while component-based integration composes components at runtime. Each approach has trade-offs in coupling, deployment independence, and complexity.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Module Federation" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Module Federation enables runtime sharing of code between independently built applications. Key decisions include singleton vs. non-singleton shared dependencies, strict version checking, and preloading strategies. Misconfiguration can lead to duplication, bundle size increases, and runtime conflicts.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "Design Tokens Community Group",
+              url: "https://www.w3.org/community/design-tokens/",
+              note: "Design tokens specification (placeholder - verify content)",
+              claimIds: "design-tokens",
+            },
+            {
+              label: "Module Federation Documentation",
+              url: "https://module-federation.io/",
+              note: "Module Federation patterns and trade-offs (placeholder - verify content)",
+              claimIds: "module-federation",
+            },
+            {
+              label: "Micro-frontends.org",
+              url: "https://micro-frontends.org/",
+              note: "Micro-frontend architecture patterns (placeholder - verify content)",
+              claimIds: "micro-frontends",
+            },
+          ],
+          practiceDemo: uiArchitectureLabDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore Design Tokens",
+              body: "Use the Mode selector to switch to 'Tokens' mode. Select different token sets (Light, Dark, Brand A) from the dropdown and watch how the Design System Preview updates automatically. Notice how all components (Button, Card, Input, Badge) reflect the token changes.",
+              focusTarget: "tokens.preview",
+            },
+            {
+              title: "View Token Changes",
+              body: "Enable 'Show token diff' to see a detailed view of which tokens changed between sets. Notice how changing from Light to Dark updates color tokens, while Brand A also changes radius and spacing. This demonstrates how tokens propagate through the system.",
+              focusTarget: "tokens.diff",
+            },
+            {
+              title: "Understand Micro-frontend Boundaries",
+              body: "Switch to 'Micro-frontends' mode. Click on different routes or components to see which MFE owns them. Notice how each MFE has distinct routes, components, and API contracts. This visualization helps understand ownership and integration seams.",
+              focusTarget: "mfe.map",
+            },
+            {
+              title: "Compare Integration Types",
+              body: "Toggle between Route-based and Component-based integration. Route-based integration assigns whole routes to MFEs, while component-based allows composing components at runtime. Observe how this affects coupling and deployment independence.",
+              focusTarget: "mfe.map",
+            },
+            {
+              title: "Explore Shared UI Trade-offs",
+              body: "Toggle 'Shared UI library' on and off. With shared UI enabled, MFEs share design system components, reducing inconsistency but adding coupling. Consider when shared UI is worth the coupling risk.",
+              focusTarget: "mfe.map",
+            },
+            {
+              title: "Understand Module Federation Architecture",
+              body: "Switch to 'Module Federation' mode. The visualization shows the Host and Remotes. Notice how shared dependencies are configured (singleton, strict version). The duplication meter shows how misconfiguration leads to bundle size increases.",
+              focusTarget: "mf.graph",
+            },
+            {
+              title: "Experiment with Shared Dependency Settings",
+              body: "Toggle 'Shared deps singleton' off and observe how duplication increases. This happens because each remote bundles its own copy of React. Turn it back on to see duplication drop to zero. Singleton ensures a single React runtime, critical for hooks.",
+              focusTarget: "mf.graph",
+            },
+            {
+              title: "Test Strict Version Checking",
+              body: "Enable 'Strict version' and observe the trade-off: strict versioning prevents version mismatches but may block remotes if versions don't align. This is a balance between safety and flexibility.",
+              focusTarget: "mf.graph",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see a chronological record of all changes and their impacts. This helps you understand cause-and-effect relationships in UI architecture decisions.",
+              focusTarget: null,
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "A large organization has multiple independent teams working on different parts of the application (checkout, products, user profile). Each team needs to deploy independently and use a shared design system. Should you use route-based or component-based micro-frontend integration? Justify your choice.",
+              expectedAnswer:
+                "Route-based integration is better for this scenario. Independent teams and independent deployments benefit from route-based boundaries because each team owns entire routes, reducing runtime coupling. The shared design system can still be distributed via a shared UI library, but teams maintain deployment independence. Component-based integration would increase runtime coupling and complicate deployment coordination.",
+              explanation:
+                "Route-based integration provides clear ownership boundaries (each team owns specific routes) and enables true deployment independence. While component-based integration offers better composition, it increases runtime coupling and requires more coordination. For large orgs with independent teams, route-based is the safer choice.",
+            },
+            {
+              prompt:
+                "In a Module Federation setup, you notice that disabling 'shared deps singleton' causes duplication. React is duplicated 280KB across remotes. What are the risks of this duplication, and when might you accept it?",
+              expectedAnswer:
+                "The main risk is multiple React instances causing hooks to fail (React hooks must use the same React instance). This can lead to runtime errors. However, if you're confident all remotes use the same React version and you want complete isolation (e.g., for experimentation), non-singleton might be acceptable. In practice, React should almost always be singleton due to hooks.",
+              explanation:
+                "React hooks require a single React instance. Multiple instances can cause 'Invalid hook call' errors. While duplication increases bundle size, the bigger risk is runtime incompatibility. Only use non-singleton if you have a specific need for isolation and can guarantee version compatibility.",
+            },
+            {
+              prompt:
+                "Your design system needs to support three brand variants (Light, Dark, Brand A) that differ in colors, spacing, and typography. How would you structure design tokens to enable easy switching while maintaining consistency?",
+              expectedAnswer:
+                "Structure tokens hierarchically by category (color, spacing, typography). Each brand variant defines complete token sets. When switching themes, update the root token context/provider, and all components automatically receive new tokens. Use CSS custom properties or a theme provider pattern. Components should reference tokens (e.g., tokens.color.accent) not hardcoded values.",
+              explanation:
+                "Design tokens should be organized by category and referenced by components, not hardcoded. When switching themes, update the token context/provider at the root, and changes propagate automatically. This ensures consistency and makes theme switching trivial.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 5 topic (component-ui-architecture)");
+    } else {
+      console.log("✓ Resource 5 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);

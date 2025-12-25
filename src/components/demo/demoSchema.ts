@@ -160,12 +160,118 @@ export const performanceBudgetLabConfigSchema = z.object({
   ),
 });
 
+// Resource 5: UI Architecture Lab
+export const tokenSetSchema = z.object({
+  name: z.string(),
+  tokens: z.object({
+    color: z.object({
+      bg: z.string(),
+      fg: z.string(),
+      accent: z.string(),
+    }),
+    radius: z.object({
+      sm: z.string(),
+      md: z.string(),
+      lg: z.string(),
+    }),
+    space: z.object({
+      "1": z.string(),
+      "2": z.string(),
+      "3": z.string(),
+    }),
+    font: z.object({
+      size: z.object({
+        sm: z.string(),
+        md: z.string(),
+        lg: z.string(),
+      }),
+    }),
+  }),
+});
+
+export const uiArchitectureLabConfigSchema = z.object({
+  demoType: z.literal("uiArchitectureLab"),
+  defaults: z.object({
+    mode: z.enum(["TOKENS", "MICROFRONTENDS", "MODULE_FEDERATION"]),
+    tokenSetName: z.string().optional(),
+    showTokenDiff: z.boolean().optional(),
+    integrationType: z.enum(["ROUTE_BASED", "COMPONENT_BASED"]).optional(),
+    sharedUI: z.boolean().optional(),
+    strictContractChecking: z.boolean().optional(),
+    sharedDepsSingleton: z.boolean().optional(),
+    sharedDepsStrictVersion: z.boolean().optional(),
+    network: z.enum(["FAST", "SLOW"]).optional(),
+    preloadRemotes: z.boolean().optional(),
+  }),
+  tokens: z
+    .object({
+      tokenSets: z.array(tokenSetSchema),
+      components: z.array(z.string()),
+      diffRules: z.array(
+        z.object({
+          tokenPath: z.string(),
+          highlightColor: z.string(),
+        })
+      ),
+    })
+    .optional(),
+  microfrontends: z
+    .object({
+      mfes: z.array(
+        z.object({
+          name: z.string(),
+          routes: z.array(z.string()),
+          ownedComponents: z.array(z.string()),
+          apiContracts: z.array(z.string()),
+        })
+      ),
+      integration: z.enum(["ROUTE_BASED", "COMPONENT_BASED"]),
+      sharedUI: z.boolean(),
+      riskNotes: z.array(z.string()),
+    })
+    .optional(),
+  moduleFederation: z
+    .object({
+      remotes: z.array(
+        z.object({
+          name: z.string(),
+          exposes: z.array(z.string()),
+          deps: z.array(z.string()),
+        })
+      ),
+      sharedDeps: z.array(
+        z.object({
+          pkg: z.string(),
+          singleton: z.boolean(),
+          strictVersion: z.boolean(),
+        })
+      ),
+      rules: z.array(
+        z.object({
+          sharedDepsSingleton: z.boolean().optional(),
+          sharedDepsStrictVersion: z.boolean().optional(),
+          network: z.enum(["FAST", "SLOW"]).optional(),
+          preloadRemotes: z.boolean().optional(),
+          estimatedBundleKb: z.object({
+            host: z.number(),
+            remotes: z.record(z.string(), z.number()),
+          }),
+          duplicationKb: z.number(),
+          loadOrderEvents: z.array(z.string()),
+          pitfalls: z.array(z.string()),
+        })
+      ),
+    })
+    .optional(),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
   renderingStrategyLabConfigSchema,
   stateAtScaleLabConfigSchema,
   performanceBudgetLabConfigSchema,
+  uiArchitectureLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -179,5 +285,9 @@ export type StateAtScaleLabConfig = z.infer<typeof stateAtScaleLabConfigSchema>;
 export type PerformanceBudgetLabConfig = z.infer<
   typeof performanceBudgetLabConfigSchema
 >;
+export type UIArchitectureLabConfig = z.infer<
+  typeof uiArchitectureLabConfigSchema
+>;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;
+export type TokenSet = z.infer<typeof tokenSetSchema>;
