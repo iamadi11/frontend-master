@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { useMotionPrefs } from "../../motion/MotionPrefsProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import { DemoShell } from "../DemoShell";
@@ -12,6 +12,12 @@ import {
   type StateAtScaleLabConfig,
 } from "../demoSchema";
 import { z } from "zod";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import {
+  StatePipelineScene,
+  triggerPipelineAction,
+} from "../../three/StatePipelineScene";
+import { Fallback2D } from "../../three/Fallback2D";
 
 interface StateAtScaleLabDemoProps {
   demoConfig: unknown;
@@ -59,6 +65,8 @@ export function StateAtScaleLabDemo({
   const [clientVersion, setClientVersion] = useState(1);
   const [cacheValue, setCacheValue] = useState("");
   const [serverValue, setServerValue] = useState("");
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const pipelineActionRef = useRef<string | null>(null);
 
   // Validate and parse demo config
   const config = useMemo(() => {
@@ -181,6 +189,11 @@ export function StateAtScaleLabDemo({
       ]);
     };
 
+    // Trigger 3D animation
+    if (viewMode === "3D") {
+      triggerPipelineAction("SAVE_MUTATION");
+    }
+
     // Phase 1: ACTION
     setCurrentPhase("ACTION");
     await new Promise((resolve) => setTimeout(resolve, 100));
@@ -255,6 +268,10 @@ export function StateAtScaleLabDemo({
         "Rollback applied",
         "Server returned error; optimistic update rolled back"
       );
+      // Trigger 3D rollback animation
+      if (viewMode === "3D") {
+        setTimeout(() => triggerPipelineAction("MUTATION_FAILURE"), 1200);
+      }
     } else {
       // CONFIRM
       setCurrentPhase("ROLLBACK_OR_CONFIRM");
@@ -266,6 +283,10 @@ export function StateAtScaleLabDemo({
         "Mutation successful",
         "Server accepted changes; state updated"
       );
+      // Trigger 3D success animation
+      if (viewMode === "3D") {
+        setTimeout(() => triggerPipelineAction("MUTATION_SUCCESS"), 1200);
+      }
     }
 
     // Phase 7: CACHE_UPDATE
@@ -305,11 +326,17 @@ export function StateAtScaleLabDemo({
     serverLatencyMs,
     cacheMode,
     cacheValue,
+    viewMode,
   ]);
 
   // Handle refetch
   const handleRefetch = useCallback(async () => {
     if (!config) return;
+
+    // Trigger 3D animation
+    if (viewMode === "3D") {
+      triggerPipelineAction("REFETCH");
+    }
 
     setIsPlaying(true);
     setCurrentPhase("REQUEST");
@@ -350,7 +377,14 @@ export function StateAtScaleLabDemo({
     await new Promise((resolve) => setTimeout(resolve, 200));
     setCurrentPhase(null);
     setIsPlaying(false);
-  }, [config, serverLatencyMs, cacheMode, serverValue, serverVersion]);
+  }, [
+    config,
+    serverLatencyMs,
+    cacheMode,
+    serverValue,
+    serverVersion,
+    viewMode,
+  ]);
 
   // Handle queue replay (when going online)
   useEffect(() => {
@@ -417,7 +451,7 @@ export function StateAtScaleLabDemo({
 
       replayQueue();
     }
-  }, [network, queue, serverLatencyMs, failureRate]);
+  }, [network, queue, serverLatencyMs, failureRate, viewMode]);
 
   if (!config) {
     return (
@@ -436,8 +470,10 @@ export function StateAtScaleLabDemo({
         <select
           value={network}
           onChange={(e) => {
-            setNetwork(e.target.value as Network);
-            if (e.target.value === "ONLINE") {
+            const newNetwork = e.target.value as Network;
+            const wasOffline = network === "OFFLINE";
+            setNetwork(newNetwork);
+            if (newNetwork === "ONLINE" && wasOffline) {
               setEventLog((prev) => [
                 ...prev,
                 {
@@ -449,6 +485,12 @@ export function StateAtScaleLabDemo({
                     "Network is now online; queued mutations will replay",
                 },
               ]);
+              // Trigger 3D replay animation
+              if (viewMode === "3D" && queue.length > 0) {
+                triggerPipelineAction("GO_ONLINE");
+              }
+            } else if (newNetwork === "OFFLINE" && viewMode === "3D") {
+              triggerPipelineAction("GO_OFFLINE");
             }
           }}
           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -568,7 +610,7 @@ export function StateAtScaleLabDemo({
     </div>
   );
 
-  const visualization = (
+  const visualization2D = (
     <Spotlight targetId={focusTarget || null}>
       <div className="space-y-6">
         {/* Timeline */}
@@ -731,6 +773,68 @@ export function StateAtScaleLabDemo({
         </div>
       </div>
     </Spotlight>
+  );
+
+  const visualization3D = (
+    <div className="w-full h-[600px] bg-gray-900 rounded-lg overflow-hidden">
+      <ThreeCanvasShell
+        className="w-full h-full"
+        fallback={
+          <Fallback2D message="3D mode unavailable. Showing 2D view.">
+            {visualization2D}
+          </Fallback2D>
+        }
+      >
+        <StatePipelineScene
+          network={network}
+          optimistic={optimistic}
+          cacheMode={cacheMode}
+          queueCount={queue.length}
+          cacheStatus={cacheStatus}
+          focusTarget={focusTarget}
+          onAction={(action) => {
+            // Handle station clicks or other actions if needed
+            console.log("Pipeline action:", action);
+          }}
+        />
+      </ThreeCanvasShell>
+    </div>
+  );
+
+  const visualization = (
+    <div className="space-y-4">
+      {/* 2D/3D Toggle */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          Visualization
+        </h3>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setViewMode("2D")}
+            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+              viewMode === "2D"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            }`}
+          >
+            2D
+          </button>
+          <button
+            onClick={() => setViewMode("3D")}
+            className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+              viewMode === "3D"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            }`}
+          >
+            3D
+          </button>
+        </div>
+      </div>
+
+      {/* Render selected view */}
+      {viewMode === "2D" ? visualization2D : visualization3D}
+    </div>
   );
 
   return (
