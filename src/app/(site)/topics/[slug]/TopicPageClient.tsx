@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { RichTextRenderer } from "@/components/content/RichTextRenderer";
 import { Prose } from "@/components/content/Prose";
+import { AnimatedExplanationBlocks } from "@/components/theory/AnimatedExplanationBlocks";
 import { RequirementsToArchitectureDemo } from "@/components/demo/demos/RequirementsToArchitectureDemo";
 import { RenderingStrategyLabDemo } from "@/components/demo/demos/RenderingStrategyLabDemo";
 import { StateAtScaleLabDemo } from "@/components/demo/demos/StateAtScaleLabDemo";
@@ -334,9 +335,23 @@ export function TopicPageClient({
                 ("children" in topic.theory &&
                   Array.isArray(topic.theory.children) &&
                   topic.theory.children.length > 0)) ? (
-                <Prose>
-                  <RichTextRenderer content={topic.theory} />
-                </Prose>
+                <>
+                  <Prose>
+                    <RichTextRenderer content={topic.theory} />
+                  </Prose>
+
+                  {/* Animated Explanation Blocks */}
+                  {topic.theoryAnimations && (
+                    <AnimatedExplanationBlocks
+                      blocks={topic.theoryAnimations}
+                      onPracticeLink={(anchor) => {
+                        // Scroll to practice tab and anchor (if implemented)
+                        setActiveTab("practice");
+                        // Could scroll to specific anchor in practice tab
+                      }}
+                    />
+                  )}
+                </>
               ) : (
                 <EmptyState
                   title="Theory content not found"

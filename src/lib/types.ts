@@ -10,6 +10,7 @@ export type Topic = {
   summary?: string | null;
   difficulty?: "beginner" | "intermediate" | "advanced" | null;
   theory?: SerializedEditorState | null;
+  theoryAnimations?: unknown; // JSON field - validated by Zod schema
   references?: Array<{
     label: string;
     url: string;

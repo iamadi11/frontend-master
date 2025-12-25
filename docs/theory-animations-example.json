@@ -1,0 +1,115 @@
+[
+  {
+    "id": "timeline-example",
+    "title": "Request Lifecycle Timeline",
+    "description": "Shows the phases of a request from browser to server and back",
+    "kind": "timeline2d",
+    "steps": [
+      {
+        "id": "step-1",
+        "label": "Request",
+        "description": "Browser sends HTTP request",
+        "lane": "client"
+      },
+      {
+        "id": "step-2",
+        "label": "Network",
+        "description": "Request travels over network",
+        "lane": "default"
+      },
+      {
+        "id": "step-3",
+        "label": "Server",
+        "description": "Server processes request",
+        "lane": "server"
+      },
+      {
+        "id": "step-4",
+        "label": "Response",
+        "description": "Server sends response back",
+        "lane": "server"
+      },
+      {
+        "id": "step-5",
+        "label": "Render",
+        "description": "Browser renders the response",
+        "lane": "client"
+      }
+    ],
+    "whatToNotice": [
+      "Request flows from client to server",
+      "Network latency affects total time",
+      "Server processing is a critical phase",
+      "Response must travel back to client"
+    ],
+    "linkedPracticeAnchor": "request-flow"
+  },
+  {
+    "id": "flow-example",
+    "title": "Data Flow Diagram",
+    "description": "Shows how data moves through the system",
+    "kind": "flow2d",
+    "nodes": [
+      {
+        "id": "user",
+        "label": "User",
+        "type": "source"
+      },
+      {
+        "id": "ui",
+        "label": "UI Layer",
+        "type": "process"
+      },
+      {
+        "id": "api",
+        "label": "API",
+        "type": "process"
+      },
+      {
+        "id": "db",
+        "label": "Database",
+        "type": "sink"
+      }
+    ],
+    "edges": [
+      {
+        "from": "user",
+        "to": "ui",
+        "label": "Input"
+      },
+      {
+        "from": "ui",
+        "to": "api",
+        "label": "Request"
+      },
+      {
+        "from": "api",
+        "to": "db",
+        "label": "Query"
+      },
+      {
+        "from": "db",
+        "to": "api",
+        "label": "Data"
+      },
+      {
+        "from": "api",
+        "to": "ui",
+        "label": "Response"
+      },
+      {
+        "from": "ui",
+        "to": "user",
+        "label": "Display"
+      }
+    ],
+    "whatToNotice": [
+      "Data flows in a cycle",
+      "Each layer has a specific role",
+      "API acts as a bridge between UI and DB"
+    ],
+    "defaultState": {
+      "activeNodeId": "user"
+    }
+  }
+]

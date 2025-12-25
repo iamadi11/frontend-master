@@ -138,6 +138,10 @@ export default buildConfig({
           editor: lexicalEditor({}),
         },
         {
+          name: "theoryAnimations",
+          type: "json",
+        },
+        {
           name: "references",
           type: "array",
           fields: [
