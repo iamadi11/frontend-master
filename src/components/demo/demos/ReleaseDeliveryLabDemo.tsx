@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DemoShell } from "../DemoShell";
 import { EventLog, EventLogEntry } from "../EventLog";
 import { Spotlight, SpotlightTarget } from "../Spotlight";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import { Fallback2D } from "../../three/Fallback2D";
+import { ReleaseOpsTheaterScene } from "../../three/ReleaseOpsTheaterScene";
 import {
   releaseDeliveryLabConfigSchema,
   type ReleaseDeliveryLabConfig,
@@ -24,6 +27,7 @@ export function ReleaseDeliveryLabDemo({
 }: ReleaseDeliveryLabDemoProps) {
   const { reduced } = useMotionPrefs();
   const [activeMode, setActiveMode] = useState<StageMode>("PIPELINE");
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
 
   // Pipeline mode state
@@ -53,6 +57,8 @@ export function ReleaseDeliveryLabDemo({
   >("NONE");
   const [edgeCompute, setEdgeCompute] = useState(false);
   const [cacheHitRate, setCacheHitRate] = useState(0.7);
+  const [requestAssetTrigger, setRequestAssetTrigger] = useState(0);
+  const [deployNewBuildTrigger, setDeployNewBuildTrigger] = useState(0);
 
   // Validate and parse demo config
   const config = useMemo(() => {
@@ -170,7 +176,11 @@ export function ReleaseDeliveryLabDemo({
     } else {
       addEvent("Asset requested", "Cache MISS", "Fetched from origin server");
     }
-  }, [cacheHitRate, cacheTTLSeconds, addEvent]);
+    // Trigger 3D animation
+    if (viewMode === "3D") {
+      setRequestAssetTrigger((prev) => prev + 1);
+    }
+  }, [cacheHitRate, cacheTTLSeconds, addEvent, viewMode]);
 
   const handleDeployNewBuild = useCallback(() => {
     if (cacheInvalidation === "NONE") {
@@ -192,7 +202,11 @@ export function ReleaseDeliveryLabDemo({
         "Versioned assets ensure correct content without cache purging"
       );
     }
-  }, [cacheInvalidation, addEvent]);
+    // Trigger 3D animation
+    if (viewMode === "3D") {
+      setDeployNewBuildTrigger((prev) => prev + 1);
+    }
+  }, [cacheInvalidation, addEvent, viewMode]);
 
   if (!config) {
     return (
@@ -204,6 +218,33 @@ export function ReleaseDeliveryLabDemo({
 
   const controls = (
     <div className="space-y-4">
+      {/* View Mode Toggle */}
+      <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded-md">
+        <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          View:
+        </span>
+        <button
+          onClick={() => setViewMode("2D")}
+          className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            viewMode === "2D"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600"
+          }`}
+        >
+          2D
+        </button>
+        <button
+          onClick={() => setViewMode("3D")}
+          className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
+            viewMode === "3D"
+              ? "bg-blue-500 text-white"
+              : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600"
+          }`}
+        >
+          3D
+        </button>
+      </div>
+
       {/* Mode Tabs */}
       <div className="border-b border-gray-200 dark:border-gray-700">
         <div className="flex gap-2 flex-wrap">
@@ -489,7 +530,7 @@ export function ReleaseDeliveryLabDemo({
     </div>
   );
 
-  const visualization = (
+  const visualization2D = (
     <Spotlight targetId={focusTarget || null}>
       <div className="space-y-6">
         {/* Pipeline Visualization */}
@@ -764,6 +805,62 @@ export function ReleaseDeliveryLabDemo({
       </div>
     </Spotlight>
   );
+
+  const visualization3D = (
+    <ThreeCanvasShell
+      className="w-full h-[600px] rounded-lg border border-gray-200 dark:border-gray-700"
+      fallback={
+        <Fallback2D message="3D unavailable - showing 2D fallback">
+          {visualization2D}
+        </Fallback2D>
+      }
+    >
+      <ReleaseOpsTheaterScene
+        mode={activeMode}
+        focusTarget={focusTarget}
+        // Pipeline
+        pipelineRunning={pipelineRunning}
+        currentStage={currentStage}
+        runTests={runTests}
+        visualRegression={visualRegression}
+        onPipelineComplete={() => {
+          setPipelineRunning(false);
+          setCurrentStage(null);
+        }}
+        // Flags & A/B
+        flagEnabled={flagEnabled}
+        abSplit={abSplit}
+        targeting={targeting}
+        // Canary
+        trafficPercent={trafficPercent}
+        errorRateNew={errorRateNew}
+        latencyNewMs={latencyNewMs}
+        canaryActive={canaryActive}
+        sloPass={sloPass}
+        onCanaryThresholdBreach={() => {
+          addEvent(
+            "Threshold breached",
+            "Rollback recommended",
+            "Error rate or latency exceeded safe thresholds"
+          );
+        }}
+        // CDN
+        cacheTTLSeconds={cacheTTLSeconds}
+        cacheInvalidation={cacheInvalidation}
+        edgeCompute={edgeCompute}
+        cacheHitRate={cacheHitRate}
+        requestAssetTrigger={requestAssetTrigger}
+        deployNewBuildTrigger={deployNewBuildTrigger}
+        // Events
+        pipelineEvents={config?.pipelineEvents || []}
+        rolloutEvents={config?.rolloutEvents || []}
+        cdnEvents={config?.cdnEvents || []}
+        notes={config?.notes || []}
+      />
+    </ThreeCanvasShell>
+  );
+
+  const visualization = viewMode === "3D" ? visualization3D : visualization2D;
 
   return (
     <DemoShell
