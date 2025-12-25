@@ -66,6 +66,9 @@ export function StateAtScaleLabDemo({
   const [cacheValue, setCacheValue] = useState("");
   const [serverValue, setServerValue] = useState("");
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const pipelineActionRef = useRef<string | null>(null);
 
   // Validate and parse demo config
@@ -796,6 +799,8 @@ export function StateAtScaleLabDemo({
             // Handle station clicks or other actions if needed
             console.log("Pipeline action:", action);
           }}
+          cameraPreset={cameraPreset}
+          onCameraPresetChange={setCameraPreset}
         />
       </ThreeCanvasShell>
     </div>

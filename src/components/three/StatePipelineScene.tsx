@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useReducedMotion3D } from "./useReducedMotion3D";
 import { PipelineNode, type StationType } from "./PipelineNodes";
 import { Packet } from "./Packet";
+
+export type CameraPreset = "overview" | "closeup" | "side";
 
 interface PacketAnimation {
   id: string;
@@ -26,6 +28,16 @@ interface BadgeState {
   visible: boolean;
 }
 
+// Camera preset positions for pipeline view
+const CAMERA_PRESETS: Record<
+  CameraPreset,
+  { position: [number, number, number]; lookAt: [number, number, number] }
+> = {
+  overview: { position: [0, 3, 8], lookAt: [0, 0, 0] },
+  closeup: { position: [0, 1.5, 5], lookAt: [0, 0, 0] },
+  side: { position: [6, 2, 4], lookAt: [0, 0, 0] },
+};
+
 interface StatePipelineSceneProps {
   network: "ONLINE" | "FLAKY" | "OFFLINE";
   optimistic: boolean;
@@ -34,6 +46,8 @@ interface StatePipelineSceneProps {
   cacheStatus: "fresh" | "stale";
   focusTarget?: string | null;
   onAction?: (action: string) => void;
+  cameraPreset?: CameraPreset;
+  onCameraPresetChange?: (preset: CameraPreset) => void;
 }
 
 // Station positions (left to right)
@@ -52,6 +66,10 @@ const PACKET_COLORS = {
   stale: "#6b7280", // gray
 };
 
+function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * t;
+}
+
 export function StatePipelineScene({
   network,
   optimistic,
@@ -60,8 +78,11 @@ export function StatePipelineScene({
   cacheStatus,
   focusTarget,
   onAction,
+  cameraPreset = "overview",
+  onCameraPresetChange,
 }: StatePipelineSceneProps) {
   const reducedMotion = useReducedMotion3D();
+  const { camera } = useThree();
   const [packets, setPackets] = useState<PacketAnimation[]>([]);
   const [badges, setBadges] = useState<BadgeState[]>([]);
   const [highlightedStation, setHighlightedStation] =
@@ -85,6 +106,40 @@ export function StatePipelineScene({
       setHighlightedStation(null);
     }
   }, [focusTarget]);
+
+  // Camera preset positioning (locked camera, no free movement)
+  useEffect(() => {
+    const preset = CAMERA_PRESETS[cameraPreset];
+    if (preset) {
+      if (reducedMotion) {
+        // Instant positioning in reduced motion
+        camera.position.set(...preset.position);
+        camera.lookAt(...preset.lookAt);
+      } else {
+        // Smooth transition to preset position
+        const startX = camera.position.x;
+        const startY = camera.position.y;
+        const startZ = camera.position.z;
+        const [targetX, targetY, targetZ] = preset.position;
+
+        let progress = 0;
+        const animate = () => {
+          progress += 0.05;
+          if (progress < 1) {
+            camera.position.x = lerp(startX, targetX, progress);
+            camera.position.y = lerp(startY, targetY, progress);
+            camera.position.z = lerp(startZ, targetZ, progress);
+            camera.lookAt(...preset.lookAt);
+            requestAnimationFrame(animate);
+          } else {
+            camera.position.set(...preset.position);
+            camera.lookAt(...preset.lookAt);
+          }
+        };
+        animate();
+      }
+    }
+  }, [cameraPreset, reducedMotion, camera]);
 
   // Helper to create a packet animation
   const createPacket = useCallback(
@@ -500,6 +555,44 @@ export function StatePipelineScene({
                     ? "Queues mutations when offline; replays on reconnect"
                     : "Processes mutations and serves data"}
             </div>
+          </div>
+        </Html>
+      )}
+
+      {/* Camera preset controls (rendered as HTML overlay) */}
+      {onCameraPresetChange && (
+        <Html position={[0, -3, 0]} center>
+          <div className="flex gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => onCameraPresetChange("overview")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "overview"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => onCameraPresetChange("closeup")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "closeup"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Close-up
+            </button>
+            <button
+              onClick={() => onCameraPresetChange("side")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "side"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Side
+            </button>
           </div>
         </Html>
       )}
