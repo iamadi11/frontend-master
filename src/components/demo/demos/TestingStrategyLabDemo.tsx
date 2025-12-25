@@ -38,6 +38,9 @@ export function TestingStrategyLabDemo({
   const { reduced } = useMotionPrefs();
   const [activeMode, setActiveMode] = useState<Mode>("PYRAMID");
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
 
   // Pyramid mode state
@@ -842,6 +845,8 @@ export function TestingStrategyLabDemo({
           visualDiff={activeMode === "VISUAL" ? visualDiff : undefined}
           baseline={activeMode === "VISUAL" ? baseline : undefined}
           current={activeMode === "VISUAL" ? current : undefined}
+          cameraPreset={cameraPreset}
+          onCameraPresetChange={setCameraPreset}
         />
       </ThreeCanvasShell>
     </div>
