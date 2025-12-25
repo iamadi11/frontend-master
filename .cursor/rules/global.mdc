@@ -1,15 +1,15 @@
 ---
-description: "Always apply: mission, two-section per topic, correctness-first, backend-driven, focus-only motion, Vercel-friendly."
+description: "Always apply: mission, two-section per topic, CMS-driven learning, correctness-first, Vercel-friendly, heavy focus-guiding motion."
 alwaysApply: true
 ---
 
 # Global Constitution (Non-negotiable)
 
 ## Mission
-Build a backend-driven learning website that is the go-to place for learning Frontend System Design.
+Build a backend-driven learning website that becomes the go-to place for learning Frontend System Design.
 Every topic MUST have exactly two primary sections:
-1) THEORY: very detailed, structured, referenced
-2) PRACTICE: learn-by-doing, interactive demos + hands-on tasks
+1) THEORY: very detailed, structured, reference-backed
+2) PRACTICE: learn-by-doing, interactive demos + hands-on tasks/solutions
 
 Users should not need to leave this site to learn. References are for credibility—not dependency.
 
@@ -18,8 +18,8 @@ Users should not need to leave this site to learn. References are for credibilit
 - Content is CMS-driven (Payload + MongoDB). Do not hardcode topic lessons in route files.
 - Server-first: default to Server Components; keep client JS minimal.
 - Secrets only via env vars. Never expose secrets via NEXT_PUBLIC_.
-- Correctness-first: do NOT invent facts. If unsure, label “Needs verification” and store a placeholder reference in CMS.
-- Animations must increase focus (not distract) and respect prefers-reduced-motion.
+- Correctness-first: do NOT invent facts. If unsure, label "Needs verification" and store a placeholder reference in CMS.
+- Heavy animation is REQUIRED, but ONLY as guided/teaching motion (see Motion Policy). Provide reduced-motion mode + UI toggle.
 
 ## Scope discipline
 Do not add extra features unless explicitly requested.

@@ -9,4 +9,4 @@ alwaysApply: false
 - Keep Next routes thin: fetch data via a server-only lib layer and render via shared components.
 - Always handle empty CMS state gracefully (empty lists, not-found, friendly admin hint).
 - Never leak secrets to the client; only use NEXT_PUBLIC_ for safe values like site URL.
-- Use server-only guards where appropriate.
+- Practice demo configs must be stored in CMS and validated with Zod before rendering.

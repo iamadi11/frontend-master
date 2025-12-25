@@ -1,5 +1,5 @@
 ---
-description: "Use when implementing any Practice section: standardize interactive demos, keep them CMS-driven, validated, and focus-first."
+description: "Use when implementing any Practice section: standardize interactive demos, keep them CMS-driven, validated, and teaching-first."
 alwaysApply: false
 ---
 
@@ -20,6 +20,7 @@ alwaysApply: false
 - Define a JSON schema for demoConfig and validate with Zod at runtime.
 - If config invalid/missing: show a friendly “Demo unavailable” state (no crash).
 
-## Focus-first motion
-- Motion only on state transitions and only to guide attention.
-- Must respect prefers-reduced-motion.
+## Teaching animations (heavy but purposeful)
+- Practice demos must use motion to illustrate change (timelines, flows, diffs).
+- Do not add decorative motion that doesn’t explain something.
+- Respect reduced-motion mode and provide a usable static alternative.
