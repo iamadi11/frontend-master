@@ -44,6 +44,9 @@ export function CapstoneBuilderDemo({
   const [isSimRunning, setIsSimRunning] = useState(false);
   const [is3DMode, setIs3DMode] = useState(false);
   const [isPlayingFlow, setIsPlayingFlow] = useState(false);
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
 
   // Validate and parse demo config
   const config = useMemo(() => {
@@ -340,6 +343,8 @@ export function CapstoneBuilderDemo({
                     isSimRunning={isSimRunning}
                     onSimComplete={handleSimComplete}
                     focusTarget={focusTarget}
+                    cameraPreset={cameraPreset}
+                    onCameraPresetChange={setCameraPreset}
                   />
                 </ThreeCanvasShell>
               </div>
