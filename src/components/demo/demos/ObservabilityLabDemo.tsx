@@ -13,6 +13,8 @@ import {
 import { TelemetryPipeline } from "../TelemetryPipeline";
 import { SamplingPanel } from "../SamplingPanel";
 import { ErrorBoundarySim } from "../ErrorBoundarySim";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import { ObservabilityControlRoomScene } from "../../three/ObservabilityControlRoomScene";
 
 interface ObservabilityLabDemoProps {
   demoConfig: unknown;
@@ -34,6 +36,7 @@ export function ObservabilityLabDemo({
   focusTarget,
 }: ObservabilityLabDemoProps) {
   const { reduced } = useMotionPrefs();
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const [mode, setMode] = useState<Mode>("PIPELINE");
   const [signal, setSignal] = useState<Signal>("LOG");
   const [volume, setVolume] = useState<Volume>("LOW");
@@ -313,6 +316,35 @@ export function ObservabilityLabDemo({
 
   const controls = (
     <div className="space-y-4">
+      {/* View Mode Toggle (2D / 3D) */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          View Mode
+        </label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode("2D")}
+            className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "2D"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            }`}
+          >
+            2D
+          </button>
+          <button
+            onClick={() => setViewMode("3D")}
+            className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "3D"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            }`}
+          >
+            3D
+          </button>
+        </div>
+      </div>
+
       {/* Mode Tabs */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -490,39 +522,104 @@ export function ObservabilityLabDemo({
     </div>
   );
 
-  const visualization = (
-    <Spotlight targetId={focusTarget || null}>
-      <div className="space-y-6">
-        {mode === "PIPELINE" && (
-          <TelemetryPipeline
-            steps={pipelineSteps}
-            activeStepId={activePipelineStep}
-            eventPackets={eventPackets}
-          />
-        )}
+  // Handle packet completion in 3D mode
+  const handlePacketComplete = useCallback((packetId: string) => {
+    setEventPackets((prev) => prev.filter((p) => p.id !== packetId));
+  }, []);
 
-        {mode === "SAMPLING_PRIVACY" && (
-          <SamplingPanel
-            sampleRate={sampleRate}
-            droppedEventsPct={droppedEventsPct}
-            totalEvents={totalEvents || 100}
-            redactPII={redactPII}
-            replayEnabled={replayEnabled}
-            privacyNotes={privacyNotes}
-          />
-        )}
+  // Handle sampling completion in 3D mode
+  const handleSamplingComplete = useCallback(() => {
+    // Sampling animation completed
+  }, []);
 
-        {mode === "ERROR_BOUNDARY" && (
-          <ErrorBoundarySim
-            errorType={errorType}
-            boundaryStrategy={boundaryStrategy}
-            errorFlow={errorFlow}
-            hasError={hasError}
-          />
-        )}
-      </div>
-    </Spotlight>
-  );
+  const visualization =
+    viewMode === "3D" ? (
+      <ThreeCanvasShell
+        className="w-full h-[500px] rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700"
+        fallback={
+          <Spotlight targetId={focusTarget || null}>
+            <div className="space-y-6">
+              {mode === "PIPELINE" && (
+                <TelemetryPipeline
+                  steps={pipelineSteps}
+                  activeStepId={activePipelineStep}
+                  eventPackets={eventPackets}
+                />
+              )}
+
+              {mode === "SAMPLING_PRIVACY" && (
+                <SamplingPanel
+                  sampleRate={sampleRate}
+                  droppedEventsPct={droppedEventsPct}
+                  totalEvents={totalEvents || 100}
+                  redactPII={redactPII}
+                  replayEnabled={replayEnabled}
+                  privacyNotes={privacyNotes}
+                />
+              )}
+
+              {mode === "ERROR_BOUNDARY" && (
+                <ErrorBoundarySim
+                  errorType={errorType}
+                  boundaryStrategy={boundaryStrategy}
+                  errorFlow={errorFlow}
+                  hasError={hasError}
+                />
+              )}
+            </div>
+          </Spotlight>
+        }
+      >
+        <ObservabilityControlRoomScene
+          config={config}
+          mode={mode}
+          signal={signal}
+          sampleRate={sampleRate}
+          redactPII={redactPII}
+          replayEnabled={replayEnabled}
+          errorType={errorType}
+          boundaryStrategy={boundaryStrategy}
+          hasError={hasError}
+          activePipelineStepId={activePipelineStep}
+          eventPackets={eventPackets}
+          focusTarget={focusTarget}
+          onPacketComplete={handlePacketComplete}
+          onSamplingComplete={handleSamplingComplete}
+        />
+      </ThreeCanvasShell>
+    ) : (
+      <Spotlight targetId={focusTarget || null}>
+        <div className="space-y-6">
+          {mode === "PIPELINE" && (
+            <TelemetryPipeline
+              steps={pipelineSteps}
+              activeStepId={activePipelineStep}
+              eventPackets={eventPackets}
+            />
+          )}
+
+          {mode === "SAMPLING_PRIVACY" && (
+            <SamplingPanel
+              sampleRate={sampleRate}
+              droppedEventsPct={droppedEventsPct}
+              totalEvents={totalEvents || 100}
+              redactPII={redactPII}
+              replayEnabled={replayEnabled}
+              privacyNotes={privacyNotes}
+            />
+          )}
+
+          {mode === "ERROR_BOUNDARY" && (
+            <ErrorBoundarySim
+              errorType={errorType}
+              boundaryStrategy={boundaryStrategy}
+              errorFlow={errorFlow}
+              hasError={hasError}
+            />
+          )}
+        </div>
+      </Spotlight>
+    );
 
   return (
     <DemoShell
