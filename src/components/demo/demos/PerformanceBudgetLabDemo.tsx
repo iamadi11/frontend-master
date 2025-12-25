@@ -11,6 +11,9 @@ import {
   type PerformanceBudgetLabConfig,
 } from "../demoSchema";
 import { z } from "zod";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import { PerformanceTheaterScene } from "../../three/PerformanceTheaterScene";
+import { Fallback2D } from "../../three/Fallback2D";
 
 interface PerformanceBudgetLabDemoProps {
   demoConfig: unknown;
@@ -175,6 +178,9 @@ export function PerformanceBudgetLabDemo({
   const [longTaskMs, setLongTaskMs] = useState(0);
   const [clsRisk, setClsRisk] = useState<CLSRisk>("LOW");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [shouldRunSimulation, setShouldRunSimulation] = useState(false);
+  const [lastChangedField, setLastChangedField] = useState<string | null>(null);
 
   // Validate and parse demo config
   const config = useMemo(() => {
@@ -286,6 +292,9 @@ export function PerformanceBudgetLabDemo({
       if (field === "longTaskMs") setLongTaskMs(value as number);
       if (field === "clsRisk") setClsRisk(value as CLSRisk);
 
+      setLastChangedField(field);
+      setShouldRunSimulation(true);
+
       // Add event log entry
       const explanation = `${field}=${value} → affects performance metrics`;
       const newEntry: EventLogEntry = {
@@ -298,6 +307,36 @@ export function PerformanceBudgetLabDemo({
       setEventLog((prev) => [...prev, newEntry]);
     },
     []
+  );
+
+  const handleRunSimulation = useCallback(() => {
+    setShouldRunSimulation(true);
+    const newEntry: EventLogEntry = {
+      id: `${Date.now()}-${Math.random()}`,
+      timestamp: Date.now(),
+      cause: "Run simulation",
+      decision: "Simulation triggered",
+      explanation: "Updating 3D visualization with current metrics",
+    };
+    setEventLog((prev) => [...prev, newEntry]);
+  }, []);
+
+  const handleSegmentClick = useCallback(
+    (category: string, ms: number) => {
+      // Find relevant recommendation
+      const relevantRec = recommendations.find((rec) =>
+        rec.toLowerCase().includes(category.toLowerCase())
+      );
+      const newEntry: EventLogEntry = {
+        id: `${Date.now()}-${Math.random()}`,
+        timestamp: Date.now(),
+        cause: `Clicked ${category} segment`,
+        decision: relevantRec || `How to improve ${category}`,
+        explanation: `${category} takes ${ms.toFixed(0)}ms. ${relevantRec || "Consider optimization."}`,
+      };
+      setEventLog((prev) => [...prev, newEntry]);
+    },
+    [recommendations]
   );
 
   if (!config) {
@@ -317,6 +356,43 @@ export function PerformanceBudgetLabDemo({
 
   const controls = (
     <div className="space-y-4">
+      {/* View mode toggle */}
+      <div className="space-y-2 pb-4 border-b border-gray-200 dark:border-gray-700">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          View Mode
+        </label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode("2D")}
+            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              viewMode === "2D"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+            }`}
+          >
+            2D
+          </button>
+          <button
+            onClick={() => setViewMode("3D")}
+            className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              viewMode === "3D"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+            }`}
+          >
+            3D
+          </button>
+        </div>
+        {viewMode === "3D" && (
+          <button
+            onClick={handleRunSimulation}
+            className="w-full mt-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium transition-colors"
+          >
+            Run Simulation
+          </button>
+        )}
+      </div>
+
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Network
@@ -536,7 +612,8 @@ export function PerformanceBudgetLabDemo({
     );
   };
 
-  const visualization = (
+  // 2D Visualization
+  const visualization2D = (
     <Spotlight targetId={focusTarget || null}>
       <div className="space-y-6">
         {/* Metrics Panel */}
@@ -689,10 +766,34 @@ export function PerformanceBudgetLabDemo({
     </Spotlight>
   );
 
+  // 3D Visualization
+  const visualization3D = (
+    <div className="w-full h-[600px] bg-gray-900 rounded-lg overflow-hidden">
+      <ThreeCanvasShell
+        fallback={
+          <Fallback2D message="3D visualization unavailable. Showing 2D view.">
+            {visualization2D}
+          </Fallback2D>
+        }
+      >
+        <PerformanceTheaterScene
+          metrics={metrics}
+          breakdown={breakdown}
+          longTaskMs={longTaskMs}
+          caching={caching}
+          imageMode={imageMode}
+          focusTarget={focusTarget || null}
+          onSegmentClick={handleSegmentClick}
+          recommendations={recommendations}
+        />
+      </ThreeCanvasShell>
+    </div>
+  );
+
   return (
     <DemoShell
       controls={controls}
-      visualization={visualization}
+      visualization={viewMode === "3D" ? visualization3D : visualization2D}
       eventLog={<EventLog entries={eventLog} />}
     />
   );
