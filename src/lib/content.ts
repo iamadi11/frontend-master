@@ -74,3 +74,18 @@ export async function getTopicBySlug(slug: string) {
 
   return result.docs[0] || null;
 }
+
+export async function getAdjacentTopics(currentSlug: string) {
+  const allTopics = await listTopics();
+  const currentIndex = allTopics.findIndex((t) => t.slug === currentSlug);
+
+  if (currentIndex === -1) {
+    return { prev: null, next: null };
+  }
+
+  return {
+    prev: currentIndex > 0 ? allTopics[currentIndex - 1] : null,
+    next:
+      currentIndex < allTopics.length - 1 ? allTopics[currentIndex + 1] : null,
+  };
+}

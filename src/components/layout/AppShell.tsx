@@ -1,6 +1,12 @@
-import type { ReactNode } from "react";
+"use client";
 
-export default function SiteLayout({ children }: { children: ReactNode }) {
+import { type ReactNode } from "react";
+
+interface AppShellProps {
+  children: ReactNode;
+}
+
+function AppShell({ children }: AppShellProps) {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
       <div className="flex-1 flex">
@@ -13,3 +19,5 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+
+export { AppShell };

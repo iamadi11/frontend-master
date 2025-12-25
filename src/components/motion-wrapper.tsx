@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
+import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 
 interface MotionWrapperProps {
   children: ReactNode;
@@ -10,33 +11,12 @@ interface MotionWrapperProps {
 
 export function MotionWrapper({ children }: MotionWrapperProps) {
   const pathname = usePathname();
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState<
-    boolean | null
-  >(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches);
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
-  // Don't render motion until mounted to avoid hydration mismatch
-  if (!mounted || prefersReducedMotion === null) {
-    return <div>{children}</div>;
-  }
+  const { reduced } = useMotionPrefs();
 
   const variants = {
-    initial: { opacity: 0, y: prefersReducedMotion ? 0 : 8 },
+    initial: { opacity: 0, y: reduced ? 0 : 8 },
     animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: prefersReducedMotion ? 0 : -8 },
+    exit: { opacity: 0, y: reduced ? 0 : -8 },
   };
 
   return (
@@ -45,8 +25,8 @@ export function MotionWrapper({ children }: MotionWrapperProps) {
       initial="initial"
       animate="animate"
       exit="exit"
-      variants={prefersReducedMotion ? {} : variants}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      variants={reduced ? {} : variants}
+      transition={reduced ? {} : { duration: 0.2, ease: "easeOut" }}
     >
       {children}
     </motion.div>

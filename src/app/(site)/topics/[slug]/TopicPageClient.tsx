@@ -18,6 +18,10 @@ import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 import { motion } from "framer-motion";
 import { demoConfigSchema } from "@/components/demo/demoSchema";
+import { Prose } from "@/components/ui/Prose";
+import { TableOfContents } from "@/components/ui/TableOfContents";
+import { TopicNavigation } from "@/components/ui/TopicNavigation";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 type Topic = {
   id: string;
@@ -46,13 +50,20 @@ type Topic = {
 
 interface TopicPageClientProps {
   topic: Topic;
+  prevTopic?: { title: string; slug: string } | null;
+  nextTopic?: { title: string; slug: string } | null;
 }
 
-export function TopicPageClient({ topic }: TopicPageClientProps) {
+export function TopicPageClient({
+  topic,
+  prevTopic,
+  nextTopic,
+}: TopicPageClientProps) {
   const [activeTab, setActiveTab] = useState<"theory" | "practice">("theory");
   const [currentStep, setCurrentStep] = useState(0);
   const [taskAnswers, setTaskAnswers] = useState<Record<number, string>>({});
   const [taskRevealed, setTaskRevealed] = useState<Record<number, boolean>>({});
+  const [showTOC, setShowTOC] = useState(false);
   const { reduced } = useMotionPrefs();
 
   const handleTaskSubmit = (index: number, answer: string) => {
@@ -66,9 +77,9 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
       : null;
 
   return (
-    <article className="space-y-6">
+    <article className="space-y-8 max-w-5xl">
       <div>
-        <h1 className="text-4xl font-bold mb-2">{topic.title}</h1>
+        <h1 className="text-4xl font-bold mb-3">{topic.title}</h1>
         {topic.summary && (
           <p className="text-lg text-gray-600 dark:text-gray-400">
             {topic.summary}
@@ -110,44 +121,61 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
         transition={reduced ? {} : { duration: 0.3 }}
       >
         {activeTab === "theory" ? (
-          <div className="space-y-8">
-            {topic.theory ? (
-              <RichTextRenderer content={topic.theory} />
-            ) : (
-              <p className="text-gray-500 dark:text-gray-400 italic">
-                Theory content not available yet.
-              </p>
-            )}
-
-            {/* References */}
-            <div className="border-t border-gray-200 dark:border-gray-800 pt-6">
-              <h2 className="text-2xl font-bold mb-4">References</h2>
-              {topic.references && topic.references.length > 0 ? (
-                <ul className="space-y-2">
-                  {topic.references.map((ref, i) => (
-                    <li key={i}>
-                      <a
-                        href={ref.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:underline"
-                      >
-                        {ref.label}
-                      </a>
-                      {ref.note && (
-                        <span className="text-gray-600 dark:text-gray-400 ml-2">
-                          — {ref.note}
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_250px] gap-8">
+            <div className="space-y-8 min-w-0">
+              {topic.theory ? (
+                <Prose>
+                  <RichTextRenderer content={topic.theory} />
+                </Prose>
               ) : (
-                <p className="text-gray-500 dark:text-gray-400 italic text-sm">
-                  References not added yet.
-                </p>
+                <EmptyState
+                  title="Theory content not available"
+                  description="Theory content will be added soon."
+                />
               )}
+
+              {/* References */}
+              <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
+                <h2 className="text-2xl font-bold mb-4">References</h2>
+                {topic.references && topic.references.length > 0 ? (
+                  <ul className="space-y-3">
+                    {topic.references.map((ref, i) => (
+                      <li key={i} className="text-sm">
+                        <a
+                          href={ref.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                        >
+                          {ref.label}
+                        </a>
+                        {ref.note && (
+                          <span className="text-gray-600 dark:text-gray-400 ml-2">
+                            — {ref.note}
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-500 dark:text-gray-400 italic text-sm">
+                    References not added yet.
+                  </p>
+                )}
+              </div>
+
+              <TopicNavigation
+                prevTopic={prevTopic || undefined}
+                nextTopic={nextTopic || undefined}
+              />
             </div>
+
+            {/* Table of Contents - Desktop */}
+            <aside className="hidden lg:block">
+              <div className="sticky top-24">
+                <TableOfContents content={topic.theory} />
+              </div>
+            </aside>
           </div>
         ) : (
           <div className="space-y-8">
@@ -396,6 +424,11 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
                 </div>
               </div>
             )}
+
+            <TopicNavigation
+              prevTopic={prevTopic || undefined}
+              nextTopic={nextTopic || undefined}
+            />
           </div>
         )}
       </motion.div>

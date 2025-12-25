@@ -7,6 +7,18 @@ interface RichTextRendererProps {
   content: SerializedEditorState | null | undefined;
 }
 
+function extractTextFromNode(node: any): string {
+  if (node.type === "text") {
+    return node.text || "";
+  }
+  if (node.children) {
+    return node.children
+      .map((child: any) => extractTextFromNode(child))
+      .join("");
+  }
+  return "";
+}
+
 export function RichTextRenderer({ content }: RichTextRendererProps) {
   if (!content || !content.root) {
     return (
@@ -27,22 +39,77 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
           <span key={i}>{renderNode(child)}</span>
         ));
 
+        // Generate ID from heading text
+        const headingText = extractTextFromNode(node);
+        const headingId =
+          headingText
+            ?.toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "") ||
+          `heading-${Math.random().toString(36).substr(2, 9)}`;
+
         // Use explicit switch to avoid dynamic component name issues
         switch (tagName) {
           case "h1":
-            return <h1 className="mt-6 mb-4 font-bold">{headingContent}</h1>;
+            return (
+              <h1
+                id={headingId}
+                className="mt-8 mb-4 font-bold text-3xl scroll-mt-24"
+              >
+                {headingContent}
+              </h1>
+            );
           case "h2":
-            return <h2 className="mt-6 mb-4 font-bold">{headingContent}</h2>;
+            return (
+              <h2
+                id={headingId}
+                className="mt-8 mb-4 font-bold text-2xl scroll-mt-24"
+              >
+                {headingContent}
+              </h2>
+            );
           case "h3":
-            return <h3 className="mt-6 mb-4 font-bold">{headingContent}</h3>;
+            return (
+              <h3
+                id={headingId}
+                className="mt-6 mb-3 font-bold text-xl scroll-mt-24"
+              >
+                {headingContent}
+              </h3>
+            );
           case "h4":
-            return <h4 className="mt-6 mb-4 font-bold">{headingContent}</h4>;
+            return (
+              <h4
+                id={headingId}
+                className="mt-6 mb-3 font-bold text-lg scroll-mt-24"
+              >
+                {headingContent}
+              </h4>
+            );
           case "h5":
-            return <h5 className="mt-6 mb-4 font-bold">{headingContent}</h5>;
+            return (
+              <h5 id={headingId} className="mt-4 mb-2 font-bold scroll-mt-24">
+                {headingContent}
+              </h5>
+            );
           case "h6":
-            return <h6 className="mt-6 mb-4 font-bold">{headingContent}</h6>;
+            return (
+              <h6
+                id={headingId}
+                className="mt-4 mb-2 font-bold text-sm scroll-mt-24"
+              >
+                {headingContent}
+              </h6>
+            );
           default:
-            return <h1 className="mt-6 mb-4 font-bold">{headingContent}</h1>;
+            return (
+              <h1
+                id={headingId}
+                className="mt-8 mb-4 font-bold text-3xl scroll-mt-24"
+              >
+                {headingContent}
+              </h1>
+            );
         }
       case "paragraph":
         return (

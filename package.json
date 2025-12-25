@@ -10,7 +10,7 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "seed": "tsx scripts/seed.mjs",
-    "prepare": "husky install"
+    "content-audit": "node scripts/content-audit.mjs"
   },
   "repository": {
     "type": "git",
