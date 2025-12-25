@@ -14,7 +14,8 @@
     "reset-topics": "tsx scripts/reset-topics.mjs",
     "update-topics": "tsx scripts/update-topics-theory.mjs",
     "content-audit": "node scripts/content-audit.mjs",
-    "cms:audit": "tsx scripts/cms-audit.mjs"
+    "cms:audit": "tsx scripts/cms-audit.mjs",
+    "cms:seed:theory-animations": "node scripts/seed-theory-animations.mjs"
   },
   "repository": {
     "type": "git",

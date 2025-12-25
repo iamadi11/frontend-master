@@ -233,11 +233,11 @@ async function audit() {
     }
 
     // Table header
-    console.log("─".repeat(140));
+    console.log("─".repeat(160));
     console.log(
-      `${"Order".padEnd(6)} | ${"Slug".padEnd(25)} | ${"Title Match".padEnd(12)} | ${"Theory".padEnd(20)} | ${"Refs".padEnd(5)} | ${"Steps".padEnd(6)} | ${"Tasks".padEnd(6)} | Issues`
+      `${"Order".padEnd(6)} | ${"Slug".padEnd(25)} | ${"Title Match".padEnd(12)} | ${"Theory".padEnd(20)} | ${"Refs".padEnd(5)} | ${"Steps".padEnd(6)} | ${"Tasks".padEnd(6)} | ${"Animations".padEnd(10)} | Issues`
     );
-    console.log("─".repeat(140));
+    console.log("─".repeat(160));
 
     // Validate each topic
     for (const topic of topics) {
@@ -310,6 +310,31 @@ async function audit() {
         topicWarnings.push(`Only ${tasksCount} tasks (need ≥2)`);
       }
 
+      // Theory animations validation
+      const animationsCount = Array.isArray(topic.theoryAnimations) ? topic.theoryAnimations.length : 0;
+      const animationsStatus = animationsCount >= 2 && animationsCount <= 6 ? `✓ ${animationsCount}` : animationsCount < 2 ? `⚠ ${animationsCount}` : `⚠ ${animationsCount} (>6)`;
+      if (animationsCount < 2) {
+        topicWarnings.push(`Only ${animationsCount} theory animations (need 2-6)`);
+      } else if (animationsCount > 6) {
+        topicWarnings.push(`${animationsCount} theory animations (recommended ≤6)`);
+      } else if (animationsCount > 0) {
+        // Validate each block structure
+        topic.theoryAnimations.forEach((block, idx) => {
+          if (!block.title) {
+            topicWarnings.push(`Animation block ${idx + 1} missing title`);
+          }
+          if (!block.kind) {
+            topicWarnings.push(`Animation block ${idx + 1} missing kind`);
+          }
+          if (!block.description) {
+            topicWarnings.push(`Animation block ${idx + 1} missing description`);
+          }
+          if (!Array.isArray(block.whatToNotice) || block.whatToNotice.length < 3) {
+            topicWarnings.push(`Animation block ${idx + 1} has <3 whatToNotice items`);
+          }
+        });
+      }
+
       // Combine issues for display
       const allIssuesStr =
         topicIssues.length > 0
@@ -318,9 +343,13 @@ async function audit() {
           ? `⚠ ${topicWarnings.join("; ")}`
           : "None";
 
+      // Theory animations status
+      const animationsCount = Array.isArray(topic.theoryAnimations) ? topic.theoryAnimations.length : 0;
+      const animationsStatus = animationsCount >= 2 && animationsCount <= 6 ? `✓ ${animationsCount}` : animationsCount < 2 ? `⚠ ${animationsCount}` : `⚠ ${animationsCount}`;
+
       // Print row
       console.log(
-        `${String(topic.order).padEnd(6)} | ${topic.slug.padEnd(25)} | ${titleMatchStr.padEnd(12)} | ${theoryStatus.padEnd(20)} | ${refsStatus.padEnd(5)} | ${stepsStatus.padEnd(6)} | ${tasksStatus.padEnd(6)} | ${allIssuesStr}`
+        `${String(topic.order).padEnd(6)} | ${topic.slug.padEnd(25)} | ${titleMatchStr.padEnd(12)} | ${theoryStatus.padEnd(20)} | ${refsStatus.padEnd(5)} | ${stepsStatus.padEnd(6)} | ${tasksStatus.padEnd(6)} | ${animationsStatus.padEnd(10)} | ${allIssuesStr}`
       );
 
       // Collect global issues/warnings
