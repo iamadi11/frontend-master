@@ -1,0 +1,291 @@
+import { getPayload } from "payload";
+import { config as dotenvConfig } from "dotenv";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+import { readFileSync } from "fs";
+
+// Load environment variables from .env.local
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenvConfig({ path: join(__dirname, "..", ".env.local") });
+
+// Expected topics from curriculum-index.md
+const EXPECTED_TITLES = [
+  "Frontend System Design Foundations: Requirements, Constraints, and Architecture Thinking",
+  "Rendering Strategies & Data Lifecycles: CSR, SSR, SSG, ISR, Streaming, Hydration, Routing, Fetching, Caching, Revalidation",
+  "State Management at Scale: Server State vs Client State, Async Orchestration, Optimistic Updates, and Offline",
+  "Performance System Design: Core Web Vitals, Loading Strategies, Bundles, Caching, Images/Video, CPU/Memory, and Long Tasks",
+  "Component & UI Architecture: Design Systems, Theming, Tokens, Micro-frontends, and Module Federation Trade-offs",
+  "Deployment & Delivery for Frontend Systems: CI/CD, Feature Flags, A/B Testing, Canary, Rollback, CDN Strategy, Edge",
+  "Testing Strategy for Frontend Systems: Unit, Integration, E2E, Contract Testing, and Visual Regression",
+  "Observability for Frontend Systems: Logging, Metrics, Tracing, Session Replay Considerations, Error Boundaries, Monitoring Strategy",
+  "Security & Privacy for Frontend Systems: XSS/CSRF/CSP, Auth Flows, Token Storage, Clickjacking, Dependency Risk, PII Handling, GDPR-like Principles",
+  "Real-time Frontend Systems: WebSockets vs SSE, Sync Models, Conflict Handling, Backpressure, and Resilience",
+  "Large-scale UX Systems: Virtualization, Pagination vs Infinite Scroll, Search, Forms, Validation, Autosave",
+  "Capstone Frontend System Designs: E-commerce PDP/Checkout, Dashboard/Analytics, Chat/Collab, Media Streaming UI",
+];
+
+/**
+ * Validates if theory field has meaningful content
+ * Lexical richText structure: root with children array
+ */
+function validateTheory(theory) {
+  if (!theory) {
+    return { valid: false, reason: "Missing" };
+  }
+
+  if (typeof theory === "object" && theory.root) {
+    const children = theory.root.children || [];
+    if (children.length === 0) {
+      return { valid: false, reason: "Empty root" };
+    }
+
+    // Count total text content
+    let totalTextLength = 0;
+    function countText(node) {
+      if (node.text) {
+        totalTextLength += node.text.length;
+      }
+      if (node.children && Array.isArray(node.children)) {
+        node.children.forEach(countText);
+      }
+    }
+    children.forEach(countText);
+
+    // Require at least 100 characters of actual text
+    if (totalTextLength < 100) {
+      return { valid: false, reason: `Too short (${totalTextLength} chars)` };
+    }
+
+    return { valid: true, charCount: totalTextLength };
+  }
+
+  return { valid: false, reason: "Invalid format" };
+}
+
+/**
+ * Compares topic title against expected curriculum title
+ */
+function compareTitles(actualTitle, expectedTitle) {
+  const normalize = (str) =>
+    str.toLowerCase().replace(/[^\w\s]/g, "").replace(/\s+/g, " ").trim();
+
+  const actual = normalize(actualTitle);
+  const expected = normalize(expectedTitle);
+
+  if (actual === expected) return { match: true };
+  
+  // Check if titles are similar (contains most words)
+  const expectedWords = expected.split(" ");
+  const actualWords = actual.split(" ");
+  const matchedWords = expectedWords.filter((word) =>
+    actualWords.includes(word)
+  );
+
+  if (matchedWords.length >= expectedWords.length * 0.7) {
+    return { match: "partial", diff: `"${actualTitle}" vs "${expectedTitle}"` };
+  }
+
+  return { match: false, diff: `"${actualTitle}" vs "${expectedTitle}"` };
+}
+
+/**
+ * Main audit function
+ */
+async function audit() {
+  console.log("🔍 CMS Audit: Validating all 12 topics...\n");
+
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL environment variable is not set");
+  }
+
+  if (!process.env.PAYLOAD_SECRET) {
+    throw new Error("PAYLOAD_SECRET environment variable is not set");
+  }
+
+  // Import config dynamically
+  const configModule = await import("../payload.config.ts");
+  const config = configModule.default;
+
+  const payload = await getPayload({ config });
+
+  try {
+    // Fetch all topics
+    const result = await payload.find({
+      collection: "topics",
+      limit: 100,
+      sort: "order",
+    });
+
+    const topics = result.docs;
+
+    // Validation results
+    const issues = [];
+    const warnings = [];
+
+    // Check count
+    if (topics.length !== 12) {
+      issues.push(
+        `❌ Expected 12 topics, found ${topics.length}`
+      );
+    } else {
+      console.log(`✓ Found 12 topics\n`);
+    }
+
+    // Check orders (1-12 with no gaps/duplicates)
+    const orders = topics.map((t) => t.order).sort((a, b) => a - b);
+    const expectedOrders = Array.from({ length: 12 }, (_, i) => i + 1);
+    const orderMismatches = expectedOrders.filter(
+      (expected, idx) => orders[idx] !== expected
+    );
+    if (orderMismatches.length > 0) {
+      issues.push(
+        `❌ Order gaps/duplicates detected. Expected [1-12], got [${orders.join(", ")}]`
+      );
+    } else {
+      console.log(`✓ Orders are correct (1-12, no gaps)\n`);
+    }
+
+    // Check for duplicate slugs
+    const slugs = topics.map((t) => t.slug);
+    const duplicateSlugs = slugs.filter(
+      (slug, index) => slugs.indexOf(slug) !== index
+    );
+    if (duplicateSlugs.length > 0) {
+      issues.push(`❌ Duplicate slugs: ${duplicateSlugs.join(", ")}`);
+    } else {
+      console.log(`✓ All slugs are unique\n`);
+    }
+
+    // Table header
+    console.log("─".repeat(140));
+    console.log(
+      `${"Order".padEnd(6)} | ${"Slug".padEnd(25)} | ${"Title Match".padEnd(12)} | ${"Theory".padEnd(20)} | ${"Refs".padEnd(5)} | ${"Steps".padEnd(6)} | ${"Tasks".padEnd(6)} | Issues`
+    );
+    console.log("─".repeat(140));
+
+    // Validate each topic
+    for (const topic of topics) {
+      const topicIssues = [];
+      const topicWarnings = [];
+
+      // Title validation
+      const expectedTitle = EXPECTED_TITLES[topic.order - 1];
+      let titleMatchStr = "N/A";
+      if (expectedTitle) {
+        const titleComparison = compareTitles(topic.title, expectedTitle);
+        if (titleComparison.match === true) {
+          titleMatchStr = "✓ Match";
+        } else if (titleComparison.match === "partial") {
+          titleMatchStr = "~ Partial";
+          topicWarnings.push(`Title differs: ${titleComparison.diff}`);
+        } else {
+          titleMatchStr = "✗ Mismatch";
+          topicWarnings.push(`Title mismatch: ${titleComparison.diff}`);
+        }
+      }
+
+      // Theory validation
+      const theoryValidation = validateTheory(topic.theory);
+      let theoryStatus = "";
+      if (theoryValidation.valid) {
+        theoryStatus = `✓ OK (${theoryValidation.charCount}ch)`;
+      } else {
+        theoryStatus = `✗ ${theoryValidation.reason}`;
+        topicIssues.push(`Theory: ${theoryValidation.reason}`);
+      }
+
+      // References validation
+      const refsCount = topic.references?.length || 0;
+      const refsStatus = refsCount >= 2 ? `✓ ${refsCount}` : `⚠ ${refsCount}`;
+      if (refsCount < 2) {
+        topicWarnings.push(`Only ${refsCount} references (need ≥2)`);
+      }
+
+      // Practice demo validation
+      if (!topic.practiceDemo) {
+        topicIssues.push("Missing practiceDemo");
+      } else if (!topic.practiceDemo.demoType) {
+        topicIssues.push("practiceDemo missing demoType");
+      }
+
+      // Practice steps validation
+      const stepsCount = topic.practiceSteps?.length || 0;
+      const stepsStatus = stepsCount >= 4 ? `✓ ${stepsCount}` : `⚠ ${stepsCount}`;
+      if (stepsCount < 4) {
+        topicWarnings.push(`Only ${stepsCount} steps (recommended ≥4)`);
+      }
+
+      // Practice tasks validation
+      const tasksCount = topic.practiceTasks?.length || 0;
+      const tasksStatus = tasksCount >= 2 ? `✓ ${tasksCount}` : `⚠ ${tasksCount}`;
+      if (tasksCount < 2) {
+        topicWarnings.push(`Only ${tasksCount} tasks (need ≥2)`);
+      }
+
+      // Combine issues for display
+      const allIssuesStr =
+        topicIssues.length > 0
+          ? topicIssues.join("; ")
+          : topicWarnings.length > 0
+          ? `⚠ ${topicWarnings.join("; ")}`
+          : "None";
+
+      // Print row
+      console.log(
+        `${String(topic.order).padEnd(6)} | ${topic.slug.padEnd(25)} | ${titleMatchStr.padEnd(12)} | ${theoryStatus.padEnd(20)} | ${refsStatus.padEnd(5)} | ${stepsStatus.padEnd(6)} | ${tasksStatus.padEnd(6)} | ${allIssuesStr}`
+      );
+
+      // Collect global issues/warnings
+      if (topicIssues.length > 0) {
+        issues.push(`Topic ${topic.order} (${topic.slug}): ${topicIssues.join(", ")}`);
+      }
+      if (topicWarnings.length > 0) {
+        warnings.push(`Topic ${topic.order} (${topic.slug}): ${topicWarnings.join(", ")}`);
+      }
+    }
+
+    console.log("─".repeat(140));
+    console.log();
+
+    // Summary
+    if (issues.length === 0 && warnings.length === 0) {
+      console.log("✅ All validations passed! All 12 topics are complete.\n");
+      return 0;
+    }
+
+    if (issues.length > 0) {
+      console.log("❌ CRITICAL ISSUES:\n");
+      issues.forEach((issue) => console.log(`  ${issue}`));
+      console.log();
+    }
+
+    if (warnings.length > 0) {
+      console.log("⚠️  WARNINGS:\n");
+      warnings.forEach((warning) => console.log(`  ${warning}`));
+      console.log();
+    }
+
+    // Exit code: 1 if any critical issues, 0 if only warnings
+    return issues.length > 0 ? 1 : 0;
+  } catch (error) {
+    console.error("❌ Audit failed:", error);
+    return 1;
+  } finally {
+    // Payload cleanup
+    if (payload && typeof payload.db?.destroy === "function") {
+      await payload.db.destroy();
+    }
+  }
+}
+
+// Run audit
+audit()
+  .then((exitCode) => {
+    process.exit(exitCode);
+  })
+  .catch((error) => {
+    console.error("Fatal error:", error);
+    process.exit(1);
+  });
+

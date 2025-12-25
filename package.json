@@ -10,7 +10,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "seed": "tsx scripts/seed.mjs",
-    "content-audit": "node scripts/content-audit.mjs"
+    "content-audit": "node scripts/content-audit.mjs",
+    "cms:audit": "tsx scripts/cms-audit.mjs"
   },
   "repository": {
     "type": "git",
