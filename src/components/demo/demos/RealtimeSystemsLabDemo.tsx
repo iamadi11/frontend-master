@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DemoShell } from "../DemoShell";
 import { EventLog, EventLogEntry } from "../EventLog";
 import { Spotlight, SpotlightTarget } from "../Spotlight";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import { RealtimePlantScene } from "../../three/RealtimePlantScene";
+import { Fallback2D } from "../../three/Fallback2D";
 import {
   realtimeSystemsLabConfigSchema,
   type RealtimeSystemsLabConfig,
@@ -45,6 +48,7 @@ export function RealtimeSystemsLabDemo({
   focusTarget,
 }: RealtimeSystemsLabDemoProps) {
   const { reduced } = useMotionPrefs();
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const [protocol, setProtocol] = useState<Protocol>("SSE");
   const [network, setNetwork] = useState<Network>("STABLE");
   const [msgRatePerSec, setMsgRatePerSec] = useState(10);
@@ -71,6 +75,7 @@ export function RealtimeSystemsLabDemo({
   const [clientAState, setClientAState] = useState("Initial value");
   const [clientBState, setClientBState] = useState("Initial value");
   const [serverState, setServerState] = useState("Initial value");
+  const [lastEditFrom, setLastEditFrom] = useState<"A" | "B" | null>(null);
 
   const streamIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const batchBufferRef = useRef<Message[]>([]);
@@ -396,6 +401,7 @@ export function RealtimeSystemsLabDemo({
   const handleClientAEdit = useCallback(() => {
     const newValue = `Client A: ${Date.now()}`;
     setClientAState(newValue);
+    setLastEditFrom("A");
 
     if (conflictMode === "LAST_WRITE_WINS") {
       setServerState(newValue);
@@ -423,6 +429,7 @@ export function RealtimeSystemsLabDemo({
   const handleClientBEdit = useCallback(() => {
     const newValue = `Client B: ${Date.now()}`;
     setClientBState(newValue);
+    setLastEditFrom("B");
 
     if (conflictMode === "LAST_WRITE_WINS") {
       setServerState(newValue);
@@ -479,6 +486,35 @@ export function RealtimeSystemsLabDemo({
 
   const controls = (
     <div className="space-y-4">
+      {/* View Mode Toggle (2D / 3D) */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          View Mode
+        </label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode("2D")}
+            className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "2D"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            }`}
+          >
+            2D
+          </button>
+          <button
+            onClick={() => setViewMode("3D")}
+            className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+              viewMode === "3D"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            }`}
+          >
+            3D
+          </button>
+        </div>
+      </div>
+
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Protocol
@@ -711,7 +747,20 @@ export function RealtimeSystemsLabDemo({
     </div>
   );
 
-  const visualization = (
+  // Prepare replay messages for 3D
+  const replayMessages = useMemo(() => {
+    if (reconnectStrategy !== "RECONNECT_WITH_REPLAY") return [];
+    return messages
+      .filter((m) => m.status === "delivered")
+      .slice(-replayWindow)
+      .map((m) => ({
+        id: m.id,
+        message: m.payload,
+        timestamp: m.timestamp,
+      }));
+  }, [messages, reconnectStrategy, replayWindow]);
+
+  const visualization2D = (
     <Spotlight targetId={focusTarget || null}>
       <div className="space-y-6">
         {/* Message Flow Visualization */}
@@ -1045,6 +1094,50 @@ export function RealtimeSystemsLabDemo({
       </div>
     </Spotlight>
   );
+
+  const visualization3D = (
+    <ThreeCanvasShell
+      className="w-full h-[600px] rounded-lg overflow-hidden bg-gray-900"
+      fallback={
+        <Fallback2D message="3D unavailable, showing 2D view">
+          {visualization2D}
+        </Fallback2D>
+      }
+    >
+      <RealtimePlantScene
+        protocol={protocol}
+        network={network}
+        isStreaming={isStreaming}
+        bufferDepth={bufferDepth}
+        maxBufferDepth={20}
+        backpressure={backpressure}
+        droppedMsgsPct={droppedMsgsPct}
+        latencyMs={latencyMs}
+        reconnectStrategy={reconnectStrategy}
+        replayWindow={replayWindow}
+        isReconnecting={isReconnecting}
+        replayMessages={replayMessages}
+        conflictMode={conflictMode}
+        clientAValue={clientAState}
+        clientBValue={clientBState}
+        serverValue={serverState}
+        hasConflict={conflictState !== null && !conflictState.resolved}
+        lastEditFrom={lastEditFrom}
+        focusTarget={focusTarget}
+        onPacketComplete={(packetId) => {
+          // Optional: handle packet completion
+        }}
+        onPacketArrive={() => {
+          // Optional: handle packet arrival
+        }}
+        onPacketDrop={() => {
+          // Optional: handle packet drop
+        }}
+      />
+    </ThreeCanvasShell>
+  );
+
+  const visualization = viewMode === "3D" ? visualization3D : visualization2D;
 
   return (
     <DemoShell
