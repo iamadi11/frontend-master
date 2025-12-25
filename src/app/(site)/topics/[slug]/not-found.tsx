@@ -5,7 +5,7 @@ export default function NotFound() {
     <div className="text-center py-12">
       <h1 className="text-4xl font-bold mb-4">Topic Not Found</h1>
       <p className="text-gray-600 dark:text-gray-400 mb-6">
-        The topic you're looking for doesn't exist.
+        The topic you&apos;re looking for doesn&apos;t exist.
       </p>
       <Link
         href="/topics"

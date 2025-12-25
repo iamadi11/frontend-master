@@ -692,10 +692,12 @@ export function SecurityPrivacyLabDemo({
               }
               className="w-full px-2 py-1 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-xs"
             >
-              <option value="NONE">'none'</option>
-              <option value="SELF">'self'</option>
-              <option value="SELF_CDN">'self' + CDN</option>
-              <option value="UNSAFE_INLINE">'unsafe-inline' (dangerous)</option>
+              <option value="NONE">&apos;none&apos;</option>
+              <option value="SELF">&apos;self&apos;</option>
+              <option value="SELF_CDN">&apos;self&apos; + CDN</option>
+              <option value="UNSAFE_INLINE">
+                &apos;unsafe-inline&apos; (dangerous)
+              </option>
             </select>
           </div>
           <div className="space-y-1">
@@ -709,8 +711,8 @@ export function SecurityPrivacyLabDemo({
               }
               className="w-full px-2 py-1 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-xs"
             >
-              <option value="SELF">'self'</option>
-              <option value="API_ONLY">'self' + API</option>
+              <option value="SELF">&apos;self&apos;</option>
+              <option value="API_ONLY">&apos;self&apos; + API</option>
               <option value="ANY">* (any)</option>
             </select>
           </div>
@@ -728,9 +730,9 @@ export function SecurityPrivacyLabDemo({
               }
               className="w-full px-2 py-1 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-xs"
             >
-              <option value="NONE">'none'</option>
-              <option value="SELF">'self'</option>
-              <option value="TRUSTED">'self' + trusted</option>
+              <option value="NONE">&apos;none&apos;</option>
+              <option value="SELF">&apos;self&apos;</option>
+              <option value="TRUSTED">&apos;self&apos; + trusted</option>
             </select>
           </div>
         </div>

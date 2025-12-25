@@ -291,8 +291,8 @@ export function FederationGraph3D({
                 ⚠️ Version Mismatch Blocked
               </div>
               <div className="text-xs text-red-600 dark:text-red-400">
-                Strict version check failed: shared dependency versions don't
-                match
+                Strict version check failed: shared dependency versions
+                don&apos;t match
               </div>
             </div>
           </Html>

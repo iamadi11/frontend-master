@@ -142,7 +142,7 @@ export function ObservabilityLabDemo({
     const steps = pipelineSteps;
     if (steps.length === 0) return;
 
-    let currentStepIndex = 0;
+    const currentStepIndex = 0;
     const packetId = `packet-${Date.now()}-${Math.random()}`;
 
     const animateStep = (index: number) => {
@@ -305,6 +305,16 @@ export function ObservabilityLabDemo({
     },
     [config]
   );
+
+  // Handle packet completion in 3D mode
+  const handlePacketComplete = useCallback((packetId: string) => {
+    setEventPackets((prev) => prev.filter((p) => p.id !== packetId));
+  }, []);
+
+  // Handle sampling completion in 3D mode
+  const handleSamplingComplete = useCallback(() => {
+    // Sampling animation completed
+  }, []);
 
   if (!config) {
     return (
@@ -521,16 +531,6 @@ export function ObservabilityLabDemo({
       )}
     </div>
   );
-
-  // Handle packet completion in 3D mode
-  const handlePacketComplete = useCallback((packetId: string) => {
-    setEventPackets((prev) => prev.filter((p) => p.id !== packetId));
-  }, []);
-
-  // Handle sampling completion in 3D mode
-  const handleSamplingComplete = useCallback(() => {
-    // Sampling animation completed
-  }, []);
 
   const visualization =
     viewMode === "3D" ? (
