@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "seed": "node scripts/seed.mjs",
+    "seed": "tsx scripts/seed.mjs",
     "prepare": "husky install"
   },
   "repository": {
@@ -53,9 +53,11 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "dotenv": "^17.2.3",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "tsx": "^4.21.0"
   }
 }

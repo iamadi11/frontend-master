@@ -93,6 +93,117 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: "topics",
+      fields: [
+        {
+          name: "title",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "slug",
+          type: "text",
+          required: true,
+          unique: true,
+        },
+        {
+          name: "order",
+          type: "number",
+          required: true,
+        },
+        {
+          name: "difficulty",
+          type: "select",
+          options: [
+            { label: "Beginner", value: "beginner" },
+            { label: "Intermediate", value: "intermediate" },
+            { label: "Advanced", value: "advanced" },
+          ],
+          defaultValue: "beginner",
+          required: true,
+        },
+        {
+          name: "summary",
+          type: "textarea",
+        },
+        {
+          name: "theory",
+          type: "richText",
+          editor: lexicalEditor({}),
+        },
+        {
+          name: "references",
+          type: "array",
+          fields: [
+            {
+              name: "label",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "url",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "note",
+              type: "text",
+            },
+            {
+              name: "claimIds",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "practiceDemo",
+          type: "json",
+          required: true,
+        },
+        {
+          name: "practiceSteps",
+          type: "array",
+          fields: [
+            {
+              name: "title",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "body",
+              type: "textarea",
+              required: true,
+            },
+            {
+              name: "focusTarget",
+              type: "text",
+            },
+          ],
+        },
+        {
+          name: "practiceTasks",
+          type: "array",
+          fields: [
+            {
+              name: "prompt",
+              type: "textarea",
+              required: true,
+            },
+            {
+              name: "expectedAnswer",
+              type: "textarea",
+              required: true,
+            },
+            {
+              name: "explanation",
+              type: "textarea",
+              required: true,
+            },
+          ],
+        },
+      ],
+    },
   ],
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || "",

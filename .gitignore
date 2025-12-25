@@ -41,4 +41,5 @@ next-env.d.ts
 
 #dev-only
 .pdf
+docs/_source/*.pdf
 docs/_source/frontend_system_design_curriculum.pdf

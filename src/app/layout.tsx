@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ConsoleErrorSuppressor } from "@/components/console-error-suppressor";
+import { MotionPrefsProvider } from "@/components/motion/MotionPrefsProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-geist-sans" });
 
@@ -21,7 +22,7 @@ export default function RootLayout({
       <body className={inter.variable} suppressHydrationWarning>
         <ConsoleErrorSuppressor />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
+          <MotionPrefsProvider>{children}</MotionPrefsProvider>
         </ThemeProvider>
       </body>
     </html>
