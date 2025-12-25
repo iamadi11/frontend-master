@@ -10,9 +10,13 @@ interface MotionWrapperProps {
 
 export function MotionWrapper({ children }: MotionWrapperProps) {
   const pathname = usePathname();
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState<
+    boolean | null
+  >(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mediaQuery.matches);
 
@@ -23,6 +27,11 @@ export function MotionWrapper({ children }: MotionWrapperProps) {
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
+
+  // Don't render motion until mounted to avoid hydration mismatch
+  if (!mounted || prefersReducedMotion === null) {
+    return <div>{children}</div>;
+  }
 
   const variants = {
     initial: { opacity: 0, y: prefersReducedMotion ? 0 : 8 },

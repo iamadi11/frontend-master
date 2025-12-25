@@ -1,0 +1,21 @@
+---
+description: "Always apply: prevent scope creep (no unrelated product features)."
+alwaysApply: true
+---
+
+# Scope Guardrails (Hard boundaries)
+
+## Do NOT add (unless user explicitly requests)
+- Learner accounts/login, comments, likes, ratings, payments, subscriptions
+- Gamification: points, badges, leaderboards, streaks
+- Notifications, emails, community features
+- Complex search engine, recommendations, personalization
+- Unnecessary microservices / over-architecture
+
+## Do add (only what supports the mission)
+- CMS-driven topic content + references
+- Two-section topic pages (Theory + Practice)
+- Minimal IA (topics list, next/prev, tags) only as needed for learning
+- Focus-first UI and motion policy
+- PWA/offline plumbing and basic caching
+- Vercel + MongoDB env correctness

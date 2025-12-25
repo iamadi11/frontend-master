@@ -1,0 +1,29 @@
+---
+description: "Use when creating/modifying any topic page: enforce Theory + Practice structure and required subsections."
+alwaysApply: false
+---
+
+# Topic Page Contract (Required)
+
+Every topic page MUST render two primary tabs/sections:
+A) THEORY (detailed)
+B) PRACTICE (interactive)
+
+## A) THEORY must include (minimum headings)
+- What you will learn
+- Prerequisites (light)
+- Mental model (simple first, then deep)
+- Core concepts
+- Design process (step-by-step)
+- Trade-offs (table)
+- Common mistakes & how to avoid
+- Mini case study (realistic)
+- Interview Q&A
+- References (must map to key claims)
+
+## B) PRACTICE must include (minimum)
+- Interactive demo (controls + visualization)
+- Side-by-side compare when relevant
+- Timeline / event log (“what happened”)
+- Guided steps mode (step-by-step)
+- Hands-on task + solution reveal

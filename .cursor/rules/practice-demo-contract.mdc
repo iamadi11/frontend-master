@@ -1,0 +1,25 @@
+---
+description: "Use when implementing any Practice section: standardize interactive demos, keep them CMS-driven, validated, and focus-first."
+alwaysApply: false
+---
+
+# Practice Demo Contract (Non-negotiable for Practice)
+
+## CMS-driven only
+- Practice demos must be driven from CMS fields (demoConfig + steps + tasks).
+- Do not hardcode topic logic in Next routes. Routes fetch + render only.
+
+## Required demo UX (minimum)
+- Controls: toggles/tabs/sliders that change behavior
+- Visualization: shows observable difference (before/after or side-by-side)
+- Timeline/event log: explains what changed when controls are used
+- Guided steps mode: Step 1..N with highlight of relevant UI area
+- Hands-on task: user must predict/choose/adjust; then reveal solution + explanation
+
+## Demo config validation
+- Define a JSON schema for demoConfig and validate with Zod at runtime.
+- If config invalid/missing: show a friendly “Demo unavailable” state (no crash).
+
+## Focus-first motion
+- Motion only on state transitions and only to guide attention.
+- Must respect prefers-reduced-motion.

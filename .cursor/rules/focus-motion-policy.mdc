@@ -1,0 +1,19 @@
+---
+description: "Use when adding animations/interactions: keep motion subtle, purposeful, and accessible."
+alwaysApply: false
+---
+
+# Focus-only Motion Policy
+
+## Allowed
+- Route transitions: opacity + small translateY (150–250ms)
+- Subtle highlight of changed area after user interaction
+- Progressive disclosure (accordion) for explanations
+
+## Not allowed
+- Looping animations, parallax, confetti, bouncing, flashy 3D
+- Anything that competes with reading or comprehension
+
+## Accessibility
+- If prefers-reduced-motion: disable motion; use static emphasis (outline/background)
+- Keep client components minimal and only where necessary
