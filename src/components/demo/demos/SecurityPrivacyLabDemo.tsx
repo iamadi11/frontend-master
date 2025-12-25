@@ -10,6 +10,9 @@ import {
   securityPrivacyLabConfigSchema,
   type SecurityPrivacyLabConfig,
 } from "../demoSchema";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import { SecuritySandboxScene } from "../../three/SecuritySandboxScene";
+import { Fallback2D } from "../../three/Fallback2D";
 
 interface SecurityPrivacyLabDemoProps {
   demoConfig: unknown;
@@ -59,6 +62,7 @@ export function SecurityPrivacyLabDemo({
 }: SecurityPrivacyLabDemoProps) {
   const { reduced } = useMotionPrefs();
   const [mode, setMode] = useState<Mode>("XSS_CSRF");
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const [threat, setThreat] = useState<Threat>("XSS");
   const [defense, setDefense] = useState<DefenseState>({
     inputEncoding: false,
@@ -79,6 +83,8 @@ export function SecurityPrivacyLabDemo({
   const [deps, setDeps] = useState<Dependency[]>([]);
   const [piiMode, setPiiMode] = useState<PIIMode>("RAW");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
+  const [evaluatePolicyTrigger, setEvaluatePolicyTrigger] = useState(0);
+  const [tryEmbedTrigger, setTryEmbedTrigger] = useState(0);
 
   // Validate and parse demo config
   const config = useMemo(() => {
@@ -518,6 +524,35 @@ export function SecurityPrivacyLabDemo({
 
   const controls = (
     <div className="space-y-4">
+      {/* 2D/3D Toggle */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          View Mode
+        </label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode("2D")}
+            className={`flex-1 px-3 py-2 text-xs rounded border transition-colors ${
+              viewMode === "2D"
+                ? "bg-blue-500 text-white border-blue-500"
+                : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            }`}
+          >
+            2D
+          </button>
+          <button
+            onClick={() => setViewMode("3D")}
+            className={`flex-1 px-3 py-2 text-xs rounded border transition-colors ${
+              viewMode === "3D"
+                ? "bg-blue-500 text-white border-blue-500"
+                : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            }`}
+          >
+            3D
+          </button>
+        </div>
+      </div>
+
       {/* Mode tabs */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -633,6 +668,19 @@ export function SecurityPrivacyLabDemo({
 
       {mode === "CSP" && (
         <div className="space-y-3">
+          <button
+            onClick={() => {
+              setEvaluatePolicyTrigger((prev) => prev + 1);
+              addEventLog(
+                "Evaluate Policy",
+                "Policy evaluation triggered",
+                "Evaluating CSP policy against actions"
+              );
+            }}
+            className="w-full px-3 py-2 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
+          >
+            Evaluate Policy
+          </button>
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
               script-src
@@ -728,23 +776,38 @@ export function SecurityPrivacyLabDemo({
       )}
 
       {mode === "CLICKJACKING" && (
-        <div className="space-y-1">
-          <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-            Defense
-          </label>
-          <select
-            value={clickjackingDefense}
-            onChange={(e) =>
-              handleClickjackingDefenseChange(
-                e.target.value as ClickjackingDefense
-              )
-            }
-            className="w-full px-2 py-1 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-xs"
+        <div className="space-y-2">
+          <button
+            onClick={() => {
+              setTryEmbedTrigger((prev) => prev + 1);
+              addEventLog(
+                "Try Embed",
+                "Embed attempt triggered",
+                "Attempting to embed page in iframe"
+              );
+            }}
+            className="w-full px-3 py-2 bg-blue-500 text-white text-xs rounded hover:bg-blue-600 transition-colors"
           >
-            <option value="NONE">None</option>
-            <option value="XFO_DENY">X-Frame-Options: DENY</option>
-            <option value="CSP_FRAME_ANCESTORS">CSP frame-ancestors</option>
-          </select>
+            Try Embed
+          </button>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              Defense
+            </label>
+            <select
+              value={clickjackingDefense}
+              onChange={(e) =>
+                handleClickjackingDefenseChange(
+                  e.target.value as ClickjackingDefense
+                )
+              }
+              className="w-full px-2 py-1 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-xs"
+            >
+              <option value="NONE">None</option>
+              <option value="XFO_DENY">X-Frame-Options: DENY</option>
+              <option value="CSP_FRAME_ANCESTORS">CSP frame-ancestors</option>
+            </select>
+          </div>
         </div>
       )}
 
@@ -803,7 +866,8 @@ export function SecurityPrivacyLabDemo({
     </div>
   );
 
-  const visualization = (
+  // 2D Visualization
+  const visualization2D = (
     <Spotlight targetId={focusTarget || null}>
       <div className="space-y-6">
         {/* XSS/CSRF Flow */}
@@ -1241,10 +1305,38 @@ export function SecurityPrivacyLabDemo({
     </Spotlight>
   );
 
+  // 3D Visualization
+  const visualization3D = (
+    <ThreeCanvasShell
+      className="w-full h-[600px] bg-gray-900 rounded-lg"
+      fallback={
+        <Fallback2D message="3D unavailable, showing 2D view">
+          {visualization2D}
+        </Fallback2D>
+      }
+    >
+      <SecuritySandboxScene
+        mode={mode}
+        threat={threat}
+        defense={defense}
+        csp={csp}
+        tokenStorage={tokenStorage}
+        clickjackingDefense={clickjackingDefense}
+        deps={deps}
+        piiMode={piiMode}
+        allowedOrBlocked={allowedOrBlocked}
+        riskSummary={riskSummary}
+        evaluatePolicyTrigger={evaluatePolicyTrigger}
+        tryEmbedTrigger={tryEmbedTrigger}
+        focusTarget={focusTarget}
+      />
+    </ThreeCanvasShell>
+  );
+
   return (
     <DemoShell
       controls={controls}
-      visualization={visualization}
+      visualization={viewMode === "3D" ? visualization3D : visualization2D}
       eventLog={<EventLog entries={eventLog} />}
     />
   );
