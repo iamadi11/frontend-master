@@ -179,6 +179,9 @@ export function PerformanceBudgetLabDemo({
   const [clsRisk, setClsRisk] = useState<CLSRisk>("LOW");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [shouldRunSimulation, setShouldRunSimulation] = useState(false);
   const [lastChangedField, setLastChangedField] = useState<string | null>(null);
 
@@ -785,6 +788,8 @@ export function PerformanceBudgetLabDemo({
           focusTarget={focusTarget || null}
           onSegmentClick={handleSegmentClick}
           recommendations={recommendations}
+          cameraPreset={cameraPreset}
+          onCameraPresetChange={setCameraPreset}
         />
       </ThreeCanvasShell>
     </div>

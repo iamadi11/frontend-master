@@ -1,10 +1,12 @@
 "use client";
 
 import { useRef, useEffect, useMemo, useState } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Text, Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useReducedMotion3D } from "./useReducedMotion3D";
+
+export type CameraPreset = "overview" | "closeup" | "side";
 
 interface Metrics {
   LCP_ms: number;
@@ -21,6 +23,16 @@ interface Breakdown {
   mainThread_ms: number;
 }
 
+// Camera preset positions for performance theater view
+const CAMERA_PRESETS: Record<
+  CameraPreset,
+  { position: [number, number, number]; lookAt: [number, number, number] }
+> = {
+  overview: { position: [0, 4, 10], lookAt: [0, 0, 0] },
+  closeup: { position: [0, 2, 6], lookAt: [0, 0, 0] },
+  side: { position: [8, 3, 6], lookAt: [0, 0, 0] },
+};
+
 interface PerformanceTheaterSceneProps {
   metrics: Metrics;
   breakdown: Breakdown;
@@ -30,6 +42,8 @@ interface PerformanceTheaterSceneProps {
   focusTarget?: string | null;
   onSegmentClick?: (category: string, ms: number) => void;
   recommendations?: string[];
+  cameraPreset?: CameraPreset;
+  onCameraPresetChange?: (preset: CameraPreset) => void;
 }
 
 const GAUGE_TARGETS = {
@@ -53,6 +67,10 @@ const BREAKDOWN_COLORS = {
   mainThread: "#f59e0b", // amber
 };
 
+function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * t;
+}
+
 export function PerformanceTheaterScene({
   metrics,
   breakdown,
@@ -62,8 +80,11 @@ export function PerformanceTheaterScene({
   focusTarget,
   onSegmentClick,
   recommendations = [],
+  cameraPreset = "overview",
+  onCameraPresetChange,
 }: PerformanceTheaterSceneProps) {
   const reducedMotion = useReducedMotion3D();
+  const { camera } = useThree();
   const [highlightedMetric, setHighlightedMetric] = useState<string | null>(
     null
   );
@@ -151,6 +172,40 @@ export function PerformanceTheaterScene({
 
     return { segments, runwayLength };
   }, [breakdown, totalDuration]);
+
+  // Camera preset positioning (locked camera, no free movement)
+  useEffect(() => {
+    const preset = CAMERA_PRESETS[cameraPreset];
+    if (preset) {
+      if (reducedMotion) {
+        // Instant positioning in reduced motion
+        camera.position.set(...preset.position);
+        camera.lookAt(...preset.lookAt);
+      } else {
+        // Smooth transition to preset position
+        const startX = camera.position.x;
+        const startY = camera.position.y;
+        const startZ = camera.position.z;
+        const [targetX, targetY, targetZ] = preset.position;
+
+        let progress = 0;
+        const animate = () => {
+          progress += 0.05;
+          if (progress < 1) {
+            camera.position.x = lerp(startX, targetX, progress);
+            camera.position.y = lerp(startY, targetY, progress);
+            camera.position.z = lerp(startZ, targetZ, progress);
+            camera.lookAt(...preset.lookAt);
+            requestAnimationFrame(animate);
+          } else {
+            camera.position.set(...preset.position);
+            camera.lookAt(...preset.lookAt);
+          }
+        };
+        animate();
+      }
+    }
+  }, [cameraPreset, reducedMotion, camera]);
 
   // Calculate gauge heights (normalized 0-1)
   const gaugeHeights = useMemo(() => {
@@ -744,6 +799,44 @@ export function PerformanceTheaterScene({
           Simulated model — values for educational purposes
         </div>
       </Html>
+
+      {/* Camera preset controls (rendered as HTML overlay) */}
+      {onCameraPresetChange && (
+        <Html position={[0, -3.5, 0]} center>
+          <div className="flex gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => onCameraPresetChange("overview")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "overview"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => onCameraPresetChange("closeup")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "closeup"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Close-up
+            </button>
+            <button
+              onClick={() => onCameraPresetChange("side")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "side"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Side
+            </button>
+          </div>
+        </Html>
+      )}
     </>
   );
 }
