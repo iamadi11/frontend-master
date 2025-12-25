@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { Header } from "@/components/layout/Header";
-import { SidebarNavClient } from "@/components/layout/SidebarNavClient";
-import { MobileNavClient } from "@/components/layout/MobileNavClient";
+import { ConditionalSidebar } from "@/components/layout/ConditionalSidebar";
 import { listTopics } from "@/lib/content";
 
 export default async function SiteLayout({
@@ -34,12 +33,8 @@ export default async function SiteLayout({
       <Header />
 
       <div className="flex-1 flex">
-        {/* Desktop Sidebar */}
-        <aside className="hidden lg:block w-64 border-r border-gray-200 dark:border-gray-800 sticky top-16 self-start">
-          <div className="p-4">
-            <SidebarNavClient topics={topics} />
-          </div>
-        </aside>
+        {/* Desktop Sidebar - Hidden on topic pages (they have their own 3-zone layout) */}
+        <ConditionalSidebar topics={topics} />
 
         {/* Main Content */}
         <main className="flex-1 min-w-0">
@@ -49,8 +44,8 @@ export default async function SiteLayout({
         </main>
       </div>
 
-      {/* Mobile Navigation */}
-      <MobileNavClient topics={topics} />
+      {/* Mobile Navigation - Hidden on topic pages */}
+      <ConditionalSidebar topics={topics} mobile />
     </div>
   );
 }

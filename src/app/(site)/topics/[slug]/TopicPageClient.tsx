@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { RichTextRenderer } from "@/components/RichTextRenderer";
 import { RequirementsToArchitectureDemo } from "@/components/demo/demos/RequirementsToArchitectureDemo";
 import { RenderingStrategyLabDemo } from "@/components/demo/demos/RenderingStrategyLabDemo";
@@ -16,22 +18,31 @@ import { LargeScaleUXLabDemo } from "@/components/demo/demos/LargeScaleUXLabDemo
 import { CapstoneBuilderDemo } from "@/components/demo/demos/CapstoneBuilderDemo";
 import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { demoConfigSchema } from "@/components/demo/demoSchema";
-import { Prose } from "@/components/ui/Prose";
 import { TableOfContents } from "@/components/ui/TableOfContents";
 import { TopicNavigation } from "@/components/ui/TopicNavigation";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ChevronRight, Menu, X, ChevronDown, ChevronUp } from "lucide-react";
 import type { Topic } from "@/lib/types";
+
+type TopicListItem = {
+  id: string;
+  title: string;
+  slug: string;
+  order: number;
+};
 
 interface TopicPageClientProps {
   topic: Topic;
+  allTopics: TopicListItem[];
   prevTopic?: { title: string; slug: string } | null;
   nextTopic?: { title: string; slug: string } | null;
 }
 
 export function TopicPageClient({
   topic,
+  allTopics,
   prevTopic,
   nextTopic,
 }: TopicPageClientProps) {
@@ -39,7 +50,9 @@ export function TopicPageClient({
   const [currentStep, setCurrentStep] = useState(0);
   const [taskAnswers, setTaskAnswers] = useState<Record<number, string>>({});
   const [taskRevealed, setTaskRevealed] = useState<Record<number, boolean>>({});
-  const [showTOC, setShowTOC] = useState(false);
+  const [isLeftRailOpen, setIsLeftRailOpen] = useState(false);
+  const [isRightRailOpen, setIsRightRailOpen] = useState(false);
+  const pathname = usePathname();
   const { reduced } = useMotionPrefs();
 
   const handleTaskSubmit = (index: number, answer: string) => {
@@ -52,56 +65,262 @@ export function TopicPageClient({
       ? topic.practiceSteps[currentStep].focusTarget
       : null;
 
+  // Determine demo component
+  const renderDemo = () => {
+    if (!topic.practiceDemo) return null;
+
+    const demoTypeResult = demoConfigSchema.safeParse(
+      topic.practiceDemo as unknown
+    );
+    if (!demoTypeResult.success) {
+      return (
+        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+          <p>Demo unavailable: Invalid configuration</p>
+        </div>
+      );
+    }
+
+    const demoType = demoTypeResult.data.demoType;
+    const demoProps = {
+      demoConfig: topic.practiceDemo,
+      focusTarget: currentFocusTarget || undefined,
+    };
+
+    const demos: Record<string, React.ReactNode> = {
+      requirementsToArchitecture: (
+        <Spotlight targetId={currentFocusTarget}>
+          <RequirementsToArchitectureDemo {...demoProps} />
+        </Spotlight>
+      ),
+      renderingStrategyLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <RenderingStrategyLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      stateAtScaleLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <StateAtScaleLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      performanceBudgetLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <PerformanceBudgetLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      uiArchitectureLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <UIArchitectureLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      releaseDeliveryLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <ReleaseDeliveryLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      testingStrategyLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <TestingStrategyLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      observabilityLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <ObservabilityLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      securityPrivacyLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <SecurityPrivacyLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      realtimeSystemsLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <RealtimeSystemsLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      largeScaleUXLab: (
+        <Spotlight targetId={currentFocusTarget}>
+          <LargeScaleUXLabDemo {...demoProps} />
+        </Spotlight>
+      ),
+      capstoneBuilder: (
+        <Spotlight targetId={currentFocusTarget}>
+          <CapstoneBuilderDemo {...demoProps} />
+        </Spotlight>
+      ),
+    };
+
+    return (
+      demos[demoType] || (
+        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+          <p>Demo unavailable: Unknown demo type</p>
+        </div>
+      )
+    );
+  };
+
   return (
-    <article className="space-y-8">
-      {/* Header */}
-      <div className="space-y-3">
-        <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-          {topic.title}
-        </h1>
-        {topic.summary && (
-          <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
-            {topic.summary}
-          </p>
-        )}
-      </div>
+    <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,_1fr)_280px] gap-6 xl:gap-8">
+      {/* Left Rail: Topic Navigator (Desktop) */}
+      <aside className="hidden lg:block">
+        <div className="sticky top-24 space-y-4">
+          <div className="px-2 mb-4">
+            <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+              Topic Navigator
+            </h2>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              {allTopics.length} topics
+            </p>
+          </div>
+          <nav className="space-y-1 max-h-[calc(100vh-8rem)] overflow-y-auto">
+            {allTopics.map((t) => {
+              const isActive = pathname === `/topics/${t.slug}`;
+              return (
+                <Link
+                  key={t.id}
+                  href={`/topics/${t.slug}`}
+                  className={`
+                    flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-all group
+                    ${
+                      isActive
+                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium shadow-sm"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    }
+                  `}
+                >
+                  <span
+                    className={`text-xs font-semibold w-5 text-center ${
+                      isActive
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-400 dark:text-gray-500"
+                    }`}
+                  >
+                    {t.order}
+                  </span>
+                  <span className="flex-1 truncate leading-snug">
+                    {t.title}
+                  </span>
+                  {isActive && (
+                    <ChevronRight className="w-4 h-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      </aside>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-800 -mx-4 sm:mx-0 px-4 sm:px-0">
-        <nav className="flex gap-4 sm:gap-6">
+      {/* Main Column: Content Area */}
+      <main className="min-w-0 space-y-6">
+        {/* Mobile Left Rail Toggle (inside main column) */}
+        <div className="lg:hidden">
           <button
-            onClick={() => setActiveTab("theory")}
-            className={`px-2 py-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${
-              activeTab === "theory"
-                ? "border-blue-600 text-blue-600 dark:text-blue-400"
-                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-            }`}
+            onClick={() => setIsLeftRailOpen(!isLeftRailOpen)}
+            className="w-full flex items-center justify-between p-3 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
           >
-            Theory
+            <span className="text-sm font-medium">Topic Navigator</span>
+            {isLeftRailOpen ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
-          <button
-            onClick={() => setActiveTab("practice")}
-            className={`px-2 py-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${
-              activeTab === "practice"
-                ? "border-blue-600 text-blue-600 dark:text-blue-400"
-                : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
-            }`}
-          >
-            Practice
-          </button>
-        </nav>
-      </div>
+          <AnimatePresence>
+            {isLeftRailOpen && (
+              <motion.div
+                initial={reduced ? {} : { height: 0, opacity: 0 }}
+                animate={reduced ? {} : { height: "auto", opacity: 1 }}
+                exit={reduced ? {} : { height: 0, opacity: 0 }}
+                transition={reduced ? {} : { duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <nav className="mt-2 space-y-1 p-2 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
+                  {allTopics.map((t) => {
+                    const isActive = pathname === `/topics/${t.slug}`;
+                    return (
+                      <Link
+                        key={t.id}
+                        href={`/topics/${t.slug}`}
+                        onClick={() => setIsLeftRailOpen(false)}
+                        className={`
+                          flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors
+                          ${
+                            isActive
+                              ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                          }
+                        `}
+                      >
+                        <span
+                          className={`text-xs font-semibold w-5 text-center ${
+                            isActive
+                              ? "text-blue-600 dark:text-blue-400"
+                              : "text-gray-400 dark:text-gray-500"
+                          }`}
+                        >
+                          {t.order}
+                        </span>
+                        <span className="flex-1 truncate">{t.title}</span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        {/* Header */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2 py-1 text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded">
+              Topic {topic.order || "?"}
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+            {topic.title}
+          </h1>
+          {topic.summary && (
+            <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+              {topic.summary}
+            </p>
+          )}
+        </div>
 
-      {/* Tab Content */}
-      <motion.div
-        key={activeTab}
-        initial={reduced ? false : { opacity: 0, y: 8 }}
-        animate={reduced ? {} : { opacity: 1, y: 0 }}
-        transition={reduced ? {} : { duration: 0.3 }}
-      >
-        {activeTab === "theory" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,_72ch)_250px] gap-8 xl:gap-12">
-            <div className="space-y-8 min-w-0">
+        {/* Tabs */}
+        <div className="border-b border-gray-200 dark:border-gray-800">
+          <nav className="flex gap-4 sm:gap-6">
+            <button
+              onClick={() => setActiveTab("theory")}
+              className={`px-2 py-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${
+                activeTab === "theory"
+                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              }`}
+            >
+              Theory
+            </button>
+            <button
+              onClick={() => setActiveTab("practice")}
+              className={`px-2 py-3 font-semibold text-sm sm:text-base border-b-2 transition-colors ${
+                activeTab === "practice"
+                  ? "border-blue-600 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+              }`}
+            >
+              Practice
+            </button>
+          </nav>
+        </div>
+
+        {/* Tab Content */}
+        <motion.div
+          key={activeTab}
+          initial={reduced ? false : { opacity: 0, y: 8 }}
+          animate={reduced ? {} : { opacity: 1, y: 0 }}
+          transition={reduced ? {} : { duration: 0.3 }}
+          className="space-y-8"
+        >
+          {activeTab === "theory" ? (
+            <>
               {topic.theory ? (
                 <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:scroll-mt-24 prose-a:text-blue-600 dark:prose-a:text-blue-400">
                   <RichTextRenderer content={topic.theory} />
@@ -114,9 +333,9 @@ export function TopicPageClient({
               )}
 
               {/* References */}
-              <div className="border-t border-gray-200 dark:border-gray-800 pt-8 space-y-4">
-                <h2 className="text-3xl font-bold">References</h2>
-                {topic.references && topic.references.length > 0 ? (
+              {topic.references && topic.references.length > 0 && (
+                <div className="border-t border-gray-200 dark:border-gray-800 pt-8 space-y-4">
+                  <h2 className="text-3xl font-bold">References</h2>
                   <ul className="space-y-4">
                     {topic.references.map((ref, i) => (
                       <li
@@ -144,282 +363,218 @@ export function TopicPageClient({
                       </li>
                     ))}
                   </ul>
-                ) : (
-                  <p className="text-gray-500 dark:text-gray-400 italic">
-                    References not added yet.
-                  </p>
-                )}
-              </div>
+                </div>
+              )}
+
+              <TopicNavigation
+                prevTopic={prevTopic || undefined}
+                nextTopic={nextTopic || undefined}
+              />
+            </>
+          ) : (
+            <div className="space-y-8">
+              {/* Demo */}
+              {renderDemo()}
+
+              {/* Guided Steps */}
+              {topic.practiceSteps && topic.practiceSteps.length > 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold">Guided Steps</h2>
+                  <div className="space-y-4">
+                    {topic.practiceSteps.map((step, index) => (
+                      <div
+                        key={index}
+                        className={`p-4 rounded-lg border-2 ${
+                          index === currentStep
+                            ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                            : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h3 className="font-semibold">
+                            Step {index + 1}: {step.title}
+                          </h3>
+                          <button
+                            onClick={() => setCurrentStep(index)}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            {index === currentStep ? "Current" : "Go to step"}
+                          </button>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                          {step.body}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Hands-on Tasks */}
+              {topic.practiceTasks && topic.practiceTasks.length > 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-bold">Hands-on Tasks</h2>
+                  <div className="space-y-6">
+                    {topic.practiceTasks.map((task, index) => (
+                      <div
+                        key={index}
+                        className="p-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                      >
+                        <h3 className="font-semibold mb-3">Task {index + 1}</h3>
+                        <p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">
+                          {task.prompt}
+                        </p>
+                        <textarea
+                          value={taskAnswers[index] || ""}
+                          onChange={(e) =>
+                            setTaskAnswers((prev) => ({
+                              ...prev,
+                              [index]: e.target.value,
+                            }))
+                          }
+                          placeholder="Your answer..."
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-sm mb-4"
+                          rows={4}
+                        />
+                        <button
+                          onClick={() =>
+                            handleTaskSubmit(index, taskAnswers[index] || "")
+                          }
+                          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                        >
+                          Check Answer
+                        </button>
+                        {taskRevealed[index] && (
+                          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-md">
+                            <p className="text-sm font-medium mb-2">
+                              Expected Answer:
+                            </p>
+                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">
+                              {task.expectedAnswer}
+                            </p>
+                            <p className="text-sm font-medium mb-2">
+                              Explanation:
+                            </p>
+                            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                              {task.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <TopicNavigation
                 prevTopic={prevTopic || undefined}
                 nextTopic={nextTopic || undefined}
               />
             </div>
+          )}
 
-            {/* Table of Contents - Desktop */}
-            <aside className="hidden lg:block">
-              <div className="sticky top-24 space-y-6">
-                <TableOfContents content={topic.theory} />
-              </div>
-            </aside>
-          </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Demo */}
-            {topic.practiceDemo
-              ? ((): React.ReactNode => {
-                  // Determine demo type
-                  const demoTypeResult = demoConfigSchema.safeParse(
-                    topic.practiceDemo as unknown
-                  );
-                  if (!demoTypeResult.success) {
-                    return (
-                      <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                        <p>Demo unavailable: Invalid configuration</p>
+          {/* Mobile Right Rail Toggle (inside main column) */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setIsRightRailOpen(!isRightRailOpen)}
+              className="w-full flex items-center justify-between p-3 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              <span className="text-sm font-medium">
+                {activeTab === "theory"
+                  ? "Table of Contents"
+                  : "What to Observe"}
+              </span>
+              {isRightRailOpen ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
+            <AnimatePresence>
+              {isRightRailOpen && (
+                <motion.div
+                  initial={reduced ? {} : { height: 0, opacity: 0 }}
+                  animate={reduced ? {} : { height: "auto", opacity: 1 }}
+                  exit={reduced ? {} : { height: 0, opacity: 0 }}
+                  transition={reduced ? {} : { duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-2 p-4 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
+                    {activeTab === "theory" ? (
+                      <TableOfContents content={topic.theory} />
+                    ) : (
+                      <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                        {topic.practiceSteps?.[currentStep]?.focusTarget && (
+                          <p>
+                            <strong>Focus:</strong>{" "}
+                            {topic.practiceSteps[currentStep].focusTarget}
+                          </p>
+                        )}
+                        <p>Watch how state changes affect the visualization</p>
+                        <p>Check the Event Log for causal explanations</p>
                       </div>
-                    );
-                  }
-
-                  const demoType = demoTypeResult.data.demoType;
-
-                  if (demoType === "requirementsToArchitecture") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <RequirementsToArchitectureDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "renderingStrategyLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <RenderingStrategyLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "stateAtScaleLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <StateAtScaleLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "performanceBudgetLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <PerformanceBudgetLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "uiArchitectureLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <UIArchitectureLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "releaseDeliveryLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <ReleaseDeliveryLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "testingStrategyLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <TestingStrategyLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "observabilityLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <ObservabilityLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "securityPrivacyLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <SecurityPrivacyLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "realtimeSystemsLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <RealtimeSystemsLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "largeScaleUXLab") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <LargeScaleUXLabDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  if (demoType === "capstoneBuilder") {
-                    return (
-                      <Spotlight targetId={currentFocusTarget}>
-                        <CapstoneBuilderDemo
-                          demoConfig={topic.practiceDemo}
-                          focusTarget={currentFocusTarget || undefined}
-                        />
-                      </Spotlight>
-                    );
-                  }
-
-                  return (
-                    <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                      <p>Demo unavailable: Unknown demo type</p>
-                    </div>
-                  );
-                })()
-              : null}
-
-            {/* Guided Steps */}
-            {topic.practiceSteps && topic.practiceSteps.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold">Guided Steps</h2>
-                <div className="space-y-4">
-                  {topic.practiceSteps.map((step, index) => (
-                    <div
-                      key={index}
-                      className={`p-4 rounded-lg border-2 ${
-                        index === currentStep
-                          ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20"
-                          : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold">
-                          Step {index + 1}: {step.title}
-                        </h3>
-                        <button
-                          onClick={() => setCurrentStep(index)}
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                        >
-                          {index === currentStep ? "Current" : "Go to step"}
-                        </button>
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                        {step.body}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Hands-on Tasks */}
-            {topic.practiceTasks && topic.practiceTasks.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-2xl font-bold">Hands-on Tasks</h2>
-                <div className="space-y-6">
-                  {topic.practiceTasks.map((task, index) => (
-                    <div
-                      key={index}
-                      className="p-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
-                    >
-                      <h3 className="font-semibold mb-3">Task {index + 1}</h3>
-                      <p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">
-                        {task.prompt}
-                      </p>
-                      <textarea
-                        value={taskAnswers[index] || ""}
-                        onChange={(e) =>
-                          setTaskAnswers((prev) => ({
-                            ...prev,
-                            [index]: e.target.value,
-                          }))
-                        }
-                        placeholder="Your answer..."
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-sm mb-4"
-                        rows={4}
-                      />
-                      <button
-                        onClick={() =>
-                          handleTaskSubmit(index, taskAnswers[index] || "")
-                        }
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
-                      >
-                        Check Answer
-                      </button>
-                      {taskRevealed[index] && (
-                        <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-md">
-                          <p className="text-sm font-medium mb-2">
-                            Expected Answer:
-                          </p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">
-                            {task.expectedAnswer}
-                          </p>
-                          <p className="text-sm font-medium mb-2">
-                            Explanation:
-                          </p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                            {task.explanation}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <TopicNavigation
-              prevTopic={prevTopic || undefined}
-              nextTopic={nextTopic || undefined}
-            />
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        )}
-      </motion.div>
-    </article>
+        </motion.div>
+      </main>
+
+      {/* Right Rail: Context Panel (Desktop) */}
+      <aside className="hidden lg:block">
+        <div className="sticky top-24 space-y-6">
+          {activeTab === "theory" ? (
+            <>
+              <TableOfContents content={topic.theory} />
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 uppercase tracking-wider mb-3">
+                  Key Takeaways
+                </h3>
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  Review the main concepts and design patterns covered in this
+                  topic. Use the table of contents above to navigate quickly.
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-4">
+              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-800">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-3">
+                  What to Observe
+                </h3>
+                <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                  {topic.practiceSteps?.[currentStep]?.focusTarget && (
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 dark:text-blue-400 mt-0.5">
+                        •
+                      </span>
+                      <span>
+                        Focus on: {topic.practiceSteps[currentStep].focusTarget}
+                      </span>
+                    </li>
+                  )}
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 mt-0.5">
+                      •
+                    </span>
+                    <span>
+                      Watch how state changes affect the visualization
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-blue-600 dark:text-blue-400 mt-0.5">
+                      •
+                    </span>
+                    <span>Check the Event Log for causal explanations</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      </aside>
+    </div>
   );
 }

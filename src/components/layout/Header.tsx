@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 import { ReduceMotionToggle } from "@/components/motion/ReduceMotionToggle";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   return (
@@ -24,6 +25,7 @@ export function Header() {
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">Topics</span>
             </Link>
+            <ThemeToggle />
             <ReduceMotionToggle />
           </div>
         </nav>

@@ -59,6 +59,12 @@ export default async function TopicPage({
   return (
     <TopicPageClient
       topic={serializedTopic}
+      allTopics={allTopics.map((t) => ({
+        id: t.id,
+        title: t.title,
+        slug: t.slug,
+        order: t.order,
+      }))}
       prevTopic={
         adjacent.prev
           ? { title: adjacent.prev.title, slug: adjacent.prev.slug }
