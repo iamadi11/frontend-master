@@ -10,6 +10,7 @@ import { UIArchitectureLabDemo } from "@/components/demo/demos/UIArchitectureLab
 import { ReleaseDeliveryLabDemo } from "@/components/demo/demos/ReleaseDeliveryLabDemo";
 import { TestingStrategyLabDemo } from "@/components/demo/demos/TestingStrategyLabDemo";
 import { ObservabilityLabDemo } from "@/components/demo/demos/ObservabilityLabDemo";
+import { SecurityPrivacyLabDemo } from "@/components/demo/demos/SecurityPrivacyLabDemo";
 import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 import { motion } from "framer-motion";
@@ -245,6 +246,17 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
                   return (
                     <Spotlight targetId={currentFocusTarget}>
                       <ObservabilityLabDemo
+                        demoConfig={topic.practiceDemo}
+                        focusTarget={currentFocusTarget || undefined}
+                      />
+                    </Spotlight>
+                  );
+                }
+
+                if (demoType === "securityPrivacyLab") {
+                  return (
+                    <Spotlight targetId={currentFocusTarget}>
+                      <SecurityPrivacyLabDemo
                         demoConfig={topic.practiceDemo}
                         focusTarget={currentFocusTarget || undefined}
                       />

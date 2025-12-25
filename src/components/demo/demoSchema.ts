@@ -416,6 +416,66 @@ export const observabilityLabConfigSchema = z.object({
   eventLines: z.array(z.string()),
 });
 
+// Resource 9: Security & Privacy Lab
+export const securityPrivacyLabConfigSchema = z.object({
+  demoType: z.literal("securityPrivacyLab"),
+  defaults: z.object({
+    mode: z.enum([
+      "XSS_CSRF",
+      "CSP",
+      "TOKEN_STORAGE",
+      "CLICKJACKING",
+      "DEPENDENCIES",
+      "PII",
+    ]),
+    threat: z.enum(["XSS", "CSRF"]).optional(),
+    defense: z
+      .object({
+        inputEncoding: z.boolean(),
+        sanitizeHtml: z.boolean(),
+        sameSite: z.enum(["NONE", "LAX", "STRICT"]),
+        csrfToken: z.boolean(),
+      })
+      .optional(),
+    csp: z
+      .object({
+        scriptSrc: z.enum(["NONE", "SELF", "SELF_CDN", "UNSAFE_INLINE"]),
+        connectSrc: z.enum(["SELF", "API_ONLY", "ANY"]),
+        frameAncestors: z.enum(["NONE", "SELF", "TRUSTED"]),
+      })
+      .optional(),
+    tokenStorage: z
+      .enum(["HTTP_ONLY_COOKIE", "LOCAL_STORAGE", "MEMORY"])
+      .optional(),
+    refreshFlow: z.boolean().optional(),
+    clickjackingDefense: z
+      .enum(["NONE", "XFO_DENY", "CSP_FRAME_ANCESTORS"])
+      .optional(),
+    deps: z
+      .array(
+        z.object({
+          name: z.string(),
+          version: z.string(),
+          risk: z.enum(["LOW", "MEDIUM", "HIGH"]),
+        })
+      )
+      .optional(),
+    piiMode: z.enum(["RAW", "REDACTED", "MINIMIZED"]).optional(),
+  }),
+  allowedOrBlocked: z.array(
+    z.object({
+      action: z.string(),
+      result: z.enum(["ALLOW", "BLOCK"]),
+      reason: z.string(),
+    })
+  ),
+  riskSummary: z.object({
+    severity: z.enum(["LOW", "MEDIUM", "HIGH"]),
+    notes: z.array(z.string()),
+  }),
+  eventLines: z.array(z.string()),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
@@ -426,6 +486,7 @@ export const demoConfigSchema = z.discriminatedUnion("demoType", [
   releaseDeliveryLabConfigSchema,
   testingStrategyLabConfigSchema,
   observabilityLabConfigSchema,
+  securityPrivacyLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -450,6 +511,9 @@ export type TestingStrategyLabConfig = z.infer<
 >;
 export type ObservabilityLabConfig = z.infer<
   typeof observabilityLabConfigSchema
+>;
+export type SecurityPrivacyLabConfig = z.infer<
+  typeof securityPrivacyLabConfigSchema
 >;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;

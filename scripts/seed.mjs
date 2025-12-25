@@ -3300,6 +3300,328 @@ async function seed() {
       console.log("✓ Resource 8 topic already exists");
     }
 
+    // Check if Resource 9 topic exists
+    const existingTopic9 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "security-privacy",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic9.docs.length === 0) {
+      const securityPrivacyLabDemoConfig = {
+        demoType: "securityPrivacyLab",
+        defaults: {
+          mode: "XSS_CSRF",
+          threat: "XSS",
+          defense: {
+            inputEncoding: false,
+            sanitizeHtml: false,
+            sameSite: "NONE",
+            csrfToken: false,
+          },
+          csp: {
+            scriptSrc: "NONE",
+            connectSrc: "SELF",
+            frameAncestors: "NONE",
+          },
+          tokenStorage: "LOCAL_STORAGE",
+          refreshFlow: false,
+          clickjackingDefense: "NONE",
+          deps: [
+            { name: "react", version: "18.2.0", risk: "LOW" },
+            { name: "lodash", version: "4.17.21", risk: "MEDIUM" },
+          ],
+          piiMode: "RAW",
+        },
+        allowedOrBlocked: [
+          {
+            action: "render user comment",
+            result: "ALLOW",
+            reason: "No XSS defenses enabled - unsafe content may execute",
+          },
+        ],
+        riskSummary: {
+          severity: "HIGH",
+          notes: ["XSS vulnerability: no input encoding or sanitization"],
+        },
+        eventLines: [
+          "Security configuration initialized",
+          "Default settings applied - review defenses",
+        ],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Security & Privacy for Frontend Systems",
+          slug: "security-privacy",
+          order: 9,
+          difficulty: "intermediate",
+          summary:
+            "Learn XSS/CSRF defenses, CSP policies, token storage trade-offs, clickjacking prevention, dependency risk management, and PII handling. Master security patterns that protect users and comply with privacy regulations.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [{ text: "Security & Privacy for Frontend Systems" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Frontend security protects users from attacks like XSS and CSRF. Privacy practices ensure compliance with regulations like GDPR. This topic covers defense mechanisms, token storage strategies, Content Security Policy, clickjacking prevention, dependency risk management, and PII handling.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "XSS and CSRF Defenses" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Cross-Site Scripting (XSS) occurs when untrusted input is rendered without sanitization, allowing attackers to execute scripts in user browsers. Defenses include input encoding (HTML entities), HTML sanitization (removing dangerous tags), and Content Security Policy. Cross-Site Request Forgery (CSRF) occurs when malicious sites trigger authenticated requests. Defenses include SameSite cookies (Lax/Strict), CSRF tokens (server-validated), and origin checking.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Content Security Policy (CSP)" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "CSP restricts resource loading (scripts, styles, images, connections) to prevent XSS and data exfiltration. script-src controls script sources ('self', CDN whitelist, 'unsafe-inline' - dangerous). connect-src controls fetch/XMLHttpRequest destinations. frame-ancestors prevents clickjacking by controlling who can embed your page. Start restrictive and relax incrementally. 'unsafe-inline' defeats XSS protection.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Token Storage Trade-offs" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "HttpOnly cookies are not accessible to JavaScript, reducing XSS token theft risk but requiring CSRF/SameSite considerations. localStorage is accessible to XSS but not sent automatically (lower CSRF risk). Memory storage (in-memory variables) has no persistence but requires refresh flow for token renewal. Choose based on XSS risk, CSRF risk, and refresh requirements.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Clickjacking Prevention" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Clickjacking embeds your page in an iframe to trick users into clicking hidden elements. Defenses: X-Frame-Options: DENY (legacy, simple) or CSP frame-ancestors 'none'/'self' (modern, flexible). Use CSP frame-ancestors for better control and compatibility.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Dependency Risk Management" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Dependencies introduce vulnerabilities through transitive deps and outdated packages. Risk levels: HIGH (known CVEs, unmaintained), MEDIUM (outdated, large surface area), LOW (up-to-date, minimal surface). Mitigation: regular audits (npm audit), pin versions (package-lock.json), reduce surface area (tree-shaking, minimal deps), review changelogs before updates, isolate risky deps when possible.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "PII Handling and Privacy" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Personally Identifiable Information (PII) includes email, phone, SSN, addresses. Raw storage has high breach impact. Redaction masks fields (u***@e***.com) but PII still present. Minimization removes fields entirely, reducing breach impact and compliance risk. GDPR-like principles: collect only what's needed, minimize retention, encrypt at rest, redact in logs, obtain consent for processing.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "OWASP Top 10",
+              url: "https://owasp.org/www-project-top-ten/",
+              note: "OWASP security risks and defenses (placeholder - verify content)",
+              claimIds: "owasp",
+            },
+            {
+              label: "Content Security Policy",
+              url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP",
+              note: "MDN CSP documentation (placeholder - verify content)",
+              claimIds: "csp",
+            },
+            {
+              label: "GDPR Compliance",
+              url: "https://gdpr.eu/what-is-gdpr/",
+              note: "GDPR privacy principles (placeholder - verify content)",
+              claimIds: "gdpr",
+            },
+          ],
+          practiceDemo: securityPrivacyLabDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore XSS Defenses",
+              body: "Switch to XSS/CSRF mode and select Threat: XSS. Toggle Input Encoding and Sanitize HTML defenses on/off. Watch the flow visualization show how untrusted input flows through defenses to rendered output. Try rendering a user comment with defenses OFF (ALLOW - unsafe) vs ON (BLOCK - safe). The event log explains how each defense prevents XSS.",
+              focusTarget: "flow",
+            },
+            {
+              title: "Understand CSRF Defenses",
+              body: "Switch Threat to CSRF. Toggle SameSite (None/Lax/Strict) and CSRF Token. Watch the flow show how cross-site requests are blocked by SameSite or CSRF token validation. Try POST /transfer with defenses OFF (ALLOW - vulnerable) vs ON (BLOCK - protected). SameSite=Strict is strongest but may break legitimate cross-site flows.",
+              focusTarget: "flow",
+            },
+            {
+              title: "Configure CSP Policies",
+              body: "Switch to CSP mode. Adjust script-src (none/self/self+CDN/unsafe-inline), connect-src (self/API only/any), and frame-ancestors (none/self/trusted). Watch the CSP visualizer show ALLOW/BLOCK for actions: load inline script, load script from CDN, fetch to api, embed in iframe. Notice how 'unsafe-inline' allows all inline scripts (dangerous). Restrictive CSP reduces attack surface.",
+              focusTarget: "csp",
+            },
+            {
+              title: "Compare Token Storage Options",
+              body: "Switch to Token Storage mode. Compare HttpOnly Cookie (not accessible to JS, reduces XSS risk but requires CSRF/SameSite), localStorage (accessible to XSS, lower CSRF risk), and Memory (no persistence, requires refresh flow). The visualization shows XSS accessibility and CSRF risk for each option. Toggle Refresh Flow to see how memory storage requires token renewal.",
+              focusTarget: "token.sim",
+            },
+            {
+              title: "Test Clickjacking Defenses",
+              body: "Switch to Clickjacking mode. Try different defenses: None (ALLOW - page can be embedded), X-Frame-Options: DENY (BLOCK - prevents embedding), CSP frame-ancestors (BLOCK - modern approach). The visualization shows how defenses block embedding attempts. Use CSP frame-ancestors for better control and compatibility.",
+              focusTarget: "frame",
+            },
+            {
+              title: "Assess Dependency Risk",
+              body: "Switch to Dependencies mode. View the list of dependencies with risk levels (LOW/MEDIUM/HIGH). The risk summary shows overall severity and notes. High-risk deps should be isolated, evaluated for alternatives, or updated. Regular audits (npm audit) and version pinning reduce risk.",
+              focusTarget: "deps",
+            },
+            {
+              title: "Compare PII Handling Modes",
+              body: "Switch to PII mode. Compare Raw (full PII visible - high breach impact), Redacted (masked fields - moderate risk), and Minimized (removed fields - low risk). Watch the event payload visualization show how PII changes in each mode. Minimization reduces breach impact and compliance risk. GDPR-like principles: collect only what's needed, minimize retention.",
+              focusTarget: "pii",
+            },
+            {
+              title: "Review Risk Summary",
+              body: "Check the Risk Summary panel to see overall severity (LOW/MEDIUM/HIGH) and notes for the current configuration. Risk increases with missing defenses, permissive CSP, risky token storage, no clickjacking defense, high-risk dependencies, and raw PII. Adjust configurations to reduce risk.",
+              focusTarget: "risk",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see a chronological record of all security configuration changes, defense toggles, CSP updates, token storage changes, and risk assessments. This helps you understand how security decisions affect protection and compliance.",
+              focusTarget: "eventlog",
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "Choose the best token storage for a SPA with high XSS risk. Justify your choice and explain the trade-offs.",
+              expectedAnswer:
+                "For a SPA with high XSS risk, I would use HttpOnly cookies for token storage. HttpOnly cookies are not accessible to JavaScript, which prevents XSS attacks from stealing tokens even if an XSS vulnerability exists. However, this requires CSRF protection (SameSite=Strict or CSRF tokens) since cookies are sent automatically. Trade-offs: HttpOnly cookies reduce XSS token theft risk significantly but require additional CSRF defenses. localStorage would be vulnerable to XSS (accessible to JavaScript), and memory storage requires a refresh flow which may not be suitable for SPAs.",
+              explanation:
+                "HttpOnly cookies are the best choice for high XSS risk because they prevent JavaScript access. The trade-off is requiring CSRF protection (SameSite or CSRF tokens) since cookies are sent automatically with requests.",
+            },
+            {
+              prompt:
+                "Design a CSP policy for an app that loads scripts from self + a trusted CDN. Explain which actions will be ALLOWED vs BLOCKED.",
+              expectedAnswer:
+                "I would set: script-src 'self' + CDN (SELF_CDN), connect-src 'self' + API (API_ONLY), frame-ancestors 'self'. This allows: loading scripts from self and the trusted CDN (ALLOW), loading inline scripts (BLOCK - unless 'unsafe-inline' is added, which is dangerous), fetching to same-origin API (ALLOW), fetching to third-party APIs (BLOCK), embedding page in same-origin iframe (ALLOW), embedding in cross-origin iframe (BLOCK). The policy balances security (blocks inline scripts and third-party connections) with functionality (allows trusted CDN scripts and same-origin operations).",
+              explanation:
+                "A restrictive CSP that allows self + trusted CDN scripts while blocking inline scripts and third-party connections provides good security. frame-ancestors 'self' prevents clickjacking from other origins while allowing same-origin embedding if needed.",
+            },
+            {
+              prompt:
+                "Pick defenses for form submission against CSRF. Explain why each defense works and when you'd use them together.",
+              expectedAnswer:
+                "I would use SameSite=Strict cookies + CSRF tokens together for defense-in-depth. SameSite=Strict blocks cross-site requests automatically at the browser level, preventing most CSRF attacks. CSRF tokens provide server-side validation - the server checks that the token in the form matches the token in the session, blocking requests without valid tokens. Use both together because: SameSite may not work in all browsers/contexts (legacy browsers, some redirect flows), and CSRF tokens provide server-side validation as a backup. SameSite alone is simpler but less reliable; CSRF tokens alone require implementation but work everywhere. Together they provide defense-in-depth.",
+              explanation:
+                "Defense-in-depth uses multiple layers (SameSite + CSRF tokens) to protect against CSRF. SameSite blocks at the browser level, CSRF tokens validate at the server level. Using both provides redundancy and better protection.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 9 topic (security-privacy)");
+    } else {
+      console.log("✓ Resource 9 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);
