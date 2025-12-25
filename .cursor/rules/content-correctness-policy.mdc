@@ -4,13 +4,14 @@ alwaysApply: false
 globs:
   - "src/app/**/topics/**"
   - "src/modules/**"
+  - "src/components/demo/**"
   - "scripts/**"
   - "docs/**"
 ---
 
 # Content Correctness Policy
 
-- Do not invent browser behaviors, standards, metrics, or tool capabilities.
+- Do not invent browser behaviors, standards, metrics, tool capabilities, or security properties.
 - If uncertain: label "Needs verification" and store placeholder reference in CMS.
 - Non-trivial claims must have references stored in CMS and rendered on the topic page.
 - Users should be able to learn without leaving the site (references are supplementary).

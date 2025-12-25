@@ -4,7 +4,7 @@ alwaysApply: false
 globs:
   - "scripts/**"
   - "src/app/**/topics/**"
-  - "src/modules/**"
+  - "src/components/demo/**"
   - "docs/**"
 ---
 
@@ -26,3 +26,8 @@ If present, treat these as authoritative:
 
 ## If unclear
 Mark "Needs verification" in CMS and add placeholder reference.
+
+## For animations and demos
+- Node labels, terminology, and topic ordering must match `docs/curriculum-index.md`.
+- Use `docs/_source/curriculum.txt` (or PDF) to verify domain terms and concept boundaries.
+- Never paste large PDF excerpts into code or CMS seed.

@@ -1,0 +1,25 @@
+---
+description: "Animation work must be shipped as small slices: one topic at a time, limited files, clear DoD."
+alwaysApply: false
+globs:
+  - "src/components/three/**"
+  - "src/components/demo/**"
+---
+
+# Animation Slice Protocol (Context-light)
+
+## One topic per slice
+- Only implement the requested topic’s 3D mode (or one discrete feature).
+- Do not implement other topics in the same pass.
+
+## Hard limits
+- Max 12 files changed per slice unless truly necessary.
+- No large refactors mixed with animation work.
+- Reuse primitives; only add new primitives if at least 2 future topics will reuse them.
+
+## End-of-slice output (required)
+- Files changed list
+- How to test the demo (route + steps)
+- Reduced motion behavior
+- Perf notes (DPR, fallback)
+- Next step suggestion

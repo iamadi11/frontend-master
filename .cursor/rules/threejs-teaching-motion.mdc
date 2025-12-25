@@ -1,0 +1,47 @@
+---
+description: "Three.js/R3F demos must be teaching-first: user-triggered motion, focus guidance, reduced-motion safe, perf safe."
+alwaysApply: false
+globs:
+  - "src/components/three/**"
+  - "src/components/demo/**"
+  - "src/app/**/topics/**"
+---
+
+# Three.js Teaching Motion Policy
+
+## Purpose
+3D is allowed ONLY when it improves learning: make invisible systems visible via motion.
+No decorative 3D.
+
+## Motion triggers (required)
+Animations may run ONLY on:
+- user control changes
+- guided step change (next/prev)
+- deliberate hover/click micro-interactions
+No idle loops, no autoplay sequences while reading.
+
+## Focus guidance (required)
+- Use spotlight/focus patterns to guide attention.
+- Animate ONLY what changed (local transitions).
+- Provide "Before vs After" comparison animation when conceptually helpful.
+
+## Reduced motion (required)
+- Must respect prefers-reduced-motion AND in-UI Reduce Motion toggle.
+- Reduced motion mode must:
+  - disable camera movement and traveling pulses
+  - replace with static emphasis (outline/opacity) and instant state changes
+- Reduced motion must not hide any info.
+
+## Performance (required)
+- Target 60fps; cap DPR on mobile.
+- Avoid heavy postprocessing.
+- Use instancing if needed; prefer simple geometries/materials.
+- Provide a WebGL fallback: if canvas fails, show the existing 2D demo.
+
+## Accessibility & UX
+- Canvas must not hijack scroll.
+- Labels should be readable (DOM overlay ok).
+- 3D interactions must not block keyboard navigation to the rest of the page.
+
+## Scope boundary
+Do not add new routes, auth, analytics integrations, community features, or unrelated UI redesign in Three.js slices.

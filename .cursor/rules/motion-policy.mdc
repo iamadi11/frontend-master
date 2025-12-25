@@ -23,6 +23,7 @@ No decorative motion.
 - Animated diffs (before/after output, cache hit/miss)
 - Spotlight/highlight tied to user actions
 - Stepper/story transitions in Practice
+- 3D (Three.js / R3F) animations ONLY if they clarify system behavior; must be user-triggered and reduced-motion safe
 
 ## Forbidden
 - Auto-looping animations without user action

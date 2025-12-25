@@ -22,7 +22,7 @@ Users should not need other sites to learn. References are for credibility, not 
 - If `docs/_source/curriculum.txt` or the PDF exists, use it to verify topic content (do not paste large chunks).
 
 ## Resumable slice protocol (prevents context overflow)
-Implement in SMALL slices only (one feature chunk).
+Implement in SMALL slices only (one feature chunk / one topic chunk).
 Each slice must end with:
 - files changed
 - Definition of Done checklist
