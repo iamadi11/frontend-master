@@ -63,6 +63,9 @@ export function SecurityPrivacyLabDemo({
   const { reduced } = useMotionPrefs();
   const [mode, setMode] = useState<Mode>("XSS_CSRF");
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [threat, setThreat] = useState<Threat>("XSS");
   const [defense, setDefense] = useState<DefenseState>({
     inputEncoding: false,
@@ -1331,6 +1334,8 @@ export function SecurityPrivacyLabDemo({
         evaluatePolicyTrigger={evaluatePolicyTrigger}
         tryEmbedTrigger={tryEmbedTrigger}
         focusTarget={focusTarget}
+        cameraPreset={cameraPreset}
+        onCameraPresetChange={setCameraPreset}
       />
     </ThreeCanvasShell>
   );

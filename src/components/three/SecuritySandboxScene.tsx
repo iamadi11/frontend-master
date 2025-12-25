@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Html, Text } from "@react-three/drei";
 import * as THREE from "three";
 import { useReducedMotion3D } from "./useReducedMotion3D";
@@ -9,6 +9,22 @@ import { CSPGates3D } from "./CSPGates3D";
 import { TokenStorageSurface3D } from "./TokenStorageSurface3D";
 import { FrameBarrier3D } from "./FrameBarrier3D";
 import { RiskShelf3D } from "./RiskShelf3D";
+
+export type CameraPreset = "overview" | "closeup" | "side";
+
+// Camera preset positions for security sandbox view
+const CAMERA_PRESETS: Record<
+  CameraPreset,
+  { position: [number, number, number]; lookAt: [number, number, number] }
+> = {
+  overview: { position: [0, 3, 10], lookAt: [0, 0, 0] },
+  closeup: { position: [0, 2, 6], lookAt: [0, 0, 0] },
+  side: { position: [8, 3, 6], lookAt: [0, 0, 0] },
+};
+
+function lerp(start: number, end: number, t: number): number {
+  return start + (end - start) * t;
+}
 
 type Mode =
   | "XSS_CSRF"
@@ -64,6 +80,8 @@ interface SecuritySandboxSceneProps {
   evaluatePolicyTrigger?: number;
   tryEmbedTrigger?: number;
   focusTarget?: string | null;
+  cameraPreset?: CameraPreset;
+  onCameraPresetChange?: (preset: CameraPreset) => void;
 }
 
 /**
@@ -84,8 +102,11 @@ export function SecuritySandboxScene({
   evaluatePolicyTrigger = 0,
   tryEmbedTrigger = 0,
   focusTarget,
+  cameraPreset = "overview",
+  onCameraPresetChange,
 }: SecuritySandboxSceneProps) {
   const reducedMotion = useReducedMotion3D();
+  const { camera } = useThree();
 
   // Ambient lighting
   const ambientLight = useMemo(() => new THREE.AmbientLight(0xffffff, 0.6), []);
@@ -96,6 +117,40 @@ export function SecuritySandboxScene({
 
   // Position lights
   directionalLight.position.set(5, 5, 5);
+
+  // Camera preset positioning (locked camera, no free movement)
+  useEffect(() => {
+    const preset = CAMERA_PRESETS[cameraPreset];
+    if (preset) {
+      if (reducedMotion) {
+        // Instant positioning in reduced motion
+        camera.position.set(...preset.position);
+        camera.lookAt(...preset.lookAt);
+      } else {
+        // Smooth transition to preset position
+        const startX = camera.position.x;
+        const startY = camera.position.y;
+        const startZ = camera.position.z;
+        const [targetX, targetY, targetZ] = preset.position;
+
+        let progress = 0;
+        const animate = () => {
+          progress += 0.05;
+          if (progress < 1) {
+            camera.position.x = lerp(startX, targetX, progress);
+            camera.position.y = lerp(startY, targetY, progress);
+            camera.position.z = lerp(startZ, targetZ, progress);
+            camera.lookAt(...preset.lookAt);
+            requestAnimationFrame(animate);
+          } else {
+            camera.position.set(...preset.position);
+            camera.lookAt(...preset.lookAt);
+          }
+        };
+        animate();
+      }
+    }
+  }, [cameraPreset, reducedMotion, camera]);
 
   // Dim non-focused sub-scenes by adjusting scale
   const isFocused = (target: string) => {
@@ -166,6 +221,44 @@ export function SecuritySandboxScene({
             reducedMotion={reducedMotion}
           />
         </group>
+      )}
+
+      {/* Camera preset controls (rendered as HTML overlay) */}
+      {onCameraPresetChange && (
+        <Html position={[0, -4, 0]} center>
+          <div className="flex gap-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+            <button
+              onClick={() => onCameraPresetChange("overview")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "overview"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => onCameraPresetChange("closeup")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "closeup"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Close-up
+            </button>
+            <button
+              onClick={() => onCameraPresetChange("side")}
+              className={`px-3 py-1 text-xs rounded transition-colors ${
+                cameraPreset === "side"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              Side
+            </button>
+          </div>
+        </Html>
       )}
     </>
   );
