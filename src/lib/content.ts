@@ -30,6 +30,7 @@ export async function listTopics() {
   const result = await payload.find({
     collection: "topics",
     sort: "order",
+    limit: 100, // Fetch all topics (default limit is 10)
   });
 
   return result.docs;
