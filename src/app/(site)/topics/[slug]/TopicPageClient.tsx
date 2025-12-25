@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, Suspense } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { RichTextRenderer } from "@/components/content/RichTextRenderer";
@@ -8,18 +9,6 @@ import { Prose } from "@/components/content/Prose";
 import { AnimatedExplanationBlocks } from "@/components/theory/AnimatedExplanationBlocks";
 import { PracticeShell } from "@/components/demo/PracticeShell";
 import { WhatToObserve } from "@/components/demo/WhatToObserve";
-import { RequirementsToArchitectureDemo } from "@/components/demo/demos/RequirementsToArchitectureDemo";
-import { RenderingStrategyLabDemo } from "@/components/demo/demos/RenderingStrategyLabDemo";
-import { StateAtScaleLabDemo } from "@/components/demo/demos/StateAtScaleLabDemo";
-import { PerformanceBudgetLabDemo } from "@/components/demo/demos/PerformanceBudgetLabDemo";
-import { UIArchitectureLabDemo } from "@/components/demo/demos/UIArchitectureLabDemo";
-import { ReleaseDeliveryLabDemo } from "@/components/demo/demos/ReleaseDeliveryLabDemo";
-import { TestingStrategyLabDemo } from "@/components/demo/demos/TestingStrategyLabDemo";
-import { ObservabilityLabDemo } from "@/components/demo/demos/ObservabilityLabDemo";
-import { SecurityPrivacyLabDemo } from "@/components/demo/demos/SecurityPrivacyLabDemo";
-import { RealtimeSystemsLabDemo } from "@/components/demo/demos/RealtimeSystemsLabDemo";
-import { LargeScaleUXLabDemo } from "@/components/demo/demos/LargeScaleUXLabDemo";
-import { CapstoneBuilderDemo } from "@/components/demo/demos/CapstoneBuilderDemo";
 import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,26 +16,129 @@ import { demoConfigSchema } from "@/components/demo/demoSchema";
 import { TableOfContents } from "@/components/ui/TableOfContents";
 import { TopicNavigation } from "@/components/ui/TopicNavigation";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { ChevronRight, Menu, X, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import type { Topic } from "@/lib/types";
 
-type TopicListItem = {
-  id: string;
-  title: string;
-  slug: string;
-  order: number;
-};
+// Dynamic imports for demo components (loaded only when Practice tab is active)
+// Next.js dynamic() requires default export, so we wrap named exports
+const RequirementsToArchitectureDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/RequirementsToArchitectureDemo").then(
+      (mod) => ({ default: mod.RequirementsToArchitectureDemo })
+    ),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const RenderingStrategyLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/RenderingStrategyLabDemo").then((mod) => ({
+      default: mod.RenderingStrategyLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const StateAtScaleLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/StateAtScaleLabDemo").then((mod) => ({
+      default: mod.StateAtScaleLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const PerformanceBudgetLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/PerformanceBudgetLabDemo").then((mod) => ({
+      default: mod.PerformanceBudgetLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const UIArchitectureLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/UIArchitectureLabDemo").then((mod) => ({
+      default: mod.UIArchitectureLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const ReleaseDeliveryLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/ReleaseDeliveryLabDemo").then((mod) => ({
+      default: mod.ReleaseDeliveryLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const TestingStrategyLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/TestingStrategyLabDemo").then((mod) => ({
+      default: mod.TestingStrategyLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const ObservabilityLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/ObservabilityLabDemo").then((mod) => ({
+      default: mod.ObservabilityLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const SecurityPrivacyLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/SecurityPrivacyLabDemo").then((mod) => ({
+      default: mod.SecurityPrivacyLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const RealtimeSystemsLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/RealtimeSystemsLabDemo").then((mod) => ({
+      default: mod.RealtimeSystemsLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const LargeScaleUXLabDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/LargeScaleUXLabDemo").then((mod) => ({
+      default: mod.LargeScaleUXLabDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+const CapstoneBuilderDemo = dynamic(
+  () =>
+    import("@/components/demo/demos/CapstoneBuilderDemo").then((mod) => ({
+      default: mod.CapstoneBuilderDemo,
+    })),
+  { ssr: false, loading: () => <DemoLoadingState /> }
+);
+
+// Loading component for demos
+function DemoLoadingState() {
+  return (
+    <div className="flex items-center justify-center p-12 min-h-[400px]">
+      <div className="text-center space-y-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600 dark:text-blue-400 mx-auto" />
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Loading interactive demo...
+        </p>
+      </div>
+    </div>
+  );
+}
 
 interface TopicPageClientProps {
   topic: Topic;
-  allTopics: TopicListItem[];
   prevTopic?: { title: string; slug: string } | null;
   nextTopic?: { title: string; slug: string } | null;
 }
 
 export function TopicPageClient({
   topic,
-  allTopics,
   prevTopic,
   nextTopic,
 }: TopicPageClientProps) {
@@ -54,7 +146,6 @@ export function TopicPageClient({
   const [currentStep, setCurrentStep] = useState(0);
   const [taskAnswers, setTaskAnswers] = useState<Record<number, string>>({});
   const [taskRevealed, setTaskRevealed] = useState<Record<number, boolean>>({});
-  const [isLeftRailOpen, setIsLeftRailOpen] = useState(false);
   const [isRightRailOpen, setIsRightRailOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const pathname = usePathname();
@@ -89,8 +180,11 @@ export function TopicPageClient({
   const demoType = demoTypeResult.success ? demoTypeResult.data.demoType : null;
   const has3D = demoType ? demosWith3D.includes(demoType) : false;
 
-  // Determine demo component
+  // Determine demo component (only render when Practice tab is active)
   const renderDemo = () => {
+    // Only load demo when Practice tab is active
+    if (activeTab !== "practice") return null;
+
     if (!topic.practiceDemo) return null;
 
     if (!demoTypeResult.success) {
@@ -190,115 +284,9 @@ export function TopicPageClient({
   const currentDemoType = demoTypeResult.success && demoType ? demoType : null;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,_1fr)_280px] gap-6 xl:gap-8">
-      {/* Left Rail: Topic Navigator (Desktop) */}
-      <aside className="hidden lg:block">
-        <div className="sticky top-24 space-y-4">
-          <div className="px-2 mb-4">
-            <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-              Topic Navigator
-            </h2>
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              {allTopics.length} topics
-            </p>
-          </div>
-          <nav className="space-y-1 max-h-[calc(100vh-8rem)] overflow-y-auto">
-            {allTopics.map((t) => {
-              const isActive = pathname === `/topics/${t.slug}`;
-              return (
-                <Link
-                  key={t.id}
-                  href={`/topics/${t.slug}`}
-                  className={`
-                    flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm transition-all group
-                    ${
-                      isActive
-                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium shadow-sm"
-                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    }
-                  `}
-                >
-                  <span
-                    className={`text-xs font-semibold w-5 text-center ${
-                      isActive
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-400 dark:text-gray-500"
-                    }`}
-                  >
-                    {t.order}
-                  </span>
-                  <span className="flex-1 truncate leading-snug">
-                    {t.title}
-                  </span>
-                  {isActive && (
-                    <ChevronRight className="w-4 h-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-      </aside>
-
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 xl:gap-8">
       {/* Main Column: Content Area */}
       <main className="min-w-0 space-y-6">
-        {/* Mobile Left Rail Toggle (inside main column) */}
-        <div className="lg:hidden">
-          <button
-            onClick={() => setIsLeftRailOpen(!isLeftRailOpen)}
-            className="w-full flex items-center justify-between p-3 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-          >
-            <span className="text-sm font-medium">Topic Navigator</span>
-            {isLeftRailOpen ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
-          </button>
-          <AnimatePresence>
-            {isLeftRailOpen && (
-              <motion.div
-                initial={reduced ? {} : { height: 0, opacity: 0 }}
-                animate={reduced ? {} : { height: "auto", opacity: 1 }}
-                exit={reduced ? {} : { height: 0, opacity: 0 }}
-                transition={reduced ? {} : { duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <nav className="mt-2 space-y-1 p-2 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
-                  {allTopics.map((t) => {
-                    const isActive = pathname === `/topics/${t.slug}`;
-                    return (
-                      <Link
-                        key={t.id}
-                        href={`/topics/${t.slug}`}
-                        onClick={() => setIsLeftRailOpen(false)}
-                        className={`
-                          flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors
-                          ${
-                            isActive
-                              ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-medium"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                          }
-                        `}
-                      >
-                        <span
-                          className={`text-xs font-semibold w-5 text-center ${
-                            isActive
-                              ? "text-blue-600 dark:text-blue-400"
-                              : "text-gray-400 dark:text-gray-500"
-                          }`}
-                        >
-                          {t.order}
-                        </span>
-                        <span className="flex-1 truncate">{t.title}</span>
-                      </Link>
-                    );
-                  })}
-                </nav>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
         {/* Header */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 mb-2">
@@ -610,55 +598,40 @@ export function TopicPageClient({
         </motion.div>
       </main>
 
-      {/* Right Rail: Context Panel (Desktop) */}
+      {/* Right Rail: Table of Contents (Desktop) */}
       <aside className="hidden lg:block">
-        <div className="sticky top-24 space-y-6">
+        <div className="sticky top-24">
           {activeTab === "theory" ? (
-            <>
-              <TableOfContents content={topic.theory} />
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 uppercase tracking-wider mb-3">
-                  Key Takeaways
-                </h3>
-                <p className="text-sm text-blue-800 dark:text-blue-200">
-                  Review the main concepts and design patterns covered in this
-                  topic. Use the table of contents above to navigate quickly.
-                </p>
-              </div>
-            </>
+            <TableOfContents content={topic.theory} />
           ) : (
-            <div className="space-y-4">
-              <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-800">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-3">
-                  What to Observe
-                </h3>
-                <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                  {topic.practiceSteps?.[currentStep]?.focusTarget && (
-                    <li className="flex items-start gap-2">
-                      <span className="text-blue-600 dark:text-blue-400 mt-0.5">
-                        •
-                      </span>
-                      <span>
-                        Focus on: {topic.practiceSteps[currentStep].focusTarget}
-                      </span>
-                    </li>
-                  )}
+            <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-800">
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-3">
+                What to Observe
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                {topic.practiceSteps?.[currentStep]?.focusTarget && (
                   <li className="flex items-start gap-2">
                     <span className="text-blue-600 dark:text-blue-400 mt-0.5">
                       •
                     </span>
                     <span>
-                      Watch how state changes affect the visualization
+                      Focus on: {topic.practiceSteps[currentStep].focusTarget}
                     </span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-600 dark:text-blue-400 mt-0.5">
-                      •
-                    </span>
-                    <span>Check the Event Log for causal explanations</span>
-                  </li>
-                </ul>
-              </div>
+                )}
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">
+                    •
+                  </span>
+                  <span>Watch how state changes affect the visualization</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-blue-600 dark:text-blue-400 mt-0.5">
+                    •
+                  </span>
+                  <span>Check the Event Log for causal explanations</span>
+                </li>
+              </ul>
             </div>
           )}
         </div>

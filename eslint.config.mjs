@@ -1,3 +1,6 @@
+// ESLint flat config for Next.js 16
+// Note: next lint has a known issue with paths containing spaces
+// Use `npm run lint:direct` as an alternative
 import { FlatCompat } from "@eslint/eslintrc";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -10,7 +13,10 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript", "prettier"),
+  {
+    ignores: [".next/**", "node_modules/**", "dist/**", "build/**", "*.config.*"],
+  },
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "warn",

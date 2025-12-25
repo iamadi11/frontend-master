@@ -110,8 +110,7 @@ async function seed() {
       limit: 1,
     });
 
-    if (existingTopic.docs.length === 0) {
-      const practiceDemoConfig = {
+    const practiceDemoConfig = {
         demoType: "requirementsToArchitecture",
         constraints: [
           {
@@ -275,6 +274,7 @@ async function seed() {
         ],
       };
 
+    if (existingTopic.docs.length === 0) {
       await payload.create({
         collection: "topics",
         data: {

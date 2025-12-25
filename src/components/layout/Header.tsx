@@ -12,15 +12,15 @@ export function Header() {
         <nav className="flex items-center justify-between gap-4">
           <Link
             href="/"
-            className="font-semibold text-lg sm:text-xl hover:opacity-80 transition-opacity truncate"
+            className="font-semibold text-lg sm:text-xl hover:opacity-80 transition-opacity truncate focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded"
           >
             <span className="hidden sm:inline">Frontend System Design</span>
             <span className="sm:hidden">FSD</span>
           </Link>
-          <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <Link
               href="/topics"
-              className="flex items-center gap-2 text-sm hover:opacity-70 transition-opacity"
+              className="flex items-center gap-2 text-sm hover:opacity-70 transition-opacity px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
             >
               <BookOpen className="w-4 h-4" />
               <span className="hidden sm:inline">Topics</span>

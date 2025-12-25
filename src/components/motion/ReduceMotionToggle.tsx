@@ -18,7 +18,7 @@ export function ReduceMotionToggle() {
   return (
     <button
       onClick={() => setReduced(!reduced)}
-      className="flex items-center gap-2 text-sm hover:opacity-70 transition-opacity px-2 py-1 rounded"
+      className="flex items-center gap-2 text-sm hover:opacity-70 transition-opacity px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
       aria-label={reduced ? "Enable animations" : "Reduce motion"}
       title={reduced ? "Enable animations" : "Reduce motion"}
     >
