@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
-import { listTopics } from "@/lib/content";
+import { listCurriculumModules } from "@/lib/content";
 
 export async function GET() {
   try {
-    const topics = await listTopics();
-    return NextResponse.json(topics);
+    const modules = await listCurriculumModules();
+    return NextResponse.json(modules);
   } catch (error) {
-    console.error("Failed to fetch topics:", error);
+    console.error("Failed to fetch modules:", error);
     return NextResponse.json(
-      { error: "Failed to fetch topics" },
+      { error: "Failed to fetch modules" },
       { status: 500 }
     );
   }

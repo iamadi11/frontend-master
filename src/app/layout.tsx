@@ -9,9 +9,9 @@ import { SWRegister } from "@/components/sw-register";
 const inter = Inter({ subsets: ["latin"], variable: "--font-geist-sans" });
 
 export const metadata: Metadata = {
-  title: "Frontend System Design | Master System Design Through Practice",
+  title: "Frontend System Design | Master System Design",
   description:
-    "Learn frontend system design through structured theory and hands-on practice. Master rendering strategies, state management, performance, architecture, and more.",
+    "Learn frontend system design through structured theory and interactive examples. Master rendering strategies, state management, performance, architecture, and more.",
 };
 
 export default function RootLayout({

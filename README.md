@@ -1,6 +1,6 @@
 # Frontend System Design Learning Platform
 
-A backend-driven, CMS-powered learning platform for Frontend System Design. Built with Next.js, Payload CMS, and MongoDB. Each topic includes detailed Theory sections and interactive Practice demos with teaching-first animations.
+A backend-driven, CMS-powered learning platform for Frontend System Design. Built with Next.js, Payload CMS, and MongoDB. Each module includes detailed theory sections and interactive 2D animated examples with teaching-first design.
 
 ## Tech Stack
 
@@ -47,7 +47,8 @@ A backend-driven, CMS-powered learning platform for Frontend System Design. Buil
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
-- `npm run seed` - Seed database with sample content (creates sample Resource, Page, and Resource 1 Topic)
+- `npm run cms:seed:curriculum` - Seed database with curriculum modules (creates 12 curriculum modules with structure)
+- `npm run cms:audit` - Audit CMS data to validate curriculum modules and animated examples
 
 ## Admin Panel & Content Management
 

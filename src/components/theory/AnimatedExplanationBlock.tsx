@@ -10,12 +10,10 @@ import { Diff2DBlock } from "./blocks/Diff2DBlock";
 
 interface AnimatedExplanationBlockProps {
   block: TheoryAnimationBlock;
-  onPracticeLink?: (anchor: string) => void;
 }
 
 export function AnimatedExplanationBlock({
   block,
-  onPracticeLink,
 }: AnimatedExplanationBlockProps) {
   const { reduced } = useMotionPrefs();
   const [currentStep, setCurrentStep] = useState(0);
@@ -158,14 +156,6 @@ export function AnimatedExplanationBlock({
             </li>
           ))}
         </ul>
-        {block.linkedPracticeAnchor && onPracticeLink && (
-          <button
-            onClick={() => onPracticeLink(block.linkedPracticeAnchor!)}
-            className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            → See this in Practice
-          </button>
-        )}
       </div>
     </div>
   );

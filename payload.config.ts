@@ -99,12 +99,13 @@ export default buildConfig({
       ],
     },
     {
-      slug: "topics",
+      slug: "curriculum_modules",
       fields: [
         {
-          name: "title",
-          type: "text",
+          name: "order",
+          type: "number",
           required: true,
+          unique: true,
         },
         {
           name: "slug",
@@ -113,103 +114,214 @@ export default buildConfig({
           unique: true,
         },
         {
-          name: "order",
-          type: "number",
-          required: true,
-        },
-        {
-          name: "difficulty",
-          type: "select",
-          options: [
-            { label: "Beginner", value: "beginner" },
-            { label: "Intermediate", value: "intermediate" },
-            { label: "Advanced", value: "advanced" },
-          ],
-          defaultValue: "beginner",
+          name: "title",
+          type: "text",
           required: true,
         },
         {
           name: "summary",
           type: "textarea",
-        },
-        {
-          name: "theory",
-          type: "richText",
-          editor: lexicalEditor({}),
-        },
-        {
-          name: "theoryAnimations",
-          type: "json",
-        },
-        {
-          name: "references",
-          type: "array",
-          fields: [
-            {
-              name: "label",
-              type: "text",
-              required: true,
-            },
-            {
-              name: "url",
-              type: "text",
-              required: true,
-            },
-            {
-              name: "note",
-              type: "text",
-            },
-            {
-              name: "claimIds",
-              type: "text",
-            },
-          ],
-        },
-        {
-          name: "practiceDemo",
-          type: "json",
           required: true,
         },
         {
-          name: "practiceSteps",
+          name: "readingTimeMins",
+          type: "number",
+          admin: {
+            description: "Estimated reading time in minutes",
+          },
+        },
+        {
+          name: "sections",
           type: "array",
+          required: true,
           fields: [
             {
-              name: "title",
+              name: "key",
               type: "text",
               required: true,
+              admin: {
+                description:
+                  "Unique key within this module (e.g., 'overview', 'mental_model')",
+              },
+            },
+            {
+              name: "heading",
+              type: "text",
+              required: true,
+            },
+            {
+              name: "kind",
+              type: "select",
+              required: true,
+              options: [
+                { label: "Overview", value: "overview" },
+                { label: "Prerequisites", value: "prerequisites" },
+                { label: "Mental Model", value: "mentalModel" },
+                { label: "Core Concepts", value: "coreConcepts" },
+                { label: "Design Process", value: "designProcess" },
+                { label: "Trade-offs", value: "tradeoffs" },
+                { label: "Common Mistakes", value: "mistakes" },
+                { label: "Case Study", value: "caseStudy" },
+                { label: "Interview Q&A", value: "interviewQA" },
+                { label: "References", value: "references" },
+              ],
             },
             {
               name: "body",
-              type: "textarea",
+              type: "richText",
               required: true,
+              editor: lexicalEditor({}),
             },
             {
-              name: "focusTarget",
-              type: "text",
+              name: "callouts",
+              type: "array",
+              fields: [
+                {
+                  name: "type",
+                  type: "select",
+                  required: true,
+                  options: [
+                    { label: "Why It Matters", value: "whyItMatters" },
+                    { label: "Heuristic", value: "heuristic" },
+                    { label: "Failure Mode", value: "failureMode" },
+                    { label: "Checklist", value: "checklist" },
+                  ],
+                },
+                {
+                  name: "title",
+                  type: "text",
+                  required: true,
+                },
+                {
+                  name: "body",
+                  type: "textarea",
+                  required: true,
+                },
+              ],
+            },
+            {
+              name: "embeddedExamples",
+              type: "array",
+              fields: [
+                {
+                  name: "exampleId",
+                  type: "relationship",
+                  relationTo: "animated_examples",
+                  required: true,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      slug: "animated_examples",
+      fields: [
+        {
+          name: "exampleId",
+          type: "text",
+          required: true,
+          unique: true,
+          admin: {
+            description:
+              "Stable key for embedding (e.g., 'foundations-requirements-flow')",
+          },
+        },
+        {
+          name: "module",
+          type: "relationship",
+          relationTo: "curriculum_modules",
+          required: true,
+        },
+        {
+          name: "title",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "placementHint",
+          type: "select",
+          options: [
+            { label: "Mental Model", value: "mentalModel" },
+            { label: "Core Concepts", value: "coreConcepts" },
+            { label: "Trade-offs", value: "tradeoffs" },
+            { label: "Case Study", value: "caseStudy" },
+          ],
+          admin: {
+            description: "Where this example is typically placed",
+          },
+        },
+        {
+          name: "kind",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Timeline 2D", value: "timeline2d" },
+            { label: "Flow 2D", value: "flow2d" },
+            { label: "Diff 2D", value: "diff2d" },
+          ],
+        },
+        {
+          name: "description",
+          type: "textarea",
+          required: true,
+        },
+        {
+          name: "controls",
+          type: "group",
+          fields: [
+            {
+              name: "mode",
+              type: "select",
+              required: true,
+              options: [
+                { label: "Stepper", value: "stepper" },
+                { label: "Toggle", value: "toggle" },
+                { label: "Play", value: "play" },
+              ],
+              defaultValue: "stepper",
+            },
+            {
+              name: "initialStep",
+              type: "number",
+              defaultValue: 0,
+            },
+            {
+              name: "toggleLabels",
+              type: "array",
+              fields: [
+                {
+                  name: "label",
+                  type: "text",
+                  required: true,
+                },
+              ],
             },
           ],
         },
         {
-          name: "practiceTasks",
+          name: "whatToNotice",
           type: "array",
+          required: true,
+          minRows: 3,
+          maxRows: 6,
           fields: [
             {
-              name: "prompt",
-              type: "textarea",
-              required: true,
-            },
-            {
-              name: "expectedAnswer",
-              type: "textarea",
-              required: true,
-            },
-            {
-              name: "explanation",
-              type: "textarea",
+              name: "item",
+              type: "text",
               required: true,
             },
           ],
+        },
+        {
+          name: "spec",
+          type: "json",
+          required: true,
+          admin: {
+            description:
+              "Renderer configuration (validated by Zod on frontend)",
+          },
         },
       ],
     },

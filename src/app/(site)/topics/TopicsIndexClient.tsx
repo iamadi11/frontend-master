@@ -43,8 +43,8 @@ export function TopicsIndexClient({ topics }: TopicsIndexClientProps) {
       <div className="space-y-4">
         <h1 className="text-4xl md:text-5xl font-bold">Learning Path</h1>
         <p className="text-lg text-gray-600 dark:text-gray-400">
-          Complete curriculum for Frontend System Design. Each topic includes
-          detailed theory and hands-on practice.
+          Complete curriculum for Frontend System Design. Each module includes
+          detailed theory and interactive examples.
         </p>
       </div>
 

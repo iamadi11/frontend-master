@@ -6,7 +6,6 @@ const baseBlockSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
   whatToNotice: z.array(z.string()).min(1).max(6),
-  linkedPracticeAnchor: z.string().optional(),
 });
 
 // Timeline2D block schema

@@ -1,6 +1,10 @@
 import { notFound } from "next/navigation";
-import { getTopicBySlug, getAdjacentTopics, listTopics } from "@/lib/content";
-import { TopicPageClient } from "./TopicPageClient";
+import {
+  getCurriculumModuleBySlug,
+  getAdjacentModules,
+  listCurriculumModules,
+} from "@/lib/content";
+import { ModulePageClient } from "./ModulePageClient";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -9,24 +13,24 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const topic = await getTopicBySlug(slug);
+  const module = await getCurriculumModuleBySlug(slug);
 
-  if (!topic) {
+  if (!module) {
     return {
-      title: "Topic Not Found",
+      title: "Module Not Found",
     };
   }
 
   return {
-    title: `${topic.title} | Frontend System Design`,
-    description: topic.summary || `Learn ${topic.title} - theory and practice.`,
+    title: `${module.title} | Frontend System Design`,
+    description: module.summary || `Learn ${module.title}`,
   };
 }
 
 export async function generateStaticParams() {
-  const topics = await listTopics();
-  return topics.map((topic) => ({
-    slug: topic.slug,
+  const modules = await listCurriculumModules();
+  return modules.map((module) => ({
+    slug: module.slug,
   }));
 }
 
@@ -36,35 +40,28 @@ export default async function TopicPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  // Fetch topics list once (cached) and use for both topic and adjacent lookup
-  const [allTopics, topic] = await Promise.all([
-    listTopics(),
-    getTopicBySlug(slug),
+  // Fetch modules list once (cached) and use for both module and adjacent lookup
+  const [allModules, module] = await Promise.all([
+    listCurriculumModules(),
+    getCurriculumModuleBySlug(slug),
   ]);
 
-  if (!topic) {
+  if (!module) {
     notFound();
   }
 
-  // Use topics list for adjacent lookup (no additional API call)
-  const adjacent = getAdjacentTopics(slug, allTopics);
-
-  // Ensure theory is properly serialized for client component
-  // Payload's richText should be serializable, but we'll ensure it's a plain object
-  const serializedTopic = {
-    ...topic,
-    theory: topic.theory ? JSON.parse(JSON.stringify(topic.theory)) : null,
-  };
+  // Use modules list for adjacent lookup (no additional API call)
+  const adjacent = getAdjacentModules(slug, allModules);
 
   return (
-    <TopicPageClient
-      topic={serializedTopic}
-      prevTopic={
+    <ModulePageClient
+      module={module as any}
+      prevModule={
         adjacent.prev
           ? { title: adjacent.prev.title, slug: adjacent.prev.slug }
           : null
       }
-      nextTopic={
+      nextModule={
         adjacent.next
           ? { title: adjacent.next.title, slug: adjacent.next.slug }
           : null

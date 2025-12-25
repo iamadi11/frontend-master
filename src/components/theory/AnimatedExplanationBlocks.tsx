@@ -5,12 +5,10 @@ import { AnimatedExplanationBlock } from "./AnimatedExplanationBlock";
 
 interface AnimatedExplanationBlocksProps {
   blocks: unknown;
-  onPracticeLink?: (anchor: string) => void;
 }
 
 export function AnimatedExplanationBlocks({
   blocks,
-  onPracticeLink,
 }: AnimatedExplanationBlocksProps) {
   const parseResult = parseTheoryAnimations(blocks);
 
@@ -36,7 +34,6 @@ export function AnimatedExplanationBlocks({
         <AnimatedExplanationBlock
           key={block.id || `block-${index}`}
           block={block}
-          onPracticeLink={onPracticeLink}
         />
       ))}
     </div>

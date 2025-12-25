@@ -382,6 +382,146 @@ async function audit() {
       console.log();
     }
 
+    // Validate curriculum_modules (new schema)
+    console.log("\n" + "=".repeat(160));
+    console.log("CURRICULUM MODULES AUDIT");
+    console.log("=".repeat(160) + "\n");
+
+    const curriculumModules = await payload.find({
+      collection: "curriculum_modules",
+      sort: "order",
+      limit: 100,
+      depth: 2,
+    });
+
+    // Check count
+    if (curriculumModules.docs.length !== 12) {
+      issues.push(
+        `❌ Expected 12 curriculum modules, found ${curriculumModules.docs.length}`
+      );
+      console.log(`❌ Expected 12 curriculum modules, found ${curriculumModules.docs.length}\n`);
+    } else {
+      console.log(`✓ Found 12 curriculum modules\n`);
+    }
+
+    // Check orders (1-12 with no gaps/duplicates)
+    if (curriculumModules.docs.length > 0) {
+      const moduleOrders = curriculumModules.docs.map((m) => m.order).sort((a, b) => a - b);
+      const expectedOrders = Array.from({ length: 12 }, (_, i) => i + 1);
+      const orderMismatches = expectedOrders.filter(
+        (expected, idx) => moduleOrders[idx] !== expected
+      );
+      if (orderMismatches.length > 0) {
+        issues.push(
+          `❌ Curriculum module order gaps/duplicates. Expected [1-12], got [${moduleOrders.join(", ")}]`
+        );
+      } else {
+        console.log(`✓ Module orders are correct (1-12, no gaps)\n`);
+      }
+
+      // Required section kinds per module
+      const REQUIRED_SECTION_KINDS = [
+        "overview",
+        "prerequisites",
+        "mentalModel",
+        "coreConcepts",
+        "designProcess",
+        "tradeoffs",
+        "mistakes",
+        "caseStudy",
+        "interviewQA",
+      ];
+
+      console.log("─".repeat(160));
+      console.log(
+        `${"Order".padEnd(6)} | ${"Slug".padEnd(30)} | ${"Sections".padEnd(8)} | ${"Examples".padEnd(9)} | Issues`
+      );
+      console.log("─".repeat(160));
+
+      for (const module of curriculumModules.docs) {
+        const moduleIssues = [];
+        const moduleWarnings = [];
+
+        // Validate sections
+        const sections = module.sections || [];
+        const sectionsCount = sections.length;
+        const sectionKinds = sections.map((s) => s.kind);
+        const missingKinds = REQUIRED_SECTION_KINDS.filter(
+          (kind) => !sectionKinds.includes(kind)
+        );
+
+        if (sectionsCount === 0) {
+          moduleIssues.push("No sections");
+        } else if (missingKinds.length > 0) {
+          moduleWarnings.push(`Missing sections: ${missingKinds.join(", ")}`);
+        }
+
+        // Validate embedded examples (should have >= 3 animated examples per module)
+        // Count unique exampleIds from embeddedExamples
+        const exampleIds = new Set();
+        sections.forEach((section) => {
+          if (section.embeddedExamples) {
+            section.embeddedExamples.forEach((emb) => {
+              const exampleId = typeof emb.exampleId === "string" ? emb.exampleId : emb.exampleId?.exampleId;
+              if (exampleId) exampleIds.add(exampleId);
+            });
+          }
+        });
+
+        const examplesCount = exampleIds.size;
+        if (examplesCount < 3) {
+          moduleWarnings.push(`Only ${examplesCount} animated examples (need ≥3)`);
+        }
+
+        // Validate that practice fields don't exist (should be removed)
+        if (module.practiceDemo || module.practiceSteps || module.practiceTasks) {
+          moduleIssues.push("Contains practice fields (should be removed)");
+        }
+
+        const allIssuesStr =
+          moduleIssues.length > 0
+            ? moduleIssues.join("; ")
+            : moduleWarnings.length > 0
+            ? `⚠ ${moduleWarnings.join("; ")}`
+            : "None";
+
+        console.log(
+          `${String(module.order).padEnd(6)} | ${module.slug.padEnd(30)} | ${String(sectionsCount).padEnd(8)} | ${String(examplesCount).padEnd(9)} | ${allIssuesStr}`
+        );
+
+        if (moduleIssues.length > 0) {
+          issues.push(`Module ${module.order} (${module.slug}): ${moduleIssues.join(", ")}`);
+        }
+        if (moduleWarnings.length > 0) {
+          warnings.push(`Module ${module.order} (${module.slug}): ${moduleWarnings.join(", ")}`);
+        }
+      }
+
+      console.log("─".repeat(160));
+      console.log();
+
+      // Validate animated_examples collection
+      const animatedExamples = await payload.find({
+        collection: "animated_examples",
+        limit: 1000,
+        depth: 1,
+      });
+
+      console.log(`Found ${animatedExamples.docs.length} animated examples`);
+      
+      // Check for invalid specs
+      for (const example of animatedExamples.docs) {
+        if (!example.spec) {
+          issues.push(`Animated example ${example.exampleId}: Missing spec`);
+        }
+        if (!example.whatToNotice || example.whatToNotice.length < 3) {
+          warnings.push(`Animated example ${example.exampleId}: <3 whatToNotice items`);
+        }
+      }
+
+      console.log();
+    }
+
     // Exit code: 1 if any critical issues, 0 if only warnings
     return issues.length > 0 ? 1 : 0;
   } catch (error) {

@@ -70,6 +70,8 @@ export interface Config {
     users: User;
     pages: Page;
     resources: Resource;
+    curriculum_modules: CurriculumModule;
+    animated_examples: AnimatedExample;
     topics: Topic;
     "payload-kv": PayloadKv;
     "payload-locked-documents": PayloadLockedDocument;
@@ -81,6 +83,12 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
+    curriculum_modules:
+      | CurriculumModulesSelect<false>
+      | CurriculumModulesSelect<true>;
+    animated_examples:
+      | AnimatedExamplesSelect<false>
+      | AnimatedExamplesSelect<true>;
     topics: TopicsSelect<false> | TopicsSelect<true>;
     "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>;
     "payload-locked-documents":
@@ -213,6 +221,120 @@ export interface Resource {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "curriculum_modules".
+ */
+export interface CurriculumModule {
+  id: string;
+  order: number;
+  slug: string;
+  title: string;
+  summary: string;
+  /**
+   * Estimated reading time in minutes
+   */
+  readingTimeMins?: number | null;
+  sections: {
+    /**
+     * Unique key within this module (e.g., 'overview', 'mental_model')
+     */
+    key: string;
+    heading: string;
+    kind:
+      | "overview"
+      | "prerequisites"
+      | "mentalModel"
+      | "coreConcepts"
+      | "designProcess"
+      | "tradeoffs"
+      | "mistakes"
+      | "caseStudy"
+      | "interviewQA"
+      | "references";
+    body: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ("ltr" | "rtl") | null;
+        format: "left" | "start" | "center" | "right" | "end" | "justify" | "";
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    callouts?:
+      | {
+          type: "whyItMatters" | "heuristic" | "failureMode" | "checklist";
+          title: string;
+          body: string;
+          id?: string | null;
+        }[]
+      | null;
+    embeddedExamples?:
+      | {
+          exampleId: string | AnimatedExample;
+          id?: string | null;
+        }[]
+      | null;
+    id?: string | null;
+  }[];
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "animated_examples".
+ */
+export interface AnimatedExample {
+  id: string;
+  /**
+   * Stable key for embedding (e.g., 'foundations-requirements-flow')
+   */
+  exampleId: string;
+  module: string | CurriculumModule;
+  title: string;
+  /**
+   * Where this example is typically placed
+   */
+  placementHint?:
+    | ("mentalModel" | "coreConcepts" | "tradeoffs" | "caseStudy")
+    | null;
+  kind: "timeline2d" | "flow2d" | "diff2d";
+  description: string;
+  controls: {
+    mode: "stepper" | "toggle" | "play";
+    initialStep?: number | null;
+    toggleLabels?:
+      | {
+          label: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  whatToNotice: {
+    item: string;
+    id?: string | null;
+  }[];
+  /**
+   * Renderer configuration (validated by Zod on frontend)
+   */
+  spec:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "topics".
  */
 export interface Topic {
@@ -255,31 +377,6 @@ export interface Topic {
         id?: string | null;
       }[]
     | null;
-  practiceDemo:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  practiceSteps?:
-    | {
-        title: string;
-        body: string;
-        focusTarget?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  practiceTasks?:
-    | {
-        prompt: string;
-        expectedAnswer: string;
-        explanation: string;
-        id?: string | null;
-      }[]
-    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -318,6 +415,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: "resources";
         value: string | Resource;
+      } | null)
+    | ({
+        relationTo: "curriculum_modules";
+        value: string | CurriculumModule;
+      } | null)
+    | ({
+        relationTo: "animated_examples";
+        value: string | AnimatedExample;
       } | null)
     | ({
         relationTo: "topics";
@@ -420,6 +525,75 @@ export interface ResourcesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "curriculum_modules_select".
+ */
+export interface CurriculumModulesSelect<T extends boolean = true> {
+  order?: T;
+  slug?: T;
+  title?: T;
+  summary?: T;
+  readingTimeMins?: T;
+  sections?:
+    | T
+    | {
+        key?: T;
+        heading?: T;
+        kind?: T;
+        body?: T;
+        callouts?:
+          | T
+          | {
+              type?: T;
+              title?: T;
+              body?: T;
+              id?: T;
+            };
+        embeddedExamples?:
+          | T
+          | {
+              exampleId?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "animated_examples_select".
+ */
+export interface AnimatedExamplesSelect<T extends boolean = true> {
+  exampleId?: T;
+  module?: T;
+  title?: T;
+  placementHint?: T;
+  kind?: T;
+  description?: T;
+  controls?:
+    | T
+    | {
+        mode?: T;
+        initialStep?: T;
+        toggleLabels?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+      };
+  whatToNotice?:
+    | T
+    | {
+        item?: T;
+        id?: T;
+      };
+  spec?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "topics_select".
  */
 export interface TopicsSelect<T extends boolean = true> {
@@ -437,23 +611,6 @@ export interface TopicsSelect<T extends boolean = true> {
         url?: T;
         note?: T;
         claimIds?: T;
-        id?: T;
-      };
-  practiceDemo?: T;
-  practiceSteps?:
-    | T
-    | {
-        title?: T;
-        body?: T;
-        focusTarget?: T;
-        id?: T;
-      };
-  practiceTasks?:
-    | T
-    | {
-        prompt?: T;
-        expectedAnswer?: T;
-        explanation?: T;
         id?: T;
       };
   updatedAt?: T;
