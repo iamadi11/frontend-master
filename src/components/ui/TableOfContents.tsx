@@ -2,62 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { SerializedEditorState } from "lexical";
-import type { LexicalNode } from "@/lib/types";
-
-interface Heading {
-  id: string;
-  text: string;
-  level: number;
-}
+import { extractHeadings, type Heading } from "@/lib/toc";
+import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 
 interface TableOfContentsProps {
   content: SerializedEditorState | null | undefined;
   className?: string;
-}
-
-function extractHeadings(
-  content: SerializedEditorState | null | undefined
-): Heading[] {
-  if (!content?.root?.children) return [];
-
-  const headings: Heading[] = [];
-
-  function traverse(node: LexicalNode, level = 0) {
-    if (node.type === "heading") {
-      const headingLevel = parseInt(node.tag?.replace("h", "") || "1");
-      const text = extractText(node);
-      if (text) {
-        // Generate ID that matches RichTextRenderer
-        const id =
-          text
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-|-$/g, "") || `heading-${headings.length}`;
-        headings.push({
-          id,
-          text,
-          level: headingLevel,
-        });
-      }
-    }
-
-    if (node.children) {
-      node.children.forEach((child) => traverse(child, level + 1));
-    }
-  }
-
-  function extractText(node: LexicalNode): string {
-    if (node.type === "text") {
-      return node.text || "";
-    }
-    if (node.children) {
-      return node.children.map((child) => extractText(child)).join("");
-    }
-    return "";
-  }
-
-  content.root.children.forEach((node) => traverse(node as LexicalNode));
-  return headings;
 }
 
 export function TableOfContents({
@@ -65,6 +15,7 @@ export function TableOfContents({
   className = "",
 }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<Heading[]>([]);
+  const { reduced } = useMotionPrefs();
 
   useEffect(() => {
     setHeadings(extractHeadings(content));
@@ -73,6 +24,21 @@ export function TableOfContents({
   if (headings.length === 0) {
     return null;
   }
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      const offset = 80; // Account for sticky header
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: reduced ? "auto" : "smooth",
+      });
+    }
+  };
 
   return (
     <nav className={`space-y-2 ${className}`}>
@@ -84,14 +50,15 @@ export function TableOfContents({
           <li key={heading.id}>
             <a
               href={`#${heading.id}`}
+              onClick={(e) => handleClick(e, heading.id)}
               className={`
                 block py-1 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors
                 ${
-                  heading.level === 1
+                  heading.level === 2
                     ? "font-medium"
-                    : heading.level === 2
-                      ? "ml-4"
-                      : "ml-8 text-gray-600 dark:text-gray-400"
+                    : heading.level === 3
+                      ? "ml-4 text-gray-600 dark:text-gray-400"
+                      : "ml-8 text-gray-500 dark:text-gray-500"
                 }
               `}
             >

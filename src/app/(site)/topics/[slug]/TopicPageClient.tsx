@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { RichTextRenderer } from "@/components/RichTextRenderer";
+import { RichTextRenderer } from "@/components/content/RichTextRenderer";
+import { Prose } from "@/components/content/Prose";
 import { RequirementsToArchitectureDemo } from "@/components/demo/demos/RequirementsToArchitectureDemo";
 import { RenderingStrategyLabDemo } from "@/components/demo/demos/RenderingStrategyLabDemo";
 import { StateAtScaleLabDemo } from "@/components/demo/demos/StateAtScaleLabDemo";
@@ -321,14 +322,26 @@ export function TopicPageClient({
         >
           {activeTab === "theory" ? (
             <>
-              {topic.theory ? (
-                <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:scroll-mt-24 prose-a:text-blue-600 dark:prose-a:text-blue-400">
+              {topic.theory &&
+              typeof topic.theory === "object" &&
+              topic.theory !== null &&
+              (("root" in topic.theory &&
+                topic.theory.root &&
+                typeof topic.theory.root === "object" &&
+                "children" in topic.theory.root &&
+                Array.isArray(topic.theory.root.children) &&
+                topic.theory.root.children.length > 0) ||
+                ("children" in topic.theory &&
+                  Array.isArray(topic.theory.children) &&
+                  topic.theory.children.length > 0)) ? (
+                <Prose>
                   <RichTextRenderer content={topic.theory} />
-                </div>
+                </Prose>
               ) : (
                 <EmptyState
-                  title="Theory content not available"
-                  description="Theory content will be added soon."
+                  title="Theory content not found"
+                  description="This topic is missing Theory content in CMS. Seed or edit it in Payload."
+                  adminHint="Admin: Add theory content via /admin → Topics → [This Topic] → Theory field"
                 />
               )}
 
