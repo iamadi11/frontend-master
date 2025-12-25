@@ -265,6 +265,36 @@ export const uiArchitectureLabConfigSchema = z.object({
     .optional(),
 });
 
+// Resource 6: Release & Delivery Lab
+export const releaseDeliveryLabConfigSchema = z.object({
+  demoType: z.literal("releaseDeliveryLab"),
+  defaults: z.object({
+    stageMode: z.array(
+      z.enum(["PIPELINE", "FLAGS_AB", "CANARY_ROLLBACK", "CDN_EDGE"])
+    ),
+    trafficPercent: z.number().min(0).max(100),
+    errorRateNew: z.number().min(0).max(0.3),
+    latencyNewMs: z.number().min(0).max(800),
+    flagEnabled: z.boolean(),
+    abSplit: z.number().min(0).max(100),
+    targeting: z.enum(["ALL", "MOBILE_ONLY", "COUNTRY_IN", "BETA_USERS"]),
+    cacheTTLSeconds: z.number().min(0).max(300),
+    cacheInvalidation: z.enum(["NONE", "PURGE_PATH", "VERSIONED_ASSETS"]),
+    edgeCompute: z.boolean(),
+  }),
+  pipelineEvents: z.array(z.string()).optional(),
+  rolloutEvents: z.array(z.string()).optional(),
+  cdnEvents: z.array(z.string()).optional(),
+  metrics: z
+    .object({
+      errorRate: z.number(),
+      latencyMs: z.number(),
+      cacheHitRate: z.number(),
+    })
+    .optional(),
+  notes: z.array(z.string()).optional(),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
@@ -272,6 +302,7 @@ export const demoConfigSchema = z.discriminatedUnion("demoType", [
   stateAtScaleLabConfigSchema,
   performanceBudgetLabConfigSchema,
   uiArchitectureLabConfigSchema,
+  releaseDeliveryLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -287,6 +318,9 @@ export type PerformanceBudgetLabConfig = z.infer<
 >;
 export type UIArchitectureLabConfig = z.infer<
   typeof uiArchitectureLabConfigSchema
+>;
+export type ReleaseDeliveryLabConfig = z.infer<
+  typeof releaseDeliveryLabConfigSchema
 >;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;

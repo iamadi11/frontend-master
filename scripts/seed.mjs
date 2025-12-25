@@ -2154,6 +2154,281 @@ async function seed() {
       console.log("✓ Resource 5 topic already exists");
     }
 
+    // Check if Resource 6 topic exists
+    const existingTopic6 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "deployment-delivery",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic6.docs.length === 0) {
+      const releaseDeliveryLabDemoConfig = {
+        demoType: "releaseDeliveryLab",
+        defaults: {
+          stageMode: ["PIPELINE", "FLAGS_AB", "CANARY_ROLLBACK", "CDN_EDGE"],
+          trafficPercent: 10,
+          errorRateNew: 0.05,
+          latencyNewMs: 200,
+          flagEnabled: false,
+          abSplit: 50,
+          targeting: "ALL",
+          cacheTTLSeconds: 60,
+          cacheInvalidation: "NONE",
+          edgeCompute: false,
+        },
+        pipelineEvents: [
+          "Build stage: compiling TypeScript",
+          "Unit tests: 150 tests passed",
+          "Integration tests: 12 tests passed",
+          "E2E tests: 8 tests passed",
+          "Deploy: assets uploaded to CDN",
+        ],
+        rolloutEvents: [
+          "Canary at 10% → monitor metrics",
+          "Threshold breached → recommend rollback",
+        ],
+        cdnEvents: [
+          "TTL=300 → higher hit rate but risk stale HTML",
+          "Versioned assets → safe caching for static assets",
+        ],
+        metrics: {
+          errorRate: 0.02,
+          latencyMs: 180,
+          cacheHitRate: 0.7,
+        },
+        notes: [
+          "Pipeline stages must pass before deployment",
+          "Feature flags enable gradual rollout",
+          "Canary deployments reduce risk",
+          "CDN caching improves performance but requires invalidation strategy",
+        ],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Deployment & Delivery for Frontend Systems",
+          slug: "deployment-delivery",
+          order: 6,
+          difficulty: "intermediate",
+          summary:
+            "Learn CI/CD pipelines, feature flags, A/B testing, canary rollouts, rollback strategies, CDN caching, and edge computing. Master deployment and delivery patterns for frontend systems.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [{ text: "Deployment & Delivery for Frontend Systems" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Effective deployment and delivery strategies are crucial for frontend systems. This topic covers CI/CD pipelines, feature flags, A/B testing, canary rollouts, rollback mechanisms, CDN strategies, and edge computing.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "CI/CD Pipelines" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Continuous Integration and Continuous Deployment pipelines automate the build, test, and deployment process. Stages typically include build, unit tests, integration tests, E2E tests, and deployment. Each stage must pass before proceeding to the next.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Feature Flags & A/B Testing" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Feature flags enable gradual feature rollouts and A/B testing. They allow you to control which users see which features, enabling safe experimentation and gradual releases. Targeting can be based on user attributes, geography, or user segments.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Canary Rollouts & Rollback" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Canary rollouts gradually shift traffic from the stable version to a new version, starting with a small percentage. SLO (Service Level Objective) checks monitor error rates and latency. If thresholds are breached, rollback shifts all traffic back to the stable version.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "CDN Strategy & Edge Computing" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "CDN (Content Delivery Network) caching improves performance by serving content from edge locations closer to users. Cache TTL (Time To Live) controls how long content is cached. Invalidation strategies (purge path, versioned assets) ensure users receive fresh content after deployments. Edge computing enables running code at CDN edge locations for even faster responses.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "Web.dev: CI/CD for Frontend",
+              url: "https://web.dev/",
+              note: "CI/CD best practices for frontend (placeholder - verify content)",
+              claimIds: "cicd",
+            },
+            {
+              label: "Feature Flags Best Practices",
+              url: "https://featureflags.io/",
+              note: "Feature flag patterns and A/B testing (placeholder - verify content)",
+              claimIds: "feature-flags",
+            },
+            {
+              label: "CDN Caching Strategies",
+              url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching",
+              note: "HTTP caching and CDN strategies (placeholder - verify content)",
+              claimIds: "cdn-caching",
+            },
+          ],
+          practiceDemo: releaseDeliveryLabDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore CI/CD Pipeline",
+              body: "Switch to the Pipeline mode. Toggle 'Run tests' and 'Visual regression gate' on/off, then click 'Run pipeline'. Watch the animated pipeline stages progress from Build → Unit → Integration → E2E → Deploy. Notice how disabling tests shows a risk warning but doesn't fail the build.",
+              focusTarget: "pipeline",
+            },
+            {
+              title: "Understand Feature Flags & A/B Testing",
+              body: "Switch to Flags & A/B mode. Enable the feature flag and adjust the A/B split slider. Change the targeting selector (ALL, MOBILE_ONLY, COUNTRY_IN, BETA_USERS). Watch the traffic routing visualization update and see how targeting affects which users receive variant B.",
+              focusTarget: "traffic",
+            },
+            {
+              title: "Experiment with Canary Rollout",
+              body: "Switch to Canary & Rollback mode. Adjust the traffic percentage, error rate, and latency sliders. Click 'Start canary' to begin the rollout. Watch the SLO check indicator - if error rate exceeds 10% or latency exceeds 500ms, it will show FAIL and recommend rollback.",
+              focusTarget: "metrics",
+            },
+            {
+              title: "Test Rollback",
+              body: "After starting a canary, if metrics breach thresholds, click 'Rollback'. Watch the traffic visualization animate back to 100% v1 (stable). The event log will record the rollback action.",
+              focusTarget: "metrics",
+            },
+            {
+              title: "Understand CDN Caching",
+              body: "Switch to CDN & Edge mode. Adjust the Cache TTL slider and observe how it affects cache hit rate. Click 'Request asset' multiple times to see cache HIT vs MISS events in the log. Higher TTL = higher hit rate but risk of stale content.",
+              focusTarget: "cdn.map",
+            },
+            {
+              title: "Test Cache Invalidation Strategies",
+              body: "Change the Invalidation strategy (None, Purge path, Versioned assets) and click 'Deploy new build'. Notice how different strategies affect cache behavior. Versioned assets ensure correctness without purging, while purge path clears cache but requires coordination.",
+              focusTarget: "cdn.map",
+            },
+            {
+              title: "Compare Invalidation Approaches",
+              body: "Try deploying with 'None' invalidation - you'll see a stale content risk warning. Switch to 'Versioned assets' and deploy again - this shows safe caching without purging. Understand when each strategy is appropriate.",
+              focusTarget: "cdn.map",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see a chronological record of all pipeline runs, feature flag changes, canary rollouts, rollbacks, and CDN operations. This helps you understand the complete deployment and delivery workflow.",
+              focusTarget: null,
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "Design a safe rollout plan for a risky UI change that affects the checkout flow. What combination of feature flags, canary rollout, and monitoring would you use?",
+              expectedAnswer:
+                "Use feature flags to enable the change for a small beta user segment first. Then use canary rollout starting at 5% traffic, gradually increasing to 10%, 25%, 50%, and 100% over several hours. Monitor error rates, latency, and checkout completion rates. Set SLO thresholds (e.g., error rate < 1%, latency < 300ms, checkout completion > 95%). If any threshold is breached, immediately rollback. Feature flags provide instant kill switch, canary provides gradual exposure.",
+              explanation:
+                "Risky changes require multiple safety layers. Feature flags enable instant rollback without redeployment. Canary rollout limits blast radius. Gradual traffic increase allows monitoring at each stage. SLO thresholds provide objective criteria for rollback decisions.",
+            },
+            {
+              prompt:
+                "Choose a caching strategy for static assets (JS, CSS, images) and ISR-like HTML pages. What TTL and invalidation strategy would you use for each?",
+              expectedAnswer:
+                "Static assets (JS, CSS, images): Use versioned assets (content-based hashing) with long TTL (e.g., 1 year). This enables aggressive caching since versioned URLs change when content changes, ensuring correctness without purging. ISR-like HTML: Use shorter TTL (e.g., 60-300 seconds) with background revalidation. For deployments, use purge path invalidation for affected routes. Versioned assets don't work for HTML since URLs are fixed.",
+              explanation:
+                "Static assets benefit from versioned URLs because the URL changes when content changes, enabling safe long-term caching. HTML pages have fixed URLs, so they need TTL-based caching with invalidation on deploy. ISR provides background revalidation to keep content fresh while serving cached versions.",
+            },
+            {
+              prompt:
+                "When should you use canary rollout vs feature flags? What are the trade-offs?",
+              expectedAnswer:
+                "Use feature flags for: instant rollback without redeployment, A/B testing, gradual user exposure (beta users → all users), and feature toggling. Use canary rollout for: infrastructure changes, dependency updates, performance-sensitive changes, and when you need traffic-based gradual exposure. Trade-offs: Feature flags add code complexity and require flag management. Canary rollouts require infrastructure support and monitoring. Feature flags are better for feature-level control, canary is better for version-level control.",
+              explanation:
+                "Feature flags and canary rollouts serve different purposes. Feature flags provide feature-level control and instant rollback, ideal for new features and A/B testing. Canary rollouts provide version-level gradual exposure, ideal for infrastructure and performance changes. Both can be used together for maximum safety.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 6 topic (deployment-delivery)");
+    } else {
+      console.log("✓ Resource 6 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);
