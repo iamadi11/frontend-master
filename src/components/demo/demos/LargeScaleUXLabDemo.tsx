@@ -52,6 +52,9 @@ export function LargeScaleUXLabDemo({
 }: LargeScaleUXLabDemoProps) {
   const { reduced } = useMotionPrefs();
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [mode, setMode] = useState<Mode>("VIRTUALIZATION");
 
   // Virtualization state
@@ -1231,6 +1234,8 @@ export function LargeScaleUXLabDemo({
           }}
           onGoOffline={() => setOffline(true)}
           onGoOnline={() => setOffline(false)}
+          cameraPreset={cameraPreset}
+          onCameraPresetChange={setCameraPreset}
         />
       </ThreeCanvasShell>
     );
