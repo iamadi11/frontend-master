@@ -31,6 +31,7 @@ export async function listTopics() {
     collection: "topics",
     sort: "order",
     limit: 100, // Fetch all topics (default limit is 10)
+    depth: 2, // Required for richText fields to be fully populated
   });
 
   return result.docs;
@@ -46,6 +47,7 @@ export async function getTopicBySlug(slug: string) {
       },
     },
     limit: 1,
+    depth: 2, // Required for richText fields to be fully populated
   });
 
   return result.docs[0] || null;

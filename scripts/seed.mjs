@@ -287,36 +287,7 @@ async function seed() {
             root: {
               children: [
                 {
-                  children: [
-                    {
-                      text: "Introduction to Frontend System Design",
-                    },
-                  ],
-                  direction: "ltr",
-                  format: "",
-                  indent: 0,
-                  type: "heading",
-                  tag: "h1",
-                  version: 1,
-                },
-                {
-                  children: [
-                    {
-                      text: "Frontend system design begins with understanding requirements and constraints. This topic covers the foundational thinking needed to make architectural decisions.",
-                    },
-                  ],
-                  direction: "ltr",
-                  format: "",
-                  indent: 0,
-                  type: "paragraph",
-                  version: 1,
-                },
-                {
-                  children: [
-                    {
-                      text: "Key Concepts",
-                    },
-                  ],
+                  children: [{ text: "What You Will Learn" }],
                   direction: "ltr",
                   format: "",
                   indent: 0,
@@ -327,9 +298,68 @@ async function seed() {
                 {
                   children: [
                     {
-                      text: "Requirements Analysis",
+                      text: "By the end of this topic, you will understand how to translate business requirements and technical constraints into frontend architecture decisions. You'll learn to identify key constraints, evaluate trade-offs, and make informed architectural choices that balance performance, user experience, and development complexity.",
                     },
                   ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Prerequisites" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Basic understanding of web development (HTML, CSS, JavaScript), familiarity with frontend frameworks (React, Vue, or similar), and awareness of web performance concepts. No prior system design experience required.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Think of frontend system design as a translation layer between business needs and technical implementation. Requirements flow in, constraints shape decisions, and architecture emerges from understanding trade-offs. Simple: Requirements → Constraints → Architecture. Deep: Every constraint creates a decision point with multiple valid solutions, each with different trade-offs in performance, complexity, maintainability, and user experience.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Core Concepts" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Requirements Analysis" }],
                   direction: "ltr",
                   format: "",
                   indent: 0,
@@ -340,7 +370,154 @@ async function seed() {
                 {
                   children: [
                     {
-                      text: "Understanding functional and non-functional requirements is the first step. Functional requirements define what the system should do, while non-functional requirements define how well it should perform.",
+                      text: "Functional requirements define what the system should do (features, user flows). Non-functional requirements define how well it should perform (performance, scalability, accessibility, SEO). Both are critical for architecture decisions.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Constraints and Trade-offs" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Every constraint (traffic volume, device mix, SEO needs, offline support) influences architecture. High traffic favors SSR/SSG. Mobile-heavy apps need smaller bundles. SEO requirements affect rendering strategy. Understanding these relationships is crucial.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Architecture Decision Framework" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A systematic approach: 1) Gather requirements and constraints, 2) Identify decision points (rendering, state, routing, etc.), 3) Evaluate options with trade-offs, 4) Choose based on priority constraints, 5) Document decisions and rationale.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Design Process" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Step 1: Gather requirements (functional and non-functional). Step 2: Identify constraints (traffic, devices, SEO, offline, real-time). Step 3: Map constraints to architectural decisions (rendering strategy, state management, routing). Step 4: Evaluate trade-offs for each decision. Step 5: Choose architecture that best fits priority constraints. Step 6: Document decisions and rationale.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Trade-offs" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "CSR vs SSR: CSR offers faster interactivity but slower initial load and poor SEO. SSR offers better SEO and faster initial load but requires server infrastructure. High traffic favors SSR/SSG. Low traffic can use CSR. SEO-critical pages need SSR/SSG.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Common Mistakes" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1) Choosing architecture before understanding constraints. 2) Optimizing for the wrong metrics (e.g., bundle size when SEO is critical). 3) Ignoring non-functional requirements. 4) Not considering device mix and network conditions. 5) Over-engineering for hypothetical scale.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mini Case Study" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "E-commerce product page: High SEO requirement → SSR/SSG. Mobile-heavy traffic → Optimize bundle size, lazy load images. High traffic → CDN, caching strategy. Real-time inventory → WebSocket or polling. Result: SSG with ISR for product data, CSR for interactive cart, WebSocket for inventory updates.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "3D Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "The 3D Practice demo visualizes how requirements and constraints map to architectural decisions. In 3D mode, you'll see:",
                     },
                   ],
                   direction: "ltr",
@@ -352,9 +529,78 @@ async function seed() {
                 {
                   children: [
                     {
-                      text: "Constraints and Trade-offs",
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How constraint changes (traffic, SEO, device mix) affect the architecture graph",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "The decision flow from requirements → constraints → architecture patterns",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How different constraint combinations create different architectural outcomes",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
                     },
                   ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "list",
+                  listType: "bullet",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Try this in Practice:" }],
                   direction: "ltr",
                   format: "",
                   indent: 0,
@@ -365,7 +611,7 @@ async function seed() {
                 {
                   children: [
                     {
-                      text: "Every constraint influences architecture decisions. High traffic requires different strategies than low traffic. SEO requirements affect rendering choices. Understanding these relationships is crucial.",
+                      text: "1. Enable 3D mode in the Practice demo. 2. Adjust traffic volume constraint and observe how the architecture graph changes. 3. Toggle SEO importance and see rendering strategy updates. 4. Change device mix and notice bundle optimization recommendations. 5. Review the EventLog to see the decision flow.",
                     },
                   ],
                   direction: "ltr",
@@ -375,11 +621,16 @@ async function seed() {
                   version: 1,
                 },
                 {
-                  children: [
-                    {
-                      text: "Architecture Decision Framework",
-                    },
-                  ],
+                  children: [{ text: "Interview Q&A" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: How do you decide between CSR and SSR?" }],
                   direction: "ltr",
                   format: "",
                   indent: 0,
@@ -390,7 +641,28 @@ async function seed() {
                 {
                   children: [
                     {
-                      text: "A systematic approach to making architecture decisions involves mapping constraints to architectural patterns. This topic introduces the framework used throughout the curriculum.",
+                      text: "A: Evaluate constraints: SEO requirement → SSR/SSG. High traffic → SSR/SSG for better caching. Mobile-heavy → Consider CSR with code splitting. Real-time updates → CSR may be better. The decision depends on priority constraints.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: What if requirements conflict?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: Prioritize based on business goals. If SEO and fast interactivity conflict, use SSR with hydration. If bundle size and feature richness conflict, use code splitting and lazy loading. Document trade-offs and rationale.",
                     },
                   ],
                   direction: "ltr",
@@ -471,32 +743,437 @@ async function seed() {
       });
       console.log("✓ Created Resource 1 topic (foundations)");
     } else {
-      // Update existing topic to add demoType if missing
+      // Update existing topic with complete data
       const existing = existingTopic.docs[0];
-      const needsUpdate =
-        !existing.practiceDemo ||
-        !existing.practiceDemo.demoType ||
-        existing.practiceDemo.demoType !== "requirementsToArchitecture";
-
-      if (needsUpdate && existing.practiceDemo) {
-        // Reconstruct the full config with demoType at the beginning
-        const updatedDemo = {
-          demoType: "requirementsToArchitecture",
-          constraints: existing.practiceDemo.constraints || [],
-          nodes: existing.practiceDemo.nodes || [],
-          rules: existing.practiceDemo.rules || [],
-        };
-        await payload.update({
-          collection: "topics",
-          id: existing.id,
-          data: {
-            practiceDemo: updatedDemo,
+      await payload.update({
+        collection: "topics",
+        id: existing.id,
+        data: {
+          title: "Frontend System Design Foundations: Requirements, Constraints, and Architecture Thinking",
+          slug: "foundations",
+          order: 1,
+          difficulty: "beginner",
+          summary: "Learn how to translate business requirements and technical constraints into frontend architecture decisions. Understand the decision-making process that connects constraints to architectural choices.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [{ text: "What You Will Learn" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "By the end of this topic, you will understand how to translate business requirements and technical constraints into frontend architecture decisions. You'll learn to identify key constraints, evaluate trade-offs, and make informed architectural choices that balance performance, user experience, and development complexity.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Prerequisites" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Basic understanding of web development (HTML, CSS, JavaScript), familiarity with frontend frameworks (React, Vue, or similar), and awareness of web performance concepts. No prior system design experience required.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Think of frontend system design as a translation layer between business needs and technical implementation. Requirements flow in, constraints shape decisions, and architecture emerges from understanding trade-offs. Simple: Requirements → Constraints → Architecture. Deep: Every constraint creates a decision point with multiple valid solutions, each with different trade-offs in performance, complexity, maintainability, and user experience.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Core Concepts" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Requirements Analysis" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Functional requirements define what the system should do (features, user flows). Non-functional requirements define how well it should perform (performance, scalability, accessibility, SEO). Both are critical for architecture decisions.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Constraints and Trade-offs" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Every constraint (traffic volume, device mix, SEO needs, offline support) influences architecture. High traffic favors SSR/SSG. Mobile-heavy apps need smaller bundles. SEO requirements affect rendering strategy. Understanding these relationships is crucial.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Architecture Decision Framework" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A systematic approach: 1) Gather requirements and constraints, 2) Identify decision points (rendering, state, routing, etc.), 3) Evaluate options with trade-offs, 4) Choose based on priority constraints, 5) Document decisions and rationale.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Design Process" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Step 1: Gather requirements (functional and non-functional). Step 2: Identify constraints (traffic, devices, SEO, offline, real-time). Step 3: Map constraints to architectural decisions (rendering strategy, state management, routing). Step 4: Evaluate trade-offs for each decision. Step 5: Choose architecture that best fits priority constraints. Step 6: Document decisions and rationale.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Trade-offs" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "CSR vs SSR: CSR offers faster interactivity but slower initial load and poor SEO. SSR offers better SEO and faster initial load but requires server infrastructure. High traffic favors SSR/SSG. Low traffic can use CSR. SEO-critical pages need SSR/SSG.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Common Mistakes" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1) Choosing architecture before understanding constraints. 2) Optimizing for the wrong metrics (e.g., bundle size when SEO is critical). 3) Ignoring non-functional requirements. 4) Not considering device mix and network conditions. 5) Over-engineering for hypothetical scale.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mini Case Study" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "E-commerce product page: High SEO requirement → SSR/SSG. Mobile-heavy traffic → Optimize bundle size, lazy load images. High traffic → CDN, caching strategy. Real-time inventory → WebSocket or polling. Result: SSG with ISR for product data, CSR for interactive cart, WebSocket for inventory updates.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "3D Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "The 3D Practice demo visualizes how requirements and constraints map to architectural decisions. In 3D mode, you'll see:",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How constraint changes (traffic, SEO, device mix) affect the architecture graph",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "The decision flow from requirements → constraints → architecture patterns",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How different constraint combinations create different architectural outcomes",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "list",
+                  listType: "bullet",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Try this in Practice:" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1. Enable 3D mode in the Practice demo. 2. Adjust traffic volume constraint and observe how the architecture graph changes. 3. Toggle SEO importance and see rendering strategy updates. 4. Change device mix and notice bundle optimization recommendations. 5. Review the EventLog to see the decision flow.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Interview Q&A" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: How do you decide between CSR and SSR?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: Evaluate constraints: SEO requirement → SSR/SSG. High traffic → SSR/SSG for better caching. Mobile-heavy → Consider CSR with code splitting. Real-time updates → CSR may be better. The decision depends on priority constraints.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: What if requirements conflict?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: Prioritize based on business goals. If SEO and fast interactivity conflict, use SSR with hydration. If bundle size and feature richness conflict, use code splitting and lazy loading. Document trade-offs and rationale.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
           },
-        });
-        console.log("✓ Updated Resource 1 topic (added demoType)");
-      } else {
-        console.log("✓ Resource 1 topic already exists");
-      }
+          references: [
+            {
+              label: "Web.dev: Rendering on the Web",
+              url: "https://web.dev/rendering-on-the-web/",
+              note: "Overview of rendering strategies (placeholder - verify content)",
+              claimIds: "rendering-strategy",
+            },
+            {
+              label: "MDN: Progressive Web Apps",
+              url: "https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps",
+              note: "PWA concepts for offline support (placeholder - verify content)",
+              claimIds: "offline-support",
+            },
+            {
+              label: "Next.js: Data Fetching",
+              url: "https://nextjs.org/docs/app/building-your-application/data-fetching",
+              note: "Next.js patterns for data fetching and caching (placeholder - verify content)",
+              claimIds: "data-caching",
+            },
+          ],
+          practiceDemo: practiceDemoConfig,
+        },
+      });
+      console.log("✓ Updated Resource 1 topic (foundations) with complete theory");
     }
 
     // Check if Resource 2 topic exists
@@ -729,24 +1406,75 @@ async function seed() {
             root: {
               children: [
                 {
-                  children: [{ text: "Rendering Strategies Overview" }],
+                  children: [{ text: "What You Will Learn" }],
                   direction: "ltr",
                   format: "",
                   indent: 0,
                   type: "heading",
-                  tag: "h1",
+                  tag: "h2",
                   version: 1,
                 },
                 {
                   children: [
                     {
-                      text: "Frontend rendering strategies determine when and where content is generated. Each strategy has trade-offs in performance, SEO, and user experience.",
+                      text: "By the end of this topic, you will understand different rendering strategies (CSR, SSR, SSG, ISR, Streaming), their trade-offs, when to use each, and how data fetching and caching interact with rendering. You'll learn to choose the right strategy based on requirements and constraints.",
                     },
                   ],
                   direction: "ltr",
                   format: "",
                   indent: 0,
                   type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Prerequisites" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Understanding of HTML, CSS, JavaScript, React or similar framework, basic knowledge of HTTP and web performance metrics. Familiarity with Next.js helpful but not required.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Simple: Rendering = when and where HTML is generated. CSR = browser, SSR = server per request, SSG = server at build time. Deep: Each strategy creates a different timeline of events (HTML delivery, JavaScript execution, data fetching, hydration, interactivity). The choice affects Core Web Vitals, SEO, caching strategies, and user experience. Understanding the timeline helps you optimize each phase.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Core Concepts" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
                   version: 1,
                 },
                 {
@@ -848,6 +1576,256 @@ async function seed() {
                   children: [
                     {
                       text: "Streaming sends HTML in chunks as it's generated. Progressive rendering improves perceived performance. Content appears incrementally, reducing time to first content.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Design Process" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Step 1: Assess SEO requirements (critical → SSR/SSG). Step 2: Evaluate traffic patterns (high → SSG/ISR for caching). Step 3: Consider content update frequency (frequent → SSR/ISR, static → SSG). Step 4: Analyze interactivity needs (high → CSR or SSR with hydration). Step 5: Choose strategy balancing performance, SEO, and complexity. Step 6: Implement data fetching and caching strategy.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Trade-offs" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "CSR: Fast interactivity, poor SEO, slower initial content. SSR: Better SEO, faster initial content, requires server, slower TTI. SSG: Fastest TTFB, excellent caching, requires rebuilds. ISR: SSG benefits with on-demand updates, more complex. Streaming: Progressive rendering, better perceived performance, requires server support.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Common Mistakes" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1) Using CSR for SEO-critical pages. 2) Over-using SSR when SSG would suffice. 3) Not considering caching strategy with rendering choice. 4) Ignoring hydration costs in SSR. 5) Choosing SSG for frequently-changing content without ISR.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mini Case Study" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "E-commerce product page: High SEO → SSG with ISR. Product data updates hourly → ISR revalidate: 3600s. High traffic → CDN caching. Interactive cart → CSR for cart component. Result: SSG for product page (fast, SEO-friendly), ISR for freshness, CSR for cart interactions.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "3D Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "The 3D Practice demo visualizes rendering timelines and strategy differences. In 3D mode, you'll see:",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How different rendering strategies create different timelines (HTML delivery, JS load, data fetch, hydration)",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "The relationship between network speed and strategy performance",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How caching strategies interact with rendering (CDN cache hits, revalidation)",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "list",
+                  listType: "bullet",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Try this in Practice:" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1. Enable 3D mode in the Practice demo. 2. Switch between CSR, SSR, SSG, ISR, and Streaming strategies. 3. Observe how the timeline changes for each strategy. 4. Adjust network speed and see how it affects different strategies. 5. Change cache mode and watch revalidation events. 6. Review the EventLog to understand the sequence of events.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Interview Q&A" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: When should you use SSR vs SSG?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: Use SSG for content that doesn't change frequently (blog posts, product pages with stable data). Use SSR for content that changes per request (user-specific data, real-time data). Use ISR when you want SSG benefits but need periodic updates without full rebuilds.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: What's the trade-off between CSR and SSR?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: CSR offers faster Time to Interactive (TTI) and better interactivity, but slower initial content and poor SEO. SSR offers faster initial content and better SEO, but slower TTI due to hydration. Choose CSR for interactive apps with minimal SEO needs. Choose SSR for SEO-critical pages or when initial content speed matters.",
                     },
                   ],
                   direction: "ltr",
@@ -1161,24 +2139,75 @@ async function seed() {
             root: {
               children: [
                 {
-                  children: [{ text: "State Management at Scale" }],
+                  children: [{ text: "What You Will Learn" }],
                   direction: "ltr",
                   format: "",
                   indent: 0,
                   type: "heading",
-                  tag: "h1",
+                  tag: "h2",
                   version: 1,
                 },
                 {
                   children: [
                     {
-                      text: "Managing state effectively at scale requires understanding the distinction between server state and client state, implementing robust async patterns, and handling edge cases like offline scenarios and conflicts.",
+                      text: "By the end of this topic, you will understand the distinction between server and client state, implement optimistic updates, handle offline scenarios with queue management, resolve conflicts, and use effective caching strategies. You'll learn async orchestration patterns for robust state management at scale.",
                     },
                   ],
                   direction: "ltr",
                   format: "",
                   indent: 0,
                   type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Prerequisites" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Understanding of React or similar framework, familiarity with async JavaScript (Promises, async/await), basic knowledge of HTTP and REST APIs. Experience with state management libraries helpful but not required.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Simple: Server state = source of truth from backend, client state = UI-only state. Optimistic updates = show changes immediately, rollback if server rejects. Deep: State management involves synchronization between client cache and server, handling network failures, conflict resolution, and maintaining consistency. The cache acts as a local replica that must stay in sync with the server, requiring strategies for freshness, invalidation, and conflict resolution.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Core Concepts" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
                   version: 1,
                 },
                 {
@@ -1257,6 +2286,256 @@ async function seed() {
                   children: [
                     {
                       text: "Effective caching balances freshness with performance. Strategies like stale-while-revalidate serve cached content immediately while updating in the background, improving perceived performance.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Design Process" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Step 1: Identify state type (server vs client). Step 2: Choose caching strategy (fresh-only, stale-while-revalidate, etc.). Step 3: Implement optimistic updates for mutations. Step 4: Add offline queue for network failures. Step 5: Design conflict resolution strategy. Step 6: Implement cache invalidation and refetching.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Trade-offs" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Optimistic updates: Better UX but requires rollback logic. Offline queue: Better resilience but adds complexity. Stale-while-revalidate: Faster perceived performance but may show stale data. Fresh-only: Always current but slower. Conflict resolution: Last-write-wins is simple but may lose data; Operational transforms are complex but preserve all changes.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Common Mistakes" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1) Mixing server and client state. 2) Not handling optimistic update rollbacks. 3) Ignoring offline scenarios. 4) Not implementing conflict resolution. 5) Over-caching or under-caching. 6) Not invalidating cache after mutations.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mini Case Study" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Collaborative document editor: Real-time updates → WebSocket for server state sync. Optimistic updates → Immediate UI feedback. Offline support → Queue mutations, replay on reconnect. Conflict resolution → Operational transforms for concurrent edits. Cache strategy → Stale-while-revalidate for document content. Result: Responsive UI with offline support and conflict-free collaboration.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "3D Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "The 3D Practice demo visualizes state synchronization and async orchestration. In 3D mode, you'll see:",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How server state and client cache synchronize (cache updates, server responses, conflicts)",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "The flow of optimistic updates and rollbacks when mutations fail",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How offline queue manages mutations and replays them when connectivity returns",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "list",
+                  listType: "bullet",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Try this in Practice:" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1. Enable 3D mode in the Practice demo. 2. Make a mutation with optimistic updates enabled and watch the state pipeline. 3. Set network to offline and queue mutations, then go online to see replay. 4. Adjust failure rate and observe rollback behavior. 5. Switch cache modes and see how stale-while-revalidate works. 6. Review the EventLog to understand the complete state flow.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Interview Q&A" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: When should you use optimistic updates?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: Use optimistic updates for mutations that are likely to succeed and where immediate feedback improves UX (likes, comments, form submissions). Avoid for critical operations (payments, deletions) or when rollback is complex. Always implement proper rollback logic.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: How do you handle conflicts in offline scenarios?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: Use version numbers or timestamps to detect conflicts. When conflicts occur, choose a resolution strategy: last-write-wins (simple, may lose data), merge (combine changes when possible), or operational transforms (preserve all changes, complex). For most apps, last-write-wins with user notification is sufficient.",
                     },
                   ],
                   direction: "ltr",
@@ -1403,24 +2682,75 @@ async function seed() {
             root: {
               children: [
                 {
-                  children: [{ text: "Performance System Design" }],
+                  children: [{ text: "What You Will Learn" }],
                   direction: "ltr",
                   format: "",
                   indent: 0,
                   type: "heading",
-                  tag: "h1",
+                  tag: "h2",
                   version: 1,
                 },
                 {
                   children: [
                     {
-                      text: "Performance is a critical aspect of frontend system design. This topic covers Core Web Vitals, loading strategies, bundle optimization, caching strategies, image and video optimization, and main-thread performance considerations.",
+                      text: "By the end of this topic, you will understand Core Web Vitals (LCP, INP, CLS), loading strategies, bundle optimization, caching strategies, image/video optimization, and main-thread performance. You'll learn to measure performance, set performance budgets, and optimize for real-world user experience.",
                     },
                   ],
                   direction: "ltr",
                   format: "",
                   indent: 0,
                   type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Prerequisites" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Understanding of HTML, CSS, JavaScript, basic knowledge of HTTP, browser DevTools, and web performance concepts. Familiarity with build tools helpful but not required.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Simple: Performance = how fast the page loads and responds. Core Web Vitals measure real user experience. Deep: Performance involves multiple layers: network (latency, bandwidth), rendering (HTML parsing, CSS, JS execution), and runtime (main thread, memory). Each layer has optimization strategies. Performance budgets help prioritize optimizations. The goal is optimizing for real users on real devices and networks.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Core Concepts" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
                   version: 1,
                 },
                 {
@@ -1520,6 +2850,256 @@ async function seed() {
                   children: [
                     {
                       text: "Long tasks that block the main thread degrade interactivity. Breaking up heavy JavaScript work, using web workers, and optimizing bundle sizes help maintain responsive user experiences.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Design Process" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Step 1: Measure current performance (Core Web Vitals, Lighthouse). Step 2: Set performance budgets (bundle size, LCP, INP targets). Step 3: Identify bottlenecks (network, rendering, runtime). Step 4: Optimize loading (code splitting, preloading, lazy loading). Step 5: Optimize assets (images, fonts, videos). Step 6: Optimize runtime (reduce main thread work, use workers). Step 7: Monitor and maintain budgets.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Trade-offs" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Bundle size vs code splitting: Smaller bundles load faster but may require more requests. Caching vs freshness: Aggressive caching improves performance but may show stale content. Image quality vs size: Higher quality looks better but loads slower. Preloading vs lazy loading: Preloading improves perceived performance but uses bandwidth upfront.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Common Mistakes" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1) Optimizing for synthetic metrics only (Lighthouse) without real user monitoring. 2) Not setting performance budgets. 3) Over-optimizing one metric while ignoring others. 4) Not considering mobile devices and slow networks. 5) Ignoring third-party script impact. 6) Not measuring performance in production.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Mini Case Study" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "E-commerce product page: Large images → WebP format, responsive images, lazy loading. Heavy JavaScript → Code splitting, route-based chunks. Third-party scripts → Defer non-critical, load asynchronously. Result: LCP improved from 4.2s to 1.8s, INP from 350ms to 120ms, bundle size reduced 40% through code splitting.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "3D Mental Model" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "The 3D Practice demo visualizes performance budgets and optimization strategies. In 3D mode, you'll see:",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How bundle size, loading strategies, and caching affect Core Web Vitals",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "The relationship between performance budgets and actual metrics",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                    {
+                      children: [
+                        {
+                          children: [
+                            {
+                              text: "How different optimization strategies impact loading timeline and interactivity",
+                            },
+                          ],
+                          direction: "ltr",
+                          format: "",
+                          indent: 0,
+                          type: "text",
+                          version: 1,
+                        },
+                      ],
+                      direction: "ltr",
+                      format: "",
+                      indent: 0,
+                      type: "listitem",
+                      version: 1,
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "list",
+                  listType: "bullet",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Try this in Practice:" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "1. Enable 3D mode in the Practice demo. 2. Adjust bundle size and observe impact on LCP and INP. 3. Change loading strategies (preload, lazy load) and see timeline changes. 4. Modify cache settings and observe performance improvements. 5. Set performance budgets and see which optimizations help meet targets. 6. Review the EventLog to understand optimization impact.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Interview Q&A" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: How do you prioritize performance optimizations?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: Start with Core Web Vitals (LCP, INP, CLS) as they directly impact user experience and SEO. Measure real user metrics, not just Lighthouse. Set performance budgets. Optimize the biggest bottlenecks first (usually images, JavaScript bundles, third-party scripts). Use the 80/20 rule: 20% of optimizations often provide 80% of the benefit.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Q: What's the trade-off between bundle size and code splitting?" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h3",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "A: Smaller bundles load faster but code splitting adds HTTP requests and may delay interactivity if chunks load sequentially. Balance: Split large chunks (>200KB), keep critical path small, use route-based splitting, preload critical chunks. Too much splitting can hurt performance due to request overhead.",
                     },
                   ],
                   direction: "ltr",

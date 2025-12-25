@@ -45,9 +45,28 @@ export default async function TopicPage({
     notFound();
   }
 
+  // Diagnostic logging - remove after fixing
+  if (process.env.NODE_ENV === "development") {
+    console.log("[DEBUG] Theory data for", slug, ":", {
+      hasTheory: !!topic.theory,
+      theoryKeys: topic.theory ? Object.keys(topic.theory) : [],
+      hasRoot: !!topic.theory?.root,
+      rootKeys: topic.theory?.root ? Object.keys(topic.theory.root) : [],
+      childrenCount: topic.theory?.root?.children?.length || 0,
+      firstChild: topic.theory?.root?.children?.[0],
+    });
+  }
+
+  // Ensure theory is properly serialized for client component
+  // Payload's richText should be serializable, but we'll ensure it's a plain object
+  const serializedTopic = {
+    ...topic,
+    theory: topic.theory ? JSON.parse(JSON.stringify(topic.theory)) : null,
+  };
+
   return (
     <TopicPageClient
-      topic={topic as any}
+      topic={serializedTopic as any}
       prevTopic={
         adjacent.prev
           ? { title: adjacent.prev.title, slug: adjacent.prev.slug }

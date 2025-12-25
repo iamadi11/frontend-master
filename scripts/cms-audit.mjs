@@ -26,18 +26,69 @@ const EXPECTED_TITLES = [
 ];
 
 /**
- * Validates if theory field has meaningful content
+ * Extracts text from a Lexical node
+ */
+function extractText(node) {
+  if (node.text) {
+    return node.text;
+  }
+  if (node.children && Array.isArray(node.children)) {
+    return node.children.map(extractText).join("");
+  }
+  return "";
+}
+
+/**
+ * Finds headings in theory content
+ */
+function findHeadings(theory) {
+  const headings = [];
+  if (!theory || !theory.root || !theory.root.children) {
+    return headings;
+  }
+
+  function traverse(node) {
+    if (node.type === "heading" && node.tag) {
+      const text = extractText(node);
+      headings.push({ level: node.tag, text: text.toLowerCase() });
+    }
+    if (node.children && Array.isArray(node.children)) {
+      node.children.forEach(traverse);
+    }
+  }
+
+  theory.root.children.forEach(traverse);
+  return headings;
+}
+
+/**
+ * Required headings from Topic Page Contract
+ */
+const REQUIRED_HEADINGS = [
+  "what you will learn",
+  "prerequisites",
+  "mental model",
+  "core concepts",
+  "design process",
+  "trade-offs",
+  "common mistakes",
+  "mini case study",
+  "interview q&a",
+];
+
+/**
+ * Validates if theory field has meaningful content and required headings
  * Lexical richText structure: root with children array
  */
 function validateTheory(theory) {
   if (!theory) {
-    return { valid: false, reason: "Missing" };
+    return { valid: false, reason: "Missing", missingHeadings: REQUIRED_HEADINGS };
   }
 
   if (typeof theory === "object" && theory.root) {
     const children = theory.root.children || [];
     if (children.length === 0) {
-      return { valid: false, reason: "Empty root" };
+      return { valid: false, reason: "Empty root", missingHeadings: REQUIRED_HEADINGS };
     }
 
     // Count total text content
@@ -54,13 +105,37 @@ function validateTheory(theory) {
 
     // Require at least 100 characters of actual text
     if (totalTextLength < 100) {
-      return { valid: false, reason: `Too short (${totalTextLength} chars)` };
+      return { valid: false, reason: `Too short (${totalTextLength} chars)`, missingHeadings: REQUIRED_HEADINGS };
     }
 
-    return { valid: true, charCount: totalTextLength };
+    // Check for required headings (case-insensitive)
+    const headings = findHeadings(theory);
+    const headingTexts = headings.map(h => h.text.toLowerCase());
+    const missingHeadings = REQUIRED_HEADINGS.filter(
+      required => !headingTexts.some(h => {
+        const normalizedH = h.toLowerCase();
+        const normalizedReq = required.toLowerCase();
+        return normalizedH.includes(normalizedReq) || normalizedReq.includes(normalizedH);
+      })
+    );
+
+    // Check for 3D Mental Model section (case-insensitive)
+    const has3DMentalModel = headingTexts.some(h => {
+      const normalized = h.toLowerCase();
+      return normalized.includes("3d mental model") || 
+             (normalized.includes("3d") && normalized.includes("mental"));
+    });
+
+    return { 
+      valid: totalTextLength >= 100, 
+      charCount: totalTextLength,
+      missingHeadings: missingHeadings.length > 0 ? missingHeadings : null,
+      has3DMentalModel,
+      headings: headings.length
+    };
   }
 
-  return { valid: false, reason: "Invalid format" };
+  return { valid: false, reason: "Invalid format", missingHeadings: REQUIRED_HEADINGS };
 }
 
 /**
@@ -189,10 +264,22 @@ async function audit() {
       const theoryValidation = validateTheory(topic.theory);
       let theoryStatus = "";
       if (theoryValidation.valid) {
-        theoryStatus = `✓ OK (${theoryValidation.charCount}ch)`;
+        let statusParts = [`✓ OK (${theoryValidation.charCount}ch, ${theoryValidation.headings} headings)`];
+        if (theoryValidation.missingHeadings && theoryValidation.missingHeadings.length > 0) {
+          statusParts.push(`Missing: ${theoryValidation.missingHeadings.slice(0, 2).join(", ")}${theoryValidation.missingHeadings.length > 2 ? "..." : ""}`);
+          topicWarnings.push(`Missing headings: ${theoryValidation.missingHeadings.join(", ")}`);
+        }
+        if (!theoryValidation.has3DMentalModel) {
+          statusParts.push("No 3D Mental Model");
+          topicWarnings.push("Missing '3D Mental Model' section");
+        }
+        theoryStatus = statusParts.join("; ");
       } else {
         theoryStatus = `✗ ${theoryValidation.reason}`;
         topicIssues.push(`Theory: ${theoryValidation.reason}`);
+        if (theoryValidation.missingHeadings) {
+          topicIssues.push(`Missing headings: ${theoryValidation.missingHeadings.join(", ")}`);
+        }
       }
 
       // References validation

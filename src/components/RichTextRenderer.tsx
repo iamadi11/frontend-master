@@ -20,7 +20,68 @@ function extractTextFromNode(node: any): string {
 }
 
 export function RichTextRenderer({ content }: RichTextRendererProps) {
-  if (!content || !content.root) {
+  // Handle null/undefined
+  if (!content) {
+    return (
+      <p className="text-gray-500 dark:text-gray-400 italic">
+        Content not available yet.
+      </p>
+    );
+  }
+
+  // Payload CMS may return richText as the root object directly, or nested under root
+  // Payload v3 with Lexical returns: { root: { children: [...], type: "root", ... } }
+  // Handle both structures: { root: {...} } or direct root object
+  let rootNode: any = null;
+
+  if ((content as any).root) {
+    // Standard Lexical structure: { root: { children: [...] } }
+    rootNode = (content as any).root;
+  } else if ((content as any).children && (content as any).type === "root") {
+    // Root object passed directly
+    rootNode = content;
+  } else if (Array.isArray((content as any).children)) {
+    // Array of children at top level (unlikely but handle it)
+    rootNode = { children: (content as any).children };
+  } else {
+    // Try to use content as root if it has children
+    rootNode = content as any;
+  }
+
+  if (!rootNode) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("RichTextRenderer: No root node found", {
+        content,
+        contentKeys: Object.keys(content || {}),
+        hasRoot: !!(content as any).root,
+      });
+    }
+    return (
+      <p className="text-gray-500 dark:text-gray-400 italic">
+        Content not available yet.
+      </p>
+    );
+  }
+
+  // Check for children array
+  if (!rootNode.children || !Array.isArray(rootNode.children)) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("RichTextRenderer: Invalid children structure", {
+        rootNode,
+        hasChildren: !!rootNode.children,
+        childrenType: typeof rootNode.children,
+        rootNodeKeys: Object.keys(rootNode || {}),
+      });
+    }
+    return (
+      <p className="text-gray-500 dark:text-gray-400 italic">
+        Content not available yet.
+      </p>
+    );
+  }
+
+  // If children array is empty, show empty state
+  if (rootNode.children.length === 0) {
     return (
       <p className="text-gray-500 dark:text-gray-400 italic">
         Content not available yet.
@@ -172,7 +233,7 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
 
   return (
     <div className="prose dark:prose-invert max-w-none">
-      {content.root.children?.map((child: any, i: number) => (
+      {rootNode.children.map((child: any, i: number) => (
         <div key={i}>{renderNode(child)}</div>
       ))}
     </div>

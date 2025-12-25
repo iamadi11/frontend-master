@@ -10,6 +10,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "seed": "tsx scripts/seed.mjs",
+    "reset-topics": "tsx scripts/reset-topics.mjs",
+    "update-topics": "tsx scripts/update-topics-theory.mjs",
     "content-audit": "node scripts/content-audit.mjs",
     "cms:audit": "tsx scripts/cms-audit.mjs"
   },
