@@ -23,7 +23,7 @@ B) PRACTICE
 7) Common mistakes
 8) Mini case study (realistic)
 9) Interview Q&A (concise answers)
-10) 2D/3D Mental Model (ties to practice demo)
+10) 2D Mental Model (ties to practice demo)
 11) References (credibility only; not required)
 
 ## THEORY Animated Explanation Blocks (required)
@@ -32,7 +32,7 @@ Each block MUST include:
 - Title
 - Short explanation (2–8 lines)
 - Control (stepper/toggle/play) – user-triggered
-- “What to notice” bullets (3–6)
+- "What to notice" bullets (3–6)
 - Reduced-motion equivalent (static/instant)
 - Link/anchor to the relevant Practice demo part (same page)
 
@@ -40,6 +40,8 @@ Rules:
 - No autoplay
 - No infinite loops
 - Animation must teach (timeline/flow/boundary/trade-off)
+- 2D only (SVG/CSS/Framer Motion or GSAP if already installed)
+- No 3D, no WebGL, no Three.js
 
 ## Empty-state rule
 If Theory is missing/empty:

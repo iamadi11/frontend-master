@@ -6,9 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DemoShell } from "../DemoShell";
 import { EventLog, EventLogEntry } from "../EventLog";
 import { Spotlight, SpotlightTarget } from "../Spotlight";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { RealtimePlantScene } from "../../three/RealtimePlantScene";
-import { Fallback2D } from "../../three/Fallback2D";
 import {
   realtimeSystemsLabConfigSchema,
   type RealtimeSystemsLabConfig,

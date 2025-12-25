@@ -73,28 +73,11 @@ const diff2DBlockSchema = baseBlockSchema.extend({
     .optional(),
 });
 
-// Three3D block schema (reuse wrapper)
-const three3DBlockSchema = baseBlockSchema.extend({
-  kind: z.literal("three3d"),
-  sceneComponent: z.string(), // e.g., "RequestConveyorScene"
-  cameraPresets: z
-    .array(
-      z.object({
-        name: z.string(),
-        position: z.tuple([z.number(), z.number(), z.number()]),
-        target: z.tuple([z.number(), z.number(), z.number()]),
-      })
-    )
-    .optional(),
-  defaultState: z.record(z.string(), z.unknown()).optional(),
-});
-
-// Union of all block types
+// Union of all block types (2D only)
 export const theoryAnimationBlockSchema = z.discriminatedUnion("kind", [
   timeline2DBlockSchema,
   flow2DBlockSchema,
   diff2DBlockSchema,
-  three3DBlockSchema,
 ]);
 
 // Array of blocks schema
@@ -105,7 +88,6 @@ export type TheoryAnimationBlock = z.infer<typeof theoryAnimationBlockSchema>;
 export type Timeline2DBlock = z.infer<typeof timeline2DBlockSchema>;
 export type Flow2DBlock = z.infer<typeof flow2DBlockSchema>;
 export type Diff2DBlock = z.infer<typeof diff2DBlockSchema>;
-export type Three3DBlock = z.infer<typeof three3DBlockSchema>;
 
 // Safe parse helper
 export function parseTheoryAnimations(data: unknown):

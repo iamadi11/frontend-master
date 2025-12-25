@@ -11,9 +11,6 @@ import {
   type LargeScaleUXLabConfig,
 } from "../demoSchema";
 import { z } from "zod";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { UXMegacityScene } from "../../three/UXMegacityScene";
-import { Fallback2D } from "../../three/Fallback2D";
 
 interface LargeScaleUXLabDemoProps {
   demoConfig: unknown;

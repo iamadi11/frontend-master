@@ -11,9 +11,6 @@ import {
   type PerformanceBudgetLabConfig,
 } from "../demoSchema";
 import { z } from "zod";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { PerformanceTheaterScene } from "../../three/PerformanceTheaterScene";
-import { Fallback2D } from "../../three/Fallback2D";
 
 interface PerformanceBudgetLabDemoProps {
   demoConfig: unknown;

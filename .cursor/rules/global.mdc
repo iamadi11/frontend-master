@@ -10,7 +10,7 @@ Build a public, backend-driven Frontend System Design learning website that is:
 - content-heavy (deep theory; complete coverage)
 - self-contained (user does NOT need external links to understand)
 - correct and grounded in `frontend_system_design_curriculum.pdf`
-- interactive (2D demos for every topic; 3D where it increases clarity)
+- interactive (2D demos for every topic)
 - Vercel-friendly (Next.js + Node, Payload CMS, MongoDB; secrets via env only)
 
 ## Always-on constraints
@@ -26,5 +26,5 @@ Build a public, backend-driven Frontend System Design learning website that is:
 ## Learning quality bar (always)
 Theory must be long-form and structured.
 Every major theory concept must be reinforced by:
-- a theory animation block (2D preferred) OR
-- a practice demo interaction (2D/3D)
+- a theory animation block (2D only) OR
+- a practice demo interaction (2D only)

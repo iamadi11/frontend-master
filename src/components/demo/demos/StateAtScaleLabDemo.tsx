@@ -12,12 +12,6 @@ import {
   type StateAtScaleLabConfig,
 } from "../demoSchema";
 import { z } from "zod";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import {
-  StatePipelineScene,
-  triggerPipelineAction,
-} from "../../three/StatePipelineScene";
-import { Fallback2D } from "../../three/Fallback2D";
 
 interface StateAtScaleLabDemoProps {
   demoConfig: unknown;

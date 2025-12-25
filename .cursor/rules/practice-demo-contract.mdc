@@ -1,9 +1,8 @@
 ---
-description: "Practice demo must be learn-by-doing; 2D required; 3D optional; aligned to PDF + theory."
+description: "Practice demo must be learn-by-doing; 2D only; aligned to PDF + theory."
 alwaysApply: false
 globs:
   - "src/components/demo/**"
-  - "src/components/three/**"
   - "src/app/**/topics/**"
 ---
 
@@ -24,12 +23,8 @@ Hardcoding lesson text in route files is forbidden.
 - Guided Steps
 - Tasks + Solution Reveal + Explanation
 
-## 2D baseline (mandatory)
+## 2D only (mandatory)
 Every topic must have a working 2D demo.
-
-## 3D mode (optional but strict if present)
-- must improve clarity vs 2D
-- user-triggered only (no idle loops)
-- reduced-motion safe
-- WebGL fallback to 2D automatically
-- must match Theory 2D/3D Mental Model + Event Log narrative
+- Use SVG/CSS/Framer Motion or GSAP if already installed
+- No 3D, no WebGL, no Three.js
+- Simple yet classy animations that teach without distracting

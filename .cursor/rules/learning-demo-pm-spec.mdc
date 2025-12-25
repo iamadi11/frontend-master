@@ -3,7 +3,6 @@ description: "For each demo/animation, define a PM-style teaching spec first."
 alwaysApply: false
 globs:
   - "src/components/demo/**"
-  - "src/components/three/**"
   - "src/components/theory/**"
 ---
 

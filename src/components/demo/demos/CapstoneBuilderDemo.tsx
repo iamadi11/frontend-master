@@ -6,8 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DemoShell } from "../DemoShell";
 import { EventLog, EventLogEntry } from "../EventLog";
 import { Spotlight, SpotlightTarget } from "../Spotlight";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { CapstoneAtlasScene } from "../../three/CapstoneAtlasScene";
 import {
   capstoneBuilderConfigSchema,
   type CapstoneBuilderConfig,
@@ -310,43 +308,7 @@ export function CapstoneBuilderDemo({
                 </button>
               </div>
               <div className="relative min-h-[400px] w-full">
-                <ThreeCanvasShell
-                  className="w-full h-[400px] rounded"
-                  fallback={renderArchitectureMap2D()}
-                >
-                  <CapstoneAtlasScene
-                    config={config}
-                    view="ARCH_MAP"
-                    scenario={scenario}
-                    emphasis={emphasis}
-                    onNodeClick={(moduleId) => {
-                      const module = currentScenarioData.modules.find(
-                        (m) => m.id === moduleId
-                      );
-                      if (module) {
-                        addLogEntry(
-                          "Module clicked",
-                          module.label,
-                          `Type: ${module.type}`
-                        );
-                      }
-                    }}
-                    onFlowPlay={handlePlayFlow}
-                    isPlayingFlow={isPlayingFlow}
-                    rendering={rendering}
-                    caching={caching}
-                    realtime={realtime}
-                    optimistic={optimistic}
-                    offline={offline}
-                    sampling={sampling}
-                    cspStrict={cspStrict}
-                    isSimRunning={isSimRunning}
-                    onSimComplete={handleSimComplete}
-                    focusTarget={focusTarget}
-                    cameraPreset={cameraPreset}
-                    onCameraPresetChange={setCameraPreset}
-                  />
-                </ThreeCanvasShell>
+                {renderArchitectureMap2D()}
               </div>
             </div>
           </SpotlightTarget>
@@ -633,30 +595,7 @@ export function CapstoneBuilderDemo({
               {isSimRunning ? "Running..." : "Run Simulation"}
             </button>
             <div className="relative min-h-[400px] w-full">
-              <ThreeCanvasShell
-                className="w-full h-[400px] rounded"
-                fallback={renderInteractiveSim2D()}
-              >
-                <CapstoneAtlasScene
-                  config={config}
-                  view="INTERACTIVE_SIM"
-                  scenario={scenario}
-                  emphasis={emphasis}
-                  onNodeClick={() => {}}
-                  onFlowPlay={() => {}}
-                  isPlayingFlow={false}
-                  rendering={rendering}
-                  caching={caching}
-                  realtime={realtime}
-                  optimistic={optimistic}
-                  offline={offline}
-                  sampling={sampling}
-                  cspStrict={cspStrict}
-                  isSimRunning={isSimRunning}
-                  onSimComplete={handleSimComplete}
-                  focusTarget={focusTarget}
-                />
-              </ThreeCanvasShell>
+              {renderInteractiveSim2D()}
             </div>
             {renderSimTimeline()}
           </SpotlightTarget>

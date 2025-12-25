@@ -6,9 +6,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DemoShell } from "../DemoShell";
 import { EventLog, EventLogEntry } from "../EventLog";
 import { Spotlight, SpotlightTarget } from "../Spotlight";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { Fallback2D } from "../../three/Fallback2D";
-import { ReleaseOpsTheaterScene } from "../../three/ReleaseOpsTheaterScene";
 import {
   releaseDeliveryLabConfigSchema,
   type ReleaseDeliveryLabConfig,

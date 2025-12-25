@@ -10,9 +10,6 @@ import {
   testingStrategyLabConfigSchema,
   type TestingStrategyLabConfig,
 } from "../demoSchema";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { TestingLabScene } from "../../three/TestingLabScene";
-import { Fallback2D } from "../../three/Fallback2D";
 
 interface TestingStrategyLabDemoProps {
   demoConfig: unknown;

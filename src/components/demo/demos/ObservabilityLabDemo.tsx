@@ -13,8 +13,6 @@ import {
 import { TelemetryPipeline } from "../TelemetryPipeline";
 import { SamplingPanel } from "../SamplingPanel";
 import { ErrorBoundarySim } from "../ErrorBoundarySim";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { ObservabilityControlRoomScene } from "../../three/ObservabilityControlRoomScene";
 
 interface ObservabilityLabDemoProps {
   demoConfig: unknown;

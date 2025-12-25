@@ -80,9 +80,6 @@ interface PracticeShellProps {
   eventLog: ReactNode;
   solution?: ReactNode;
   whatToObserve?: ReactNode;
-  has3D?: boolean;
-  viewMode?: "2D" | "3D";
-  onViewModeChange?: (mode: "2D" | "3D") => void;
 }
 
 export function PracticeShell({
@@ -93,9 +90,6 @@ export function PracticeShell({
   eventLog,
   solution,
   whatToObserve,
-  has3D = false,
-  viewMode = "2D",
-  onViewModeChange,
 }: PracticeShellProps) {
   return (
     <>
@@ -126,34 +120,10 @@ export function PracticeShell({
         <main className="space-y-4 min-w-0">
           {/* Visualization Card */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
-            <div className="p-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <div className="p-3 border-b border-gray-200 dark:border-gray-800">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 Visualization
               </h3>
-              {has3D && onViewModeChange && (
-                <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded p-1">
-                  <button
-                    onClick={() => onViewModeChange("2D")}
-                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                      viewMode === "2D"
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                    }`}
-                  >
-                    2D
-                  </button>
-                  <button
-                    onClick={() => onViewModeChange("3D")}
-                    className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                      viewMode === "3D"
-                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                    }`}
-                  >
-                    3D
-                  </button>
-                </div>
-              )}
             </div>
             <div className="p-6 min-h-[400px] flex items-center justify-center bg-gray-50 dark:bg-gray-900/50">
               {visualization}
@@ -196,34 +166,10 @@ export function PracticeShell({
       <div className="lg:hidden space-y-4">
         {/* Visualization */}
         <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
-          <div className="p-3 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
+          <div className="p-3 border-b border-gray-200 dark:border-gray-800">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Visualization
             </h3>
-            {has3D && onViewModeChange && (
-              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded p-1">
-                <button
-                  onClick={() => onViewModeChange("2D")}
-                  className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                    viewMode === "2D"
-                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                      : "text-gray-600 dark:text-gray-400"
-                  }`}
-                >
-                  2D
-                </button>
-                <button
-                  onClick={() => onViewModeChange("3D")}
-                  className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
-                    viewMode === "3D"
-                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm"
-                      : "text-gray-600 dark:text-gray-400"
-                  }`}
-                >
-                  3D
-                </button>
-              </div>
-            )}
           </div>
           <div className="p-4 min-h-[300px] flex items-center justify-center bg-gray-50 dark:bg-gray-900/50">
             {visualization}

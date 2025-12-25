@@ -147,7 +147,6 @@ export function TopicPageClient({
   const [taskAnswers, setTaskAnswers] = useState<Record<number, string>>({});
   const [taskRevealed, setTaskRevealed] = useState<Record<number, boolean>>({});
   const [isRightRailOpen, setIsRightRailOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const pathname = usePathname();
   const { reduced } = useMotionPrefs();
 
@@ -161,24 +160,11 @@ export function TopicPageClient({
       ? topic.practiceSteps[currentStep].focusTarget
       : null;
 
-  // Check if demo has 3D support (based on demo type)
-  const demosWith3D = [
-    "requirementsToArchitecture",
-    "renderingStrategyLab",
-    "uiArchitectureLab",
-    "observabilityLab",
-    "securityPrivacyLab",
-    "realtimeSystemsLab",
-    "largeScaleUXLab",
-    "capstoneBuilder",
-  ];
-
   // Parse demo type once
   const demoTypeResult = topic.practiceDemo
     ? demoConfigSchema.safeParse(topic.practiceDemo as unknown)
     : { success: false as const, data: null };
   const demoType = demoTypeResult.success ? demoTypeResult.data.demoType : null;
-  const has3D = demoType ? demosWith3D.includes(demoType) : false;
 
   // Determine demo component (only render when Practice tab is active)
   const renderDemo = () => {
@@ -279,9 +265,6 @@ export function TopicPageClient({
       )
     );
   };
-
-  // Get demo type for has3D check
-  const currentDemoType = demoTypeResult.success && demoType ? demoType : null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6 xl:gap-8">
@@ -543,13 +526,6 @@ export function TopicPageClient({
                   whatToObserve={
                     <WhatToObserve topic={topic} currentStep={currentStep} />
                   }
-                  has3D={
-                    currentDemoType
-                      ? demosWith3D.includes(currentDemoType)
-                      : false
-                  }
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
                 />
               ) : (
                 <div className="p-8 text-center text-gray-500 dark:text-gray-400">

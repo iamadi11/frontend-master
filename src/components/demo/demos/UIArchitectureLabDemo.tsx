@@ -14,9 +14,6 @@ import {
 import { TokenDiff } from "../TokenDiff";
 import { MFBoundaryMap } from "../MFBoundaryMap";
 import { FederationGraph } from "../FederationGraph";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { Fallback2D } from "../../three/Fallback2D";
-import { UIArchitectureAtlasScene } from "../../three/UIArchitectureAtlasScene";
 
 interface UIArchitectureLabDemoProps {
   demoConfig: unknown;

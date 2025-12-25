@@ -10,9 +10,6 @@ import {
   securityPrivacyLabConfigSchema,
   type SecurityPrivacyLabConfig,
 } from "../demoSchema";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { SecuritySandboxScene } from "../../three/SecuritySandboxScene";
-import { Fallback2D } from "../../three/Fallback2D";
 
 interface SecurityPrivacyLabDemoProps {
   demoConfig: unknown;

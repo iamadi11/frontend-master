@@ -8,9 +8,6 @@ import { EventLog, EventLogEntry } from "../EventLog";
 import { Spotlight, SpotlightTarget } from "../Spotlight";
 import { Timeline, TimelinePhase } from "../Timeline";
 import { DiffView } from "../DiffView";
-import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
-import { Fallback2D } from "../../three/Fallback2D";
-import { RequestConveyorScene } from "../../three/RequestConveyorScene";
 import {
   renderingStrategyLabConfigSchema,
   type RenderingStrategyLabConfig,
@@ -40,7 +37,6 @@ export function RenderingStrategyLabDemo({
   const [cacheMode, setCacheMode] = useState<CacheMode>("NONE");
   const [revalidateSeconds, setRevalidateSeconds] = useState(0);
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
-  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
 
   // Validate and parse demo config
   const config = useMemo(() => {
@@ -196,20 +192,6 @@ export function RenderingStrategyLabDemo({
     <div className="space-y-4">
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          View Mode
-        </label>
-        <select
-          value={viewMode}
-          onChange={(e) => setViewMode(e.target.value as "2D" | "3D")}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="2D">2D Timeline</option>
-          <option value="3D">3D Conveyor</option>
-        </select>
-      </div>
-
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           Strategy
         </label>
         <select
@@ -297,43 +279,11 @@ export function RenderingStrategyLabDemo({
           <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             User-Perceived Timeline
           </h4>
-          {viewMode === "2D" ? (
-            <Timeline
-              phases={timelinePhases}
-              totalDuration={totalDuration}
-              userSeesContentAt={userSeesContentAt}
-            />
-          ) : (
-            <ThreeCanvasShell
-              className="w-full h-[500px] rounded-lg border border-gray-200 dark:border-gray-700"
-              fallback={
-                <Fallback2D message="3D view unavailable, showing 2D timeline">
-                  <Timeline
-                    phases={timelinePhases}
-                    totalDuration={totalDuration}
-                    userSeesContentAt={userSeesContentAt}
-                  />
-                </Fallback2D>
-              }
-            >
-              {currentRule && (
-                <RequestConveyorScene
-                  strategy={strategy}
-                  phases={timelinePhases.map((p) => ({
-                    id: p.id,
-                    label: p.label,
-                    duration: p.duration,
-                  }))}
-                  cacheMode={cacheMode}
-                  revalidateSeconds={revalidateSeconds}
-                  focusTarget={focusTarget}
-                  onPhaseClick={handlePhaseClick}
-                  cacheEvents={currentRule.cacheEvents}
-                  notes={currentRule.notes}
-                />
-              )}
-            </ThreeCanvasShell>
-          )}
+          <Timeline
+            phases={timelinePhases}
+            totalDuration={totalDuration}
+            userSeesContentAt={userSeesContentAt}
+          />
         </SpotlightTarget>
 
         {/* Diff View */}

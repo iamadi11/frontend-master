@@ -1,9 +1,14 @@
 ---
-description: "Heavy animation is allowed but must guide focus and improve learning."
+description: "2D animation only; must guide focus and improve learning."
 alwaysApply: true
 ---
 
 # MOTION POLICY (Learning-first, Not Decorative)
+
+## 2D-only requirement (strict)
+- ONLY 2D animations (SVG/CSS/Framer Motion or GSAP if already installed)
+- No camera controls, no 3D, no WebGL
+- No Three.js, R3F, or Drei usage
 
 ## Heavy motion requirement
 Use motion strongly where it improves understanding, but only for teaching:
@@ -16,6 +21,7 @@ Use motion strongly where it improves understanding, but only for teaching:
 - autoplay while reading
 - background loops
 - motion that competes with content readability
+- 3D rendering, WebGL, Three.js, or any 3D libraries
 
 ## Trigger rule
 Animations only run on user actions:

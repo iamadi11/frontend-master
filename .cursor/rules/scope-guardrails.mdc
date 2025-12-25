@@ -7,8 +7,8 @@ alwaysApply: true
 
 ## Allowed (always)
 - Content expansion and proofreading to become a go-to learning resource
-- Theory animations (teaching-first, user-triggered)
-- 2D/3D practice demos aligned to theory
+- Theory animations (teaching-first, user-triggered, 2D only)
+- 2D practice demos aligned to theory
 - CMS seeding/validation/audit for completeness of 12 topics
 - Code quality improvements + dead code removal
 - Remove any login/auth gating from public pages

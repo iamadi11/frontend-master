@@ -7,7 +7,6 @@ import type { TheoryAnimationBlock } from "@/modules/theoryAnimations/schema";
 import { Timeline2DBlock } from "./blocks/Timeline2DBlock";
 import { Flow2DBlock } from "./blocks/Flow2DBlock";
 import { Diff2DBlock } from "./blocks/Diff2DBlock";
-import { Three3DBlock } from "./blocks/Three3DBlock";
 
 interface AnimatedExplanationBlockProps {
   block: TheoryAnimationBlock;
@@ -70,8 +69,6 @@ export function AnimatedExplanationBlock({
         return <Flow2DBlock block={block} reduced={reduced} />;
       case "diff2d":
         return <Diff2DBlock block={block} reduced={reduced} />;
-      case "three3d":
-        return <Three3DBlock block={block} reduced={reduced} />;
       default:
         return (
           <div className="p-4 text-center text-gray-500 dark:text-gray-400">
