@@ -14,6 +14,9 @@ import {
 import { TokenDiff } from "../TokenDiff";
 import { MFBoundaryMap } from "../MFBoundaryMap";
 import { FederationGraph } from "../FederationGraph";
+import { ThreeCanvasShell } from "../../three/ThreeCanvasShell";
+import { Fallback2D } from "../../three/Fallback2D";
+import { UIArchitectureAtlasScene } from "../../three/UIArchitectureAtlasScene";
 
 interface UIArchitectureLabDemoProps {
   demoConfig: unknown;
@@ -28,6 +31,7 @@ export function UIArchitectureLabDemo({
 }: UIArchitectureLabDemoProps) {
   const { reduced } = useMotionPrefs();
   const [mode, setMode] = useState<Mode>("TOKENS");
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
 
   // Token mode state
@@ -307,9 +311,55 @@ export function UIArchitectureLabDemo({
     );
   };
 
+  // Handle play load for federation mode
+  const handlePlayLoad = useCallback(() => {
+    if (
+      moduleFederationRule &&
+      moduleFederationRule.loadOrderEvents.length > 0
+    ) {
+      const newEntry: EventLogEntry = {
+        id: `${Date.now()}-${Math.random()}`,
+        timestamp: Date.now(),
+        cause: "Play load order animation",
+        decision: "Module Federation load sequence",
+        explanation: moduleFederationRule.loadOrderEvents.join(" → "),
+      };
+      setEventLog((prev) => [...prev, newEntry]);
+    }
+  }, [moduleFederationRule]);
+
   // Controls based on mode
   const controls = (
     <div className="space-y-4">
+      {/* View mode toggle (2D/3D) */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          View Mode
+        </label>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode("2D")}
+            className={`flex-1 px-3 py-2 text-xs font-medium rounded transition-colors ${
+              viewMode === "2D"
+                ? "bg-blue-600 text-white dark:bg-blue-500"
+                : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            }`}
+          >
+            2D
+          </button>
+          <button
+            onClick={() => setViewMode("3D")}
+            className={`flex-1 px-3 py-2 text-xs font-medium rounded transition-colors ${
+              viewMode === "3D"
+                ? "bg-blue-600 text-white dark:bg-blue-500"
+                : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+            }`}
+          >
+            3D
+          </button>
+        </div>
+      </div>
+
       {/* Mode selector */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -492,8 +542,8 @@ export function UIArchitectureLabDemo({
     </div>
   );
 
-  // Visualization based on mode
-  const visualization = (
+  // 2D Visualization
+  const visualization2D = (
     <Spotlight targetId={focusTarget || null}>
       <div className="space-y-6">
         {mode === "TOKENS" && config.tokens && (
@@ -551,6 +601,43 @@ export function UIArchitectureLabDemo({
       </div>
     </Spotlight>
   );
+
+  // 3D Visualization
+  const visualization3D = (
+    <div className="w-full h-[600px] rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
+      <ThreeCanvasShell
+        className="w-full h-full"
+        fallback={
+          <Fallback2D message="3D unavailable, showing 2D view">
+            {visualization2D}
+          </Fallback2D>
+        }
+      >
+        <UIArchitectureAtlasScene
+          mode={mode}
+          config={config}
+          currentTokenSet={currentTokenSet}
+          previousTokenSet={previousTokenSet}
+          showTokenDiff={showTokenDiff}
+          integrationType={integrationType}
+          sharedUI={sharedUI}
+          selectedRoute={selectedRoute}
+          selectedComponent={selectedComponent}
+          sharedDepsSingleton={sharedDepsSingleton}
+          sharedDepsStrictVersion={sharedDepsStrictVersion}
+          duplicationKb={moduleFederationRule?.duplicationKb}
+          loadOrderEvents={moduleFederationRule?.loadOrderEvents || []}
+          network={network}
+          preloadRemotes={preloadRemotes}
+          onPlayLoad={handlePlayLoad}
+          focusTarget={focusTarget}
+        />
+      </ThreeCanvasShell>
+    </div>
+  );
+
+  // Choose visualization based on view mode
+  const visualization = viewMode === "3D" ? visualization3D : visualization2D;
 
   return (
     <DemoShell
