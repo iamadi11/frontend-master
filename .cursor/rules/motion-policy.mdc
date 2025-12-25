@@ -1,0 +1,30 @@
+---
+description: "Always apply: heavy animations required, but only as teaching/focus motion; reduced-motion toggle required."
+alwaysApply: true
+---
+
+# Motion Policy (Heavy, Teaching-Only)
+
+## Requirement
+Use heavy animation across the site and demos ONLY to:
+- teach (visualize system behavior)
+- guide focus (spotlight current panel/step)
+- explain state changes (timelines/diffs/transitions)
+
+No decorative motion.
+
+## Must-have
+- Respect prefers-reduced-motion
+- Provide an in-UI "Reduce motion" toggle (persisted)
+- Reduced motion must remain fully usable (static emphasis instead of motion)
+
+## Allowed teaching animations
+- Animated timelines (CSR/SSR/hydration/caching phases)
+- Animated diffs (before/after output, cache hit/miss)
+- Spotlight/highlight tied to user actions
+- Stepper/story transitions in Practice
+
+## Forbidden
+- Auto-looping animations without user action
+- Parallax/background motion competing with reading
+- Flashy effects not tied to learning

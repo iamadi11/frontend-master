@@ -1,19 +1,11 @@
 ---
-description: "Use when writing/structuring Theory content: ensure correctness, claim-to-reference mapping, and no hallucinations."
+description: "Correctness: no hallucinations; claim-to-reference mapping; on-site completeness."
 alwaysApply: false
 ---
 
 # Content Correctness Policy
 
-## No hallucinations
 - Do not invent browser behaviors, standards, metrics, or tool capabilities.
-- If uncertain: label “Needs verification”, and add a placeholder reference entry in CMS.
-
-## Claim-to-reference mapping
-- Any non-trivial claim must be supported by at least one Reference stored in CMS.
-- References must be rendered on the topic page (Theory section).
-- Prefer primary sources: specs, official docs, reputable engineering posts.
-
-## On-site learning completeness
-- Do not require users to read external sites to understand the concept.
-- External references are supplementary; the explanation must stand alone on-site.
+- If uncertain: label "Needs verification" and store a placeholder reference in CMS.
+- Non-trivial claims must have references stored in CMS and rendered on the topic page.
+- Users should be able to learn without leaving the site (references are supplementary).

@@ -1,12 +1,11 @@
 ---
-description: "Use when building data flow: all content from Payload CMS, thin routes, robust empty states, env-safe."
+description: "CMS rule: all learning content from Payload; thin routes; server-only data layer; empty states; env safety."
 alwaysApply: false
 ---
 
-# CMS-driven Content Rule
+# CMS-driven Content
 
-- All Theory and Practice content must come from Payload CMS (MongoDB).
-- Keep Next routes thin: fetch data via a server-only lib layer and render via shared components.
-- Always handle empty CMS state gracefully (empty lists, not-found, friendly admin hint).
-- Never leak secrets to the client; only use NEXT_PUBLIC_ for safe values like site URL.
-- Practice demo configs must be stored in CMS and validated with Zod before rendering.
+- All Theory + Practice + References live in Payload CMS (MongoDB).
+- Next routes must be thin: fetch via server-only lib layer and render via shared components.
+- Handle empty CMS state gracefully (no crashes).
+- Never leak secrets to client; NEXT_PUBLIC_ only for safe values (e.g., site URL).

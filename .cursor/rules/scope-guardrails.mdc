@@ -1,22 +1,21 @@
 ---
-description: "Always apply: prevent scope creep (no unrelated product features)."
+description: "Always apply: forbid scope creep."
 alwaysApply: true
 ---
 
-# Scope Guardrails (Hard boundaries)
+# Scope Guardrails
 
-## Do NOT add (unless user explicitly requests)
-- Learner accounts/login, comments, likes, ratings, payments, subscriptions
-- Gamification: points, badges, leaderboards, streaks
-- Notifications, emails, community features
-- Complex search engine, recommendations, personalization
-- Unnecessary microservices / over-architecture
-- Random UI experiments unrelated to learning
+Do NOT add unless explicitly requested:
+- Learner accounts/login, comments, likes/ratings
+- Payments/subscriptions
+- Gamification (points/badges/leaderboards/streaks)
+- Notifications/community features
+- Complex search/recommendations/personalization
+- Over-architecture
 
-## Do add (only what supports the mission)
-- CMS-driven topic content + references
-- Two-section topic pages (Theory + Practice)
-- Minimal information architecture: topics list, next/prev, tags only as needed for learning flow
-- Heavy but focus-guiding motion (teaching animations)
-- PWA/offline plumbing and basic caching
-- Vercel + MongoDB env correctness
+Only build what supports learning:
+- Topic pages (Theory + Practice)
+- CMS schema + rendering + interactive demos
+- Minimal navigation for learning flow
+- PWA/offline plumbing + performance basics
+- Vercel + MongoDB deployment hygiene
