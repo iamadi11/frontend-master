@@ -28,6 +28,9 @@ export function ReleaseDeliveryLabDemo({
   const { reduced } = useMotionPrefs();
   const [activeMode, setActiveMode] = useState<StageMode>("PIPELINE");
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [eventLog, setEventLog] = useState<EventLogEntry[]>([]);
 
   // Pipeline mode state
@@ -856,6 +859,8 @@ export function ReleaseDeliveryLabDemo({
         rolloutEvents={config?.rolloutEvents || []}
         cdnEvents={config?.cdnEvents || []}
         notes={config?.notes || []}
+        cameraPreset={cameraPreset}
+        onCameraPresetChange={setCameraPreset}
       />
     </ThreeCanvasShell>
   );
