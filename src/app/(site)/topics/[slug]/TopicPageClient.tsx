@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { RichTextRenderer } from "@/components/content/RichTextRenderer";
 import { Prose } from "@/components/content/Prose";
 import { AnimatedExplanationBlocks } from "@/components/theory/AnimatedExplanationBlocks";
+import { PracticeShell } from "@/components/demo/PracticeShell";
+import { WhatToObserve } from "@/components/demo/WhatToObserve";
 import { RequirementsToArchitectureDemo } from "@/components/demo/demos/RequirementsToArchitectureDemo";
 import { RenderingStrategyLabDemo } from "@/components/demo/demos/RenderingStrategyLabDemo";
 import { StateAtScaleLabDemo } from "@/components/demo/demos/StateAtScaleLabDemo";
@@ -54,6 +56,7 @@ export function TopicPageClient({
   const [taskRevealed, setTaskRevealed] = useState<Record<number, boolean>>({});
   const [isLeftRailOpen, setIsLeftRailOpen] = useState(false);
   const [isRightRailOpen, setIsRightRailOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
   const pathname = usePathname();
   const { reduced } = useMotionPrefs();
 
@@ -67,13 +70,29 @@ export function TopicPageClient({
       ? topic.practiceSteps[currentStep].focusTarget
       : null;
 
+  // Check if demo has 3D support (based on demo type)
+  const demosWith3D = [
+    "requirementsToArchitecture",
+    "renderingStrategyLab",
+    "uiArchitectureLab",
+    "observabilityLab",
+    "securityPrivacyLab",
+    "realtimeSystemsLab",
+    "largeScaleUXLab",
+    "capstoneBuilder",
+  ];
+
+  // Parse demo type once
+  const demoTypeResult = topic.practiceDemo
+    ? demoConfigSchema.safeParse(topic.practiceDemo as unknown)
+    : { success: false as const, data: null };
+  const demoType = demoTypeResult.success ? demoTypeResult.data.demoType : null;
+  const has3D = demoType ? demosWith3D.includes(demoType) : false;
+
   // Determine demo component
   const renderDemo = () => {
     if (!topic.practiceDemo) return null;
 
-    const demoTypeResult = demoConfigSchema.safeParse(
-      topic.practiceDemo as unknown
-    );
     if (!demoTypeResult.success) {
       return (
         <div className="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -82,7 +101,6 @@ export function TopicPageClient({
       );
     }
 
-    const demoType = demoTypeResult.data.demoType;
     const demoProps = {
       demoConfig: topic.practiceDemo,
       focusTarget: currentFocusTarget || undefined,
@@ -151,6 +169,14 @@ export function TopicPageClient({
       ),
     };
 
+    if (!demoType) {
+      return (
+        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+          <p>Demo unavailable: Unknown demo type</p>
+        </div>
+      );
+    }
+
     return (
       demos[demoType] || (
         <div className="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -159,6 +185,9 @@ export function TopicPageClient({
       )
     );
   };
+
+  // Get demo type for has3D check
+  const currentDemoType = demoTypeResult.success && demoType ? demoType : null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,_1fr)_280px] gap-6 xl:gap-8">
@@ -400,97 +429,143 @@ export function TopicPageClient({
               />
             </>
           ) : (
-            <div className="space-y-8">
-              {/* Demo */}
-              {renderDemo()}
-
-              {/* Guided Steps */}
-              {topic.practiceSteps && topic.practiceSteps.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold">Guided Steps</h2>
-                  <div className="space-y-4">
-                    {topic.practiceSteps.map((step, index) => (
-                      <div
-                        key={index}
-                        className={`p-4 rounded-lg border-2 ${
-                          index === currentStep
-                            ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20"
-                            : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
-                        }`}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold">
-                            Step {index + 1}: {step.title}
-                          </h3>
-                          <button
+            <>
+              {renderDemo() ? (
+                <PracticeShell
+                  controls={null}
+                  steps={
+                    topic.practiceSteps && topic.practiceSteps.length > 0 ? (
+                      <div className="space-y-3">
+                        {topic.practiceSteps.map((step, index) => (
+                          <div
+                            key={index}
+                            className={`p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                              index === currentStep
+                                ? "border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                                : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:border-gray-300 dark:hover:border-gray-600"
+                            }`}
                             onClick={() => setCurrentStep(index)}
-                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                           >
-                            {index === currentStep ? "Current" : "Go to step"}
-                          </button>
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-                          {step.body}
-                        </p>
+                            <div className="flex items-start justify-between mb-1">
+                              <h4 className="text-sm font-semibold">
+                                Step {index + 1}: {step.title}
+                              </h4>
+                              {index === currentStep && (
+                                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                                  Current
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-line line-clamp-2">
+                              {step.body}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Hands-on Tasks */}
-              {topic.practiceTasks && topic.practiceTasks.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold">Hands-on Tasks</h2>
-                  <div className="space-y-6">
-                    {topic.practiceTasks.map((task, index) => (
-                      <div
-                        key={index}
-                        className="p-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
-                      >
-                        <h3 className="font-semibold mb-3">Task {index + 1}</h3>
-                        <p className="text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">
-                          {task.prompt}
-                        </p>
-                        <textarea
-                          value={taskAnswers[index] || ""}
-                          onChange={(e) =>
-                            setTaskAnswers((prev) => ({
-                              ...prev,
-                              [index]: e.target.value,
-                            }))
-                          }
-                          placeholder="Your answer..."
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-sm mb-4"
-                          rows={4}
-                        />
-                        <button
-                          onClick={() =>
-                            handleTaskSubmit(index, taskAnswers[index] || "")
-                          }
-                          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
-                        >
-                          Check Answer
-                        </button>
-                        {taskRevealed[index] && (
-                          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-md">
-                            <p className="text-sm font-medium mb-2">
+                    ) : null
+                  }
+                  tasks={
+                    topic.practiceTasks && topic.practiceTasks.length > 0 ? (
+                      <div className="space-y-4">
+                        {topic.practiceTasks.map((task, index) => (
+                          <div
+                            key={index}
+                            className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
+                          >
+                            <h4 className="text-sm font-semibold mb-2">
+                              Task {index + 1}
+                            </h4>
+                            <p className="text-xs text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-line">
+                              {task.prompt}
+                            </p>
+                            <textarea
+                              value={taskAnswers[index] || ""}
+                              onChange={(e) =>
+                                setTaskAnswers((prev) => ({
+                                  ...prev,
+                                  [index]: e.target.value,
+                                }))
+                              }
+                              placeholder="Your answer..."
+                              className="w-full px-2 py-1.5 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-900 text-xs mb-2"
+                              rows={3}
+                            />
+                            <button
+                              onClick={() =>
+                                handleTaskSubmit(
+                                  index,
+                                  taskAnswers[index] || ""
+                                )
+                              }
+                              className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs"
+                            >
+                              Check Answer
+                            </button>
+                            {taskRevealed[index] && (
+                              <div className="mt-3 p-3 bg-white dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
+                                <p className="text-xs font-medium mb-1 text-gray-900 dark:text-gray-100">
+                                  Expected Answer:
+                                </p>
+                                <p className="text-xs text-gray-700 dark:text-gray-300 mb-2 whitespace-pre-line">
+                                  {task.expectedAnswer}
+                                </p>
+                                <p className="text-xs font-medium mb-1 text-gray-900 dark:text-gray-100">
+                                  Explanation:
+                                </p>
+                                <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                                  {task.explanation}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : null
+                  }
+                  visualization={renderDemo()}
+                  eventLog={null}
+                  solution={
+                    topic.practiceTasks && topic.practiceTasks.length > 0 ? (
+                      <div className="space-y-3">
+                        {topic.practiceTasks.map((task, index) => (
+                          <div
+                            key={index}
+                            className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
+                          >
+                            <h4 className="text-sm font-semibold mb-2">
+                              Task {index + 1}
+                            </h4>
+                            <p className="text-xs font-medium mb-1 text-gray-900 dark:text-gray-100">
                               Expected Answer:
                             </p>
-                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 whitespace-pre-line">
+                            <p className="text-xs text-gray-700 dark:text-gray-300 mb-2 whitespace-pre-line">
                               {task.expectedAnswer}
                             </p>
-                            <p className="text-sm font-medium mb-2">
+                            <p className="text-xs font-medium mb-1 text-gray-900 dark:text-gray-100">
                               Explanation:
                             </p>
-                            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">
+                            <p className="text-xs text-gray-700 dark:text-gray-300 whitespace-pre-line">
                               {task.explanation}
                             </p>
                           </div>
-                        )}
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    ) : null
+                  }
+                  whatToObserve={
+                    <WhatToObserve topic={topic} currentStep={currentStep} />
+                  }
+                  has3D={
+                    currentDemoType
+                      ? demosWith3D.includes(currentDemoType)
+                      : false
+                  }
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                />
+              ) : (
+                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                  <p>Practice demo not available</p>
                 </div>
               )}
 
@@ -498,55 +573,40 @@ export function TopicPageClient({
                 prevTopic={prevTopic || undefined}
                 nextTopic={nextTopic || undefined}
               />
-            </div>
+            </>
           )}
 
-          {/* Mobile Right Rail Toggle (inside main column) */}
-          <div className="lg:hidden">
-            <button
-              onClick={() => setIsRightRailOpen(!isRightRailOpen)}
-              className="w-full flex items-center justify-between p-3 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              <span className="text-sm font-medium">
-                {activeTab === "theory"
-                  ? "Table of Contents"
-                  : "What to Observe"}
-              </span>
-              {isRightRailOpen ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
-            </button>
-            <AnimatePresence>
-              {isRightRailOpen && (
-                <motion.div
-                  initial={reduced ? {} : { height: 0, opacity: 0 }}
-                  animate={reduced ? {} : { height: "auto", opacity: 1 }}
-                  exit={reduced ? {} : { height: 0, opacity: 0 }}
-                  transition={reduced ? {} : { duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="mt-2 p-4 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
-                    {activeTab === "theory" ? (
+          {/* Mobile Right Rail Toggle (inside main column) - Theory only */}
+          {activeTab === "theory" && (
+            <div className="lg:hidden">
+              <button
+                onClick={() => setIsRightRailOpen(!isRightRailOpen)}
+                className="w-full flex items-center justify-between p-3 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                <span className="text-sm font-medium">Table of Contents</span>
+                {isRightRailOpen ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
+              </button>
+              <AnimatePresence>
+                {isRightRailOpen && (
+                  <motion.div
+                    initial={reduced ? {} : { height: 0, opacity: 0 }}
+                    animate={reduced ? {} : { height: "auto", opacity: 1 }}
+                    exit={reduced ? {} : { height: 0, opacity: 0 }}
+                    transition={reduced ? {} : { duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-2 p-4 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
                       <TableOfContents content={topic.theory} />
-                    ) : (
-                      <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                        {topic.practiceSteps?.[currentStep]?.focusTarget && (
-                          <p>
-                            <strong>Focus:</strong>{" "}
-                            {topic.practiceSteps[currentStep].focusTarget}
-                          </p>
-                        )}
-                        <p>Watch how state changes affect the visualization</p>
-                        <p>Check the Event Log for causal explanations</p>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
         </motion.div>
       </main>
 
