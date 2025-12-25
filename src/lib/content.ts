@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { getPayloadClient } from "./payload";
 
 export async function getPageBySlug(slug: string) {
@@ -25,7 +26,8 @@ export async function getPageBySlug(slug: string) {
   return result.docs[0] || null;
 }
 
-export async function listTopics() {
+// Cache listTopics to deduplicate requests within the same render
+export const listTopics = cache(async () => {
   const payload = await getPayloadClient();
   const result = await payload.find({
     collection: "topics",
@@ -35,7 +37,7 @@ export async function listTopics() {
   });
 
   return result.docs;
-}
+});
 
 export async function getTopicBySlug(slug: string) {
   const payload = await getPayloadClient();
@@ -53,17 +55,19 @@ export async function getTopicBySlug(slug: string) {
   return result.docs[0] || null;
 }
 
-export async function getAdjacentTopics(currentSlug: string) {
-  const allTopics = await listTopics();
-  const currentIndex = allTopics.findIndex((t) => t.slug === currentSlug);
+// Optimized: accepts topics list to avoid re-fetching
+export function getAdjacentTopics(
+  currentSlug: string,
+  topics: Array<{ slug: string; title: string }>
+) {
+  const currentIndex = topics.findIndex((t) => t.slug === currentSlug);
 
   if (currentIndex === -1) {
     return { prev: null, next: null };
   }
 
   return {
-    prev: currentIndex > 0 ? allTopics[currentIndex - 1] : null,
-    next:
-      currentIndex < allTopics.length - 1 ? allTopics[currentIndex + 1] : null,
+    prev: currentIndex > 0 ? topics[currentIndex - 1] : null,
+    next: currentIndex < topics.length - 1 ? topics[currentIndex + 1] : null,
   };
 }

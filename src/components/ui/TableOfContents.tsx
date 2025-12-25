@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SerializedEditorState } from "lexical";
+import type { LexicalNode } from "@/lib/types";
 
 interface Heading {
   id: string;
@@ -21,7 +22,7 @@ function extractHeadings(
 
   const headings: Heading[] = [];
 
-  function traverse(node: any, level = 0) {
+  function traverse(node: LexicalNode, level = 0) {
     if (node.type === "heading") {
       const headingLevel = parseInt(node.tag?.replace("h", "") || "1");
       const text = extractText(node);
@@ -41,21 +42,21 @@ function extractHeadings(
     }
 
     if (node.children) {
-      node.children.forEach((child: any) => traverse(child, level + 1));
+      node.children.forEach((child) => traverse(child, level + 1));
     }
   }
 
-  function extractText(node: any): string {
+  function extractText(node: LexicalNode): string {
     if (node.type === "text") {
       return node.text || "";
     }
     if (node.children) {
-      return node.children.map((child: any) => extractText(child)).join("");
+      return node.children.map((child) => extractText(child)).join("");
     }
     return "";
   }
 
-  content.root.children.forEach((node: any) => traverse(node));
+  content.root.children.forEach((node) => traverse(node as LexicalNode));
   return headings;
 }
 

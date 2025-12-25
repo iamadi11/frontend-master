@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronRight } from "lucide-react";
@@ -23,6 +23,23 @@ export function MobileNav({ topics, currentSlug }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { reduced } = useMotionPrefs();
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure consistent rendering between server and client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // During SSR and initial render, only use currentSlug prop (from server)
+  // After mount, use pathname for client-side navigation
+  const getIsActive = (topicSlug: string) => {
+    if (!mounted) {
+      // Server-side and initial render: only use currentSlug prop
+      return currentSlug === topicSlug;
+    }
+    // Client-side: use pathname
+    return currentSlug === topicSlug || pathname === `/topics/${topicSlug}`;
+  };
 
   return (
     <>
@@ -70,9 +87,7 @@ export function MobileNav({ topics, currentSlug }: MobileNavProps) {
 
               <nav className="p-4 space-y-1">
                 {topics.map((topic) => {
-                  const isActive =
-                    currentSlug === topic.slug ||
-                    pathname === `/topics/${topic.slug}`;
+                  const isActive = getIsActive(topic.slug);
                   return (
                     <Link
                       key={topic.id}

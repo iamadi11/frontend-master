@@ -1,6 +1,7 @@
 import { listTopics } from "@/lib/content";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { TopicsIndexClient } from "./TopicsIndexClient";
+import type { TopicListItem } from "@/lib/types";
 
 export const metadata = {
   title: "All Topics | Frontend System Design",
@@ -8,28 +9,19 @@ export const metadata = {
     "Complete curriculum for Frontend System Design. 12 comprehensive topics covering theory and practice.",
 };
 
-type Topic = {
-  id: string;
-  title: string;
-  slug: string;
-  order: number;
-  summary?: string;
-  difficulty?: "beginner" | "intermediate" | "advanced";
-};
-
 export default async function TopicsPage() {
-  let topics: Topic[] = [];
+  let topics: TopicListItem[] = [];
   let error: string | null = null;
 
   try {
     const result = await listTopics();
-    topics = result.map((t: any) => ({
+    topics = result.map((t) => ({
       id: t.id,
       title: t.title,
       slug: t.slug,
       order: t.order,
-      summary: t.summary,
-      difficulty: t.difficulty,
+      summary: t.summary ?? null,
+      difficulty: t.difficulty ?? null,
     }));
   } catch (e) {
     error = "Failed to load topics";

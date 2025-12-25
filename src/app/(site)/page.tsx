@@ -1,6 +1,7 @@
 import { listTopics } from "@/lib/content";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { HomePageClient } from "./HomePageClient";
+import type { TopicListItem } from "@/lib/types";
 
 export const metadata = {
   title: "Frontend System Design | Learn Theory & Practice",
@@ -8,26 +9,18 @@ export const metadata = {
     "Master frontend system design through structured theory and hands-on practice. Build production-ready frontend systems.",
 };
 
-type Topic = {
-  id: string;
-  title: string;
-  slug: string;
-  order: number;
-  summary?: string;
-};
-
 export default async function HomePage() {
-  let topics: Topic[] = [];
+  let topics: TopicListItem[] = [];
   let error: string | null = null;
 
   try {
     const result = await listTopics();
-    topics = result.map((t: any) => ({
+    topics = result.map((t) => ({
       id: t.id,
       title: t.title,
       slug: t.slug,
       order: t.order,
-      summary: t.summary,
+      summary: t.summary ?? null,
     }));
   } catch (e) {
     error = "Failed to load topics";

@@ -2,17 +2,10 @@
 
 import Link from "next/link";
 import { BookOpen, Target, Code, Rocket } from "lucide-react";
-
-type Topic = {
-  id: string;
-  title: string;
-  slug: string;
-  order: number;
-  summary?: string;
-};
+import type { TopicListItem } from "@/lib/types";
 
 interface HomePageClientProps {
-  topics: Topic[];
+  topics: TopicListItem[];
   error: string | null;
 }
 

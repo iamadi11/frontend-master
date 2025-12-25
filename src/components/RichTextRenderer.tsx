@@ -2,19 +2,18 @@
 
 import React from "react";
 import { SerializedEditorState } from "lexical";
+import type { LexicalNode } from "@/lib/types";
 
 interface RichTextRendererProps {
   content: SerializedEditorState | null | undefined;
 }
 
-function extractTextFromNode(node: any): string {
+function extractTextFromNode(node: LexicalNode): string {
   if (node.type === "text") {
     return node.text || "";
   }
   if (node.children) {
-    return node.children
-      .map((child: any) => extractTextFromNode(child))
-      .join("");
+    return node.children.map((child) => extractTextFromNode(child)).join("");
   }
   return "";
 }
@@ -32,28 +31,57 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
   // Payload CMS may return richText as the root object directly, or nested under root
   // Payload v3 with Lexical returns: { root: { children: [...], type: "root", ... } }
   // Handle both structures: { root: {...} } or direct root object
-  let rootNode: any = null;
+  let rootNode: LexicalNode | null = null;
 
-  if ((content as any).root) {
-    // Standard Lexical structure: { root: { children: [...] } }
-    rootNode = (content as any).root;
-  } else if ((content as any).children && (content as any).type === "root") {
-    // Root object passed directly
-    rootNode = content;
-  } else if (Array.isArray((content as any).children)) {
-    // Array of children at top level (unlikely but handle it)
-    rootNode = { children: (content as any).children };
-  } else {
-    // Try to use content as root if it has children
-    rootNode = content as any;
+  // Check for standard Lexical structure: { root: { children: [...], type: "root" } }
+  if (content && typeof content === "object" && content !== null) {
+    const contentObj = content as unknown as Record<string, unknown>;
+
+    // First check: content has "root" property
+    if ("root" in contentObj && contentObj.root) {
+      const root = contentObj.root;
+      if (typeof root === "object" && root !== null) {
+        const rootObj = root as Record<string, unknown>;
+        // Check if root has children array
+        if ("children" in rootObj && Array.isArray(rootObj.children)) {
+          rootNode = rootObj as unknown as LexicalNode;
+        }
+      }
+    }
+    // Second check: content itself is the root node (has children and type="root")
+    else if (
+      "children" in contentObj &&
+      Array.isArray(contentObj.children) &&
+      "type" in contentObj &&
+      contentObj.type === "root"
+    ) {
+      rootNode = content as unknown as LexicalNode;
+    }
+    // Third check: content has children at top level (wrap it)
+    else if ("children" in contentObj && Array.isArray(contentObj.children)) {
+      rootNode = {
+        type: "root",
+        children: contentObj.children as LexicalNode[],
+      };
+    }
   }
 
   if (!rootNode) {
     if (process.env.NODE_ENV === "development") {
       console.warn("RichTextRenderer: No root node found", {
         content,
-        contentKeys: Object.keys(content || {}),
-        hasRoot: !!(content as any).root,
+        contentType: typeof content,
+        contentKeys:
+          content && typeof content === "object" ? Object.keys(content) : [],
+        hasRoot: !!(
+          content &&
+          typeof content === "object" &&
+          "root" in content
+        ),
+        rootType:
+          content && typeof content === "object" && "root" in content
+            ? typeof (content as { root: unknown }).root
+            : undefined,
       });
     }
     return (
@@ -89,14 +117,14 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
     );
   }
 
-  const renderNode = (node: any): React.ReactNode => {
+  const renderNode = (node: LexicalNode): React.ReactNode => {
     if (!node) return null;
 
     switch (node.type) {
       case "heading":
         // node.tag is already "h1", "h2", etc. from Lexical
         const tagName = (node.tag || "h1").toLowerCase();
-        const headingContent = node.children?.map((child: any, i: number) => (
+        const headingContent = node.children?.map((child, i: number) => (
           <span key={i}>{renderNode(child)}</span>
         ));
 
@@ -175,7 +203,7 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
       case "paragraph":
         return (
           <p className="mb-4">
-            {node.children?.map((child: any, i: number) => (
+            {node.children?.map((child, i: number) => (
               <span key={i}>{renderNode(child)}</span>
             ))}
           </p>
@@ -184,7 +212,7 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
         const ListTag = node.listType === "number" ? "ol" : "ul";
         return (
           <ListTag className="mb-4 ml-6 list-disc">
-            {node.children?.map((child: any, i: number) => (
+            {node.children?.map((child, i: number) => (
               <li key={i}>{renderNode(child)}</li>
             ))}
           </ListTag>
@@ -192,13 +220,13 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
       case "listitem":
         return (
           <>
-            {node.children?.map((child: any, i: number) => (
+            {node.children?.map((child, i: number) => (
               <span key={i}>{renderNode(child)}</span>
             ))}
           </>
         );
       case "text":
-        let text = node.text || "";
+        let text: React.ReactNode = node.text || "";
         if (node.format) {
           if (node.format & 1) text = <strong key="bold">{text}</strong>;
           if (node.format & 2) text = <em key="italic">{text}</em>;
@@ -212,7 +240,7 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
             rel="noopener noreferrer"
             className="text-blue-600 dark:text-blue-400 hover:underline"
           >
-            {node.children?.map((child: any, i: number) => (
+            {node.children?.map((child, i: number) => (
               <span key={i}>{renderNode(child)}</span>
             ))}
           </a>
@@ -221,7 +249,7 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
         if (node.children) {
           return (
             <>
-              {node.children.map((child: any, i: number) => (
+              {node.children.map((child, i: number) => (
                 <span key={i}>{renderNode(child)}</span>
               ))}
             </>
@@ -233,7 +261,7 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
 
   return (
     <div className="prose dark:prose-invert max-w-none">
-      {rootNode.children.map((child: any, i: number) => (
+      {rootNode.children.map((child, i: number) => (
         <div key={i}>{renderNode(child)}</div>
       ))}
     </div>

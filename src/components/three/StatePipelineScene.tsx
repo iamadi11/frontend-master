@@ -340,11 +340,15 @@ export function StatePipelineScene({
 
   useEffect(() => {
     // Store ref in window for external trigger
-    (window as any).__statePipelineAction = (action: string) => {
+    interface WindowWithStatePipeline {
+      __statePipelineAction?: (action: string) => void;
+    }
+    const windowWithExtension = window as Window & WindowWithStatePipeline;
+    windowWithExtension.__statePipelineAction = (action: string) => {
       actionHandlerRef.current(action);
     };
     return () => {
-      delete (window as any).__statePipelineAction;
+      delete windowWithExtension.__statePipelineAction;
     };
   }, []);
 
@@ -505,7 +509,11 @@ export function StatePipelineScene({
 
 // Export action handler for parent component
 export function triggerPipelineAction(action: string) {
-  const handler = (window as any).__statePipelineAction;
+  interface WindowWithStatePipeline {
+    __statePipelineAction?: (action: string) => void;
+  }
+  const windowWithExtension = window as Window & WindowWithStatePipeline;
+  const handler = windowWithExtension.__statePipelineAction;
   if (handler) {
     handler(action);
   }

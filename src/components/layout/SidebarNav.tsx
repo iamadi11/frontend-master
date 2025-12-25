@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
@@ -18,6 +19,23 @@ interface SidebarNavProps {
 
 export function SidebarNav({ topics, currentSlug }: SidebarNavProps) {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure consistent rendering between server and client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // During SSR and initial render, only use currentSlug prop (from server)
+  // After mount, use pathname for client-side navigation
+  const getIsActive = (topicSlug: string) => {
+    if (!mounted) {
+      // Server-side and initial render: only use currentSlug prop
+      return currentSlug === topicSlug;
+    }
+    // Client-side: use pathname
+    return currentSlug === topicSlug || pathname === `/topics/${topicSlug}`;
+  };
 
   return (
     <nav className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto pb-4">
@@ -31,8 +49,7 @@ export function SidebarNav({ topics, currentSlug }: SidebarNavProps) {
           </p>
         </div>
         {topics.map((topic) => {
-          const isActive =
-            currentSlug === topic.slug || pathname === `/topics/${topic.slug}`;
+          const isActive = getIsActive(topic.slug);
           return (
             <Link
               key={topic.id}

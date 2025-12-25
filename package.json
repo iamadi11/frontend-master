@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "seed": "tsx scripts/seed.mjs",
     "reset-topics": "tsx scripts/reset-topics.mjs",

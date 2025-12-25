@@ -22,31 +22,7 @@ import { Prose } from "@/components/ui/Prose";
 import { TableOfContents } from "@/components/ui/TableOfContents";
 import { TopicNavigation } from "@/components/ui/TopicNavigation";
 import { EmptyState } from "@/components/ui/EmptyState";
-
-type Topic = {
-  id: string;
-  title: string;
-  slug: string;
-  summary?: string;
-  theory?: any;
-  references?: Array<{
-    label: string;
-    url: string;
-    note?: string;
-    claimIds?: string;
-  }>;
-  practiceDemo?: any;
-  practiceSteps?: Array<{
-    title: string;
-    body: string;
-    focusTarget?: string;
-  }>;
-  practiceTasks?: Array<{
-    prompt: string;
-    expectedAnswer: string;
-    explanation: string;
-  }>;
-};
+import type { Topic } from "@/lib/types";
 
 interface TopicPageClientProps {
   topic: Topic;
@@ -191,160 +167,161 @@ export function TopicPageClient({
         ) : (
           <div className="space-y-8">
             {/* Demo */}
-            {topic.practiceDemo &&
-              (() => {
-                // Determine demo type
-                const demoTypeResult = demoConfigSchema.safeParse(
-                  topic.practiceDemo
-                );
-                if (!demoTypeResult.success) {
+            {topic.practiceDemo
+              ? ((): React.ReactNode => {
+                  // Determine demo type
+                  const demoTypeResult = demoConfigSchema.safeParse(
+                    topic.practiceDemo as unknown
+                  );
+                  if (!demoTypeResult.success) {
+                    return (
+                      <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                        <p>Demo unavailable: Invalid configuration</p>
+                      </div>
+                    );
+                  }
+
+                  const demoType = demoTypeResult.data.demoType;
+
+                  if (demoType === "requirementsToArchitecture") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <RequirementsToArchitectureDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "renderingStrategyLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <RenderingStrategyLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "stateAtScaleLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <StateAtScaleLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "performanceBudgetLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <PerformanceBudgetLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "uiArchitectureLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <UIArchitectureLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "releaseDeliveryLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <ReleaseDeliveryLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "testingStrategyLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <TestingStrategyLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "observabilityLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <ObservabilityLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "securityPrivacyLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <SecurityPrivacyLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "realtimeSystemsLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <RealtimeSystemsLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "largeScaleUXLab") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <LargeScaleUXLabDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
+                  if (demoType === "capstoneBuilder") {
+                    return (
+                      <Spotlight targetId={currentFocusTarget}>
+                        <CapstoneBuilderDemo
+                          demoConfig={topic.practiceDemo}
+                          focusTarget={currentFocusTarget || undefined}
+                        />
+                      </Spotlight>
+                    );
+                  }
+
                   return (
                     <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                      <p>Demo unavailable: Invalid configuration</p>
+                      <p>Demo unavailable: Unknown demo type</p>
                     </div>
                   );
-                }
-
-                const demoType = demoTypeResult.data.demoType;
-
-                if (demoType === "requirementsToArchitecture") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <RequirementsToArchitectureDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "renderingStrategyLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <RenderingStrategyLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "stateAtScaleLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <StateAtScaleLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "performanceBudgetLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <PerformanceBudgetLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "uiArchitectureLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <UIArchitectureLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "releaseDeliveryLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <ReleaseDeliveryLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "testingStrategyLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <TestingStrategyLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "observabilityLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <ObservabilityLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "securityPrivacyLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <SecurityPrivacyLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "realtimeSystemsLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <RealtimeSystemsLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "largeScaleUXLab") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <LargeScaleUXLabDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                if (demoType === "capstoneBuilder") {
-                  return (
-                    <Spotlight targetId={currentFocusTarget}>
-                      <CapstoneBuilderDemo
-                        demoConfig={topic.practiceDemo}
-                        focusTarget={currentFocusTarget || undefined}
-                      />
-                    </Spotlight>
-                  );
-                }
-
-                return (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    <p>Demo unavailable: Unknown demo type</p>
-                  </div>
-                );
-              })()}
+                })()
+              : null}
 
             {/* Guided Steps */}
             {topic.practiceSteps && topic.practiceSteps.length > 0 && (

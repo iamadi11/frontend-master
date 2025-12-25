@@ -56,10 +56,10 @@ export function RequirementsToArchitectureDemo({
   const config = useMemo(() => {
     try {
       // If demoType is missing but we have the right structure, add it
-      const configToValidate = demoConfig as any;
-      if (configToValidate && !configToValidate.demoType) {
-        configToValidate.demoType = "requirementsToArchitecture";
-      }
+      const configToValidate =
+        typeof demoConfig === "object" && demoConfig !== null
+          ? { ...demoConfig, demoType: "requirementsToArchitecture" }
+          : demoConfig;
       return requirementsToArchitectureConfigSchema.parse(configToValidate);
     } catch (error) {
       console.error("Invalid demo config:", error);

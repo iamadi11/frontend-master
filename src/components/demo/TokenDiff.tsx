@@ -17,11 +17,20 @@ export function TokenDiff({
 }: TokenDiffProps) {
   const { reduced } = useMotionPrefs();
 
-  const getNestedValue = (obj: any, path: string): string => {
+  const getNestedValue = (
+    obj: Record<string, unknown>,
+    path: string
+  ): string => {
     try {
       const value = path
         .split(".")
-        .reduce((curr: any, key: string) => curr?.[key], obj);
+        .reduce(
+          (curr: unknown, key: string) =>
+            curr && typeof curr === "object" && key in curr
+              ? (curr as Record<string, unknown>)[key]
+              : undefined,
+          obj
+        );
       return value != null ? String(value) : "";
     } catch {
       return "";
@@ -116,7 +125,7 @@ export function TokenDiff({
     const categoryObj = oldTokens.tokens[category as keyof TokenSet["tokens"]];
     if (typeof categoryObj === "object" && categoryObj !== null) {
       Object.keys(categoryObj).forEach((key) => {
-        const value = (categoryObj as any)[key];
+        const value = (categoryObj as Record<string, unknown>)[key];
         if (
           typeof value === "object" &&
           value !== null &&

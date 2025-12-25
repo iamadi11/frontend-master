@@ -3,18 +3,10 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, ChevronRight } from "lucide-react";
-
-type Topic = {
-  id: string;
-  title: string;
-  slug: string;
-  order: number;
-  summary?: string;
-  difficulty?: "beginner" | "intermediate" | "advanced";
-};
+import type { TopicListItem } from "@/lib/types";
 
 interface TopicsIndexClientProps {
-  topics: Topic[];
+  topics: TopicListItem[];
 }
 
 export function TopicsIndexClient({ topics }: TopicsIndexClientProps) {

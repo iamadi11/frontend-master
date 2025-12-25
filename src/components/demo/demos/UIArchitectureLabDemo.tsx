@@ -114,14 +114,24 @@ export function UIArchitectureLabDemo({
       if (newTokenSet && currentTokenSet) {
         // Find changed tokens
         const changedTokens: string[] = [];
-        const checkTokens = (oldObj: any, newObj: any, path: string = "") => {
+        const checkTokens = (
+          oldObj: Record<string, unknown>,
+          newObj: Record<string, unknown>,
+          path: string = ""
+        ) => {
           Object.keys(oldObj).forEach((key) => {
             const newPath = path ? `${path}.${key}` : key;
             if (
               typeof oldObj[key] === "object" &&
-              typeof newObj[key] === "object"
+              oldObj[key] !== null &&
+              typeof newObj[key] === "object" &&
+              newObj[key] !== null
             ) {
-              checkTokens(oldObj[key], newObj[key], newPath);
+              checkTokens(
+                oldObj[key] as Record<string, unknown>,
+                newObj[key] as Record<string, unknown>,
+                newPath
+              );
             } else if (oldObj[key] !== newObj[key]) {
               changedTokens.push(newPath);
             }

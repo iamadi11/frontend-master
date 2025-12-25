@@ -25,7 +25,7 @@ export async function generateMetadata({
 
 export async function generateStaticParams() {
   const topics = await listTopics();
-  return topics.map((topic: any) => ({
+  return topics.map((topic) => ({
     slug: topic.slug,
   }));
 }
@@ -36,26 +36,18 @@ export default async function TopicPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [topic, adjacent] = await Promise.all([
+  // Fetch topics list once (cached) and use for both topic and adjacent lookup
+  const [allTopics, topic] = await Promise.all([
+    listTopics(),
     getTopicBySlug(slug),
-    getAdjacentTopics(slug),
   ]);
 
   if (!topic) {
     notFound();
   }
 
-  // Diagnostic logging - remove after fixing
-  if (process.env.NODE_ENV === "development") {
-    console.log("[DEBUG] Theory data for", slug, ":", {
-      hasTheory: !!topic.theory,
-      theoryKeys: topic.theory ? Object.keys(topic.theory) : [],
-      hasRoot: !!topic.theory?.root,
-      rootKeys: topic.theory?.root ? Object.keys(topic.theory.root) : [],
-      childrenCount: topic.theory?.root?.children?.length || 0,
-      firstChild: topic.theory?.root?.children?.[0],
-    });
-  }
+  // Use topics list for adjacent lookup (no additional API call)
+  const adjacent = getAdjacentTopics(slug, allTopics);
 
   // Ensure theory is properly serialized for client component
   // Payload's richText should be serializable, but we'll ensure it's a plain object
@@ -66,7 +58,7 @@ export default async function TopicPage({
 
   return (
     <TopicPageClient
-      topic={serializedTopic as any}
+      topic={serializedTopic}
       prevTopic={
         adjacent.prev
           ? { title: adjacent.prev.title, slug: adjacent.prev.slug }

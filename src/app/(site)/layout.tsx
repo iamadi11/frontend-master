@@ -2,8 +2,33 @@ import type { ReactNode } from "react";
 import { Header } from "@/components/layout/Header";
 import { SidebarNavClient } from "@/components/layout/SidebarNavClient";
 import { MobileNavClient } from "@/components/layout/MobileNavClient";
+import { listTopics } from "@/lib/content";
 
-export default function SiteLayout({ children }: { children: ReactNode }) {
+export default async function SiteLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  // Fetch topics once server-side for navigation
+  let topics: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    order: number;
+  }> = [];
+  try {
+    const result = await listTopics();
+    topics = result.map((t) => ({
+      id: t.id,
+      title: t.title,
+      slug: t.slug,
+      order: t.order,
+    }));
+  } catch (error) {
+    // Silently fail - navigation will show empty state
+    console.error("Failed to load topics for navigation:", error);
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
       <Header />
@@ -12,7 +37,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-64 border-r border-gray-200 dark:border-gray-800 sticky top-16 self-start">
           <div className="p-4">
-            <SidebarNavClient />
+            <SidebarNavClient topics={topics} />
           </div>
         </aside>
 
@@ -25,7 +50,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Mobile Navigation */}
-      <MobileNavClient />
+      <MobileNavClient topics={topics} />
     </div>
   );
 }
