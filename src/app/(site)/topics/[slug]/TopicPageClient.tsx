@@ -13,6 +13,7 @@ import { ObservabilityLabDemo } from "@/components/demo/demos/ObservabilityLabDe
 import { SecurityPrivacyLabDemo } from "@/components/demo/demos/SecurityPrivacyLabDemo";
 import { RealtimeSystemsLabDemo } from "@/components/demo/demos/RealtimeSystemsLabDemo";
 import { LargeScaleUXLabDemo } from "@/components/demo/demos/LargeScaleUXLabDemo";
+import { CapstoneBuilderDemo } from "@/components/demo/demos/CapstoneBuilderDemo";
 import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 import { motion } from "framer-motion";
@@ -281,6 +282,17 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
                   return (
                     <Spotlight targetId={currentFocusTarget}>
                       <LargeScaleUXLabDemo
+                        demoConfig={topic.practiceDemo}
+                        focusTarget={currentFocusTarget || undefined}
+                      />
+                    </Spotlight>
+                  );
+                }
+
+                if (demoType === "capstoneBuilder") {
+                  return (
+                    <Spotlight targetId={currentFocusTarget}>
+                      <CapstoneBuilderDemo
                         demoConfig={topic.practiceDemo}
                         focusTarget={currentFocusTarget || undefined}
                       />

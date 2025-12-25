@@ -4546,6 +4546,555 @@ async function seed() {
       console.log("✓ Resource 11 topic already exists");
     }
 
+    // Check if Resource 12 topic exists
+    const existingTopic12 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "capstone",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic12.docs.length === 0) {
+      const capstoneBuilderDemoConfig = {
+        demoType: "capstoneBuilder",
+        defaults: {
+          scenario: "ECOMMERCE",
+          view: "ARCH_MAP",
+          emphasis: "PERF",
+        },
+        scenarios: [
+          {
+            id: "ECOMMERCE",
+            modules: [
+              { id: "pdp", label: "Product Detail Page", type: "UI" },
+              { id: "checkout", label: "Checkout", type: "UI" },
+              { id: "product-api", label: "Product API", type: "API" },
+              { id: "cart-api", label: "Cart API", type: "API" },
+              { id: "payment-api", label: "Payment API", type: "API" },
+              { id: "auth", label: "Auth Service", type: "AUTH" },
+              { id: "cdn", label: "CDN", type: "CACHE" },
+              { id: "edge", label: "Edge Cache", type: "EDGE" },
+              { id: "analytics", label: "Analytics", type: "ANALYTICS" },
+            ],
+            flows: [
+              { from: "pdp", to: "product-api", label: "Product Data", kind: "DATA" },
+              { from: "checkout", to: "cart-api", label: "Cart Updates", kind: "DATA" },
+              { from: "checkout", to: "payment-api", label: "Payment", kind: "DATA" },
+              { from: "pdp", to: "auth", label: "Auth Check", kind: "AUTH" },
+              { from: "pdp", to: "analytics", label: "Page Views", kind: "EVENT" },
+              { from: "cdn", to: "pdp", label: "Static Assets", kind: "DATA" },
+            ],
+            tradeoffs: [
+              {
+                label: "SSR vs SSG for PDP",
+                goodFor: ["SEO", "Initial load", "Dynamic pricing"],
+                risks: ["Server load", "TTFB", "Cache invalidation"],
+              },
+              {
+                label: "CDN caching for product images",
+                goodFor: ["Performance", "Bandwidth", "Global delivery"],
+                risks: ["Cache invalidation", "Stale images", "Storage costs"],
+              },
+              {
+                label: "Strict CSP for checkout",
+                goodFor: ["Security", "XSS prevention"],
+                risks: ["Third-party script limitations", "Development overhead"],
+              },
+            ],
+            recommendedChoices: {
+              rendering: "SSR",
+              caching: "CDN",
+              state: "Server state with React Query",
+              delivery: "CDN + Edge caching",
+              observability: "Checkout funnel tracking",
+              security: "Strict CSP + token-based auth",
+              deployment: "Canary releases with feature flags",
+            },
+          },
+          {
+            id: "DASHBOARD",
+            modules: [
+              { id: "dashboard-ui", label: "Dashboard UI", type: "UI" },
+              { id: "charts-api", label: "Charts API", type: "API" },
+              { id: "metrics-api", label: "Metrics API", type: "API" },
+              { id: "auth", label: "Auth Service", type: "AUTH" },
+              { id: "cache", label: "API Cache", type: "CACHE" },
+              { id: "edge", label: "Edge Compute", type: "EDGE" },
+              { id: "analytics", label: "Analytics", type: "ANALYTICS" },
+            ],
+            flows: [
+              { from: "dashboard-ui", to: "charts-api", label: "Chart Data", kind: "DATA" },
+              { from: "dashboard-ui", to: "metrics-api", label: "Metrics", kind: "DATA" },
+              { from: "dashboard-ui", to: "auth", label: "Auth Check", kind: "AUTH" },
+              { from: "dashboard-ui", to: "analytics", label: "User Actions", kind: "EVENT" },
+              { from: "cache", to: "charts-api", label: "Cached Responses", kind: "DATA" },
+            ],
+            tradeoffs: [
+              {
+                label: "CSR vs SSR for dashboard",
+                goodFor: ["Interactivity", "Real-time updates"],
+                risks: ["Initial load", "SEO", "Client performance"],
+              },
+              {
+                label: "API caching strategy",
+                goodFor: ["Performance", "Server load reduction"],
+                risks: ["Stale data", "Cache invalidation complexity"],
+              },
+            ],
+            recommendedChoices: {
+              rendering: "CSR",
+              caching: "APP",
+              state: "Client state with SWR/React Query",
+              delivery: "CDN for static assets only",
+              observability: "User interaction tracking",
+              security: "Token-based auth + RBAC",
+              deployment: "Feature flags for gradual rollout",
+            },
+          },
+          {
+            id: "CHAT_COLLAB",
+            modules: [
+              { id: "chat-ui", label: "Chat UI", type: "UI" },
+              { id: "messages-api", label: "Messages API", type: "API" },
+              { id: "presence-api", label: "Presence API", type: "API" },
+              { id: "auth", label: "Auth Service", type: "AUTH" },
+              { id: "websocket", label: "WebSocket Server", type: "REALTIME" },
+              { id: "cache", label: "Message Cache", type: "CACHE" },
+              { id: "analytics", label: "Analytics", type: "ANALYTICS" },
+            ],
+            flows: [
+              { from: "chat-ui", to: "websocket", label: "Real-time Messages", kind: "DATA" },
+              { from: "chat-ui", to: "messages-api", label: "History", kind: "DATA" },
+              { from: "chat-ui", to: "presence-api", label: "Presence", kind: "DATA" },
+              { from: "chat-ui", to: "auth", label: "Auth Check", kind: "AUTH" },
+              { from: "websocket", to: "chat-ui", label: "Message Events", kind: "EVENT" },
+            ],
+            tradeoffs: [
+              {
+                label: "WebSocket vs SSE",
+                goodFor: ["Bidirectional", "Low latency"],
+                risks: ["Connection management", "Scalability"],
+              },
+              {
+                label: "Optimistic updates",
+                goodFor: ["Perceived performance", "UX"],
+                risks: ["State conflicts", "Rollback complexity"],
+              },
+              {
+                label: "Message caching",
+                goodFor: ["Offline support", "Performance"],
+                risks: ["Storage limits", "Sync complexity"],
+              },
+            ],
+            recommendedChoices: {
+              rendering: "CSR",
+              caching: "BROWSER",
+              state: "Optimistic updates with conflict resolution",
+              delivery: "WebSocket for real-time, REST for history",
+              observability: "Message delivery tracking + sampling",
+              security: "WSS + token auth + message encryption",
+              deployment: "Blue-green with message replay",
+            },
+          },
+          {
+            id: "MEDIA_UI",
+            modules: [
+              { id: "player-ui", label: "Media Player UI", type: "UI" },
+              { id: "stream-api", label: "Stream API", type: "API" },
+              { id: "metadata-api", label: "Metadata API", type: "API" },
+              { id: "auth", label: "Auth Service", type: "AUTH" },
+              { id: "cdn", label: "Media CDN", type: "CACHE" },
+              { id: "edge", label: "Edge Streaming", type: "EDGE" },
+              { id: "analytics", label: "Analytics", type: "ANALYTICS" },
+            ],
+            flows: [
+              { from: "player-ui", to: "stream-api", label: "Stream Request", kind: "DATA" },
+              { from: "player-ui", to: "metadata-api", label: "Metadata", kind: "DATA" },
+              { from: "player-ui", to: "auth", label: "Auth Check", kind: "AUTH" },
+              { from: "cdn", to: "player-ui", label: "Media Stream", kind: "DATA" },
+              { from: "player-ui", to: "analytics", label: "Playback Events", kind: "EVENT" },
+            ],
+            tradeoffs: [
+              {
+                label: "Streaming vs download",
+                goodFor: ["Bandwidth efficiency", "Start time"],
+                risks: ["Buffering", "Quality adaptation"],
+              },
+              {
+                label: "CDN distribution",
+                goodFor: ["Global performance", "Bandwidth offload"],
+                risks: ["Cost", "Cache invalidation"],
+              },
+            ],
+            recommendedChoices: {
+              rendering: "SSR",
+              caching: "CDN",
+              state: "Streaming state with buffering logic",
+              delivery: "HLS/DASH via CDN",
+              observability: "Playback quality + buffering metrics",
+              security: "Token-based auth + DRM",
+              deployment: "Canary with quality rollback",
+            },
+          },
+        ],
+        sim: {
+          demoScenario: "CHAT_COLLAB",
+          toggles: {
+            rendering: ["CSR", "SSR", "SSG", "ISR", "STREAMING"],
+            caching: ["NONE", "BROWSER", "CDN", "APP"],
+            realtime: ["NONE", "SSE", "WEBSOCKET"],
+            optimistic: true,
+            offline: false,
+            sampling: 1.0,
+            cspStrict: true,
+          },
+          rules: [
+            {
+              rendering: "CSR",
+              caching: "BROWSER",
+              realtime: "WEBSOCKET",
+              optimistic: true,
+              offline: false,
+              sampling: 1.0,
+              cspStrict: true,
+              simTimelineEvents: [
+                "User types message → Optimistic render in UI",
+                "Message sent to WebSocket server",
+                "Server receives and broadcasts",
+                "Other user receives via WebSocket",
+                "Message cache updated in browser",
+                "Analytics event sent (sampled)",
+              ],
+              simMetrics: {
+                latencyMs: 150,
+                errorRate: 0.01,
+                cacheHitRate: 0.85,
+                droppedMsgsPct: 0.5,
+              },
+              simNotes: [
+                "CSR enables instant optimistic updates",
+                "WebSocket provides low-latency real-time delivery",
+                "Browser cache improves offline experience",
+                "CSP strict prevents XSS in message rendering",
+              ],
+            },
+            {
+              rendering: "CSR",
+              caching: "BROWSER",
+              realtime: "SSE",
+              optimistic: true,
+              offline: false,
+              simTimelineEvents: [
+                "User types message → Optimistic render",
+                "Message sent to server via POST",
+                "Server sends via SSE to other users",
+                "SSE connection delivers message",
+                "Browser cache updated",
+              ],
+              simMetrics: {
+                latencyMs: 200,
+                errorRate: 0.02,
+                cacheHitRate: 0.80,
+                droppedMsgsPct: 1.0,
+              },
+              simNotes: [
+                "SSE provides server-to-client real-time",
+                "Higher latency than WebSocket (no bidirectional)",
+                "Requires separate POST for client-to-server",
+              ],
+            },
+            {
+              rendering: "SSR",
+              caching: "CDN",
+              realtime: "WEBSOCKET",
+              optimistic: false,
+              simTimelineEvents: [
+                "Server renders initial HTML",
+                "Client hydrates",
+                "WebSocket connection established",
+                "Messages arrive and update UI",
+                "CDN caches static assets",
+              ],
+              simMetrics: {
+                latencyMs: 300,
+                errorRate: 0.015,
+                cacheHitRate: 0.90,
+                droppedMsgsPct: 0.3,
+              },
+              simNotes: [
+                "SSR improves initial load but delays interactivity",
+                "CDN caching helps with static assets",
+                "No optimistic updates increase perceived latency",
+              ],
+            },
+          ],
+        },
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Capstone Frontend System Designs",
+          slug: "capstone",
+          order: 12,
+          difficulty: "advanced",
+          summary:
+            "Capstone system design builder: E-commerce PDP/Checkout, Dashboard/Analytics, Chat/Collab, Media Streaming UI. Interactive architecture maps and simulation.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [
+                    {
+                      text: "Capstone Frontend System Designs",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "This capstone resource brings together concepts from all previous topics to design complete frontend systems for real-world scenarios: E-commerce Product Detail Page and Checkout, Dashboard/Analytics, Chat/Collaboration, and Media Streaming UI.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "E-commerce PDP/Checkout",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "E-commerce systems require SSR/SSG for SEO on product pages, CDN caching for assets, strict CSP for checkout security, and comprehensive observability for checkout funnel tracking. Key considerations include dynamic pricing updates, inventory management, and payment processing security.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Dashboard/Analytics",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Dashboard systems prioritize interactivity with CSR, API-level caching, client-side state management, and real-time data updates. Focus on performance for chart rendering, efficient data fetching patterns, and user interaction tracking for analytics.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Chat/Collaboration",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Chat systems require WebSocket or SSE for real-time delivery, optimistic updates for perceived performance, browser caching for offline support, and conflict resolution for concurrent edits. Security considerations include message encryption, token-based auth, and CSP for XSS prevention.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Media Streaming UI",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Media streaming systems use SSR for initial page load, CDN distribution for media delivery, adaptive bitrate streaming (HLS/DASH), and comprehensive playback analytics. Key challenges include buffering management, quality adaptation, and global distribution.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "Web.dev: E-commerce Performance",
+              url: "https://web.dev/ecommerce/",
+              note: "E-commerce performance best practices (placeholder - verify content)",
+              claimIds: "ecommerce",
+            },
+            {
+              label: "MDN: WebSocket API",
+              url: "https://developer.mozilla.org/en-US/docs/Web/API/WebSocket",
+              note: "WebSocket API documentation (placeholder - verify content)",
+              claimIds: "websocket",
+            },
+            {
+              label: "HLS.js Documentation",
+              url: "https://github.com/video-dev/hls.js/",
+              note: "HTTP Live Streaming library (placeholder - verify content)",
+              claimIds: "streaming",
+            },
+          ],
+          practiceDemo: capstoneBuilderDemoConfig,
+          practiceSteps: [
+            {
+              title: "Choose Scenario",
+              body: "Select a capstone scenario (E-commerce, Dashboard, Chat/Collab, or Media UI). Each scenario represents a real-world frontend system with different requirements and trade-offs.",
+              focusTarget: "controls.scenario",
+            },
+            {
+              title: "Explore Architecture Map",
+              body: "Switch to Architecture Map view. Review the module graph showing UI components, APIs, caches, edge services, auth, realtime connections, and analytics. Understand the data flows between modules.",
+              focusTarget: "arch.map",
+            },
+            {
+              title: "Change Emphasis",
+              body: "Try different emphasis modes (Performance, Reliability, Security, DX). Watch how the architecture map highlights different critical paths and trade-offs. Performance emphasizes caching/CDN/streaming; Security emphasizes auth/CSP/token handling; Reliability emphasizes retries/fallbacks; DX emphasizes module boundaries/testing.",
+              focusTarget: "tradeoffs.panel",
+            },
+            {
+              title: "Review Recommended Choices",
+              body: "Examine the recommended choices panel for your selected scenario. These represent best-practice decisions for rendering strategy, caching, state management, delivery, observability, security, and deployment based on the scenario's requirements.",
+              focusTarget: "tradeoffs.panel",
+            },
+            {
+              title: "Switch to Interactive Simulation",
+              body: "Switch to Interactive Simulation view. This provides a mini-capstone implementation (default: Chat/Collab) that demonstrates how multiple concepts work together: rendering strategy, caching, realtime, optimistic updates, offline support, sampling, and CSP.",
+              focusTarget: "sim.panel",
+            },
+            {
+              title: "Adjust Simulation Toggles",
+              body: "Experiment with different toggles: rendering strategy (CSR/SSR/SSG/ISR/STREAMING), caching mode (NONE/BROWSER/CDN/APP), realtime protocol (NONE/SSE/WEBSOCKET), optimistic updates, offline support, sampling rate, and CSP strict mode. Each combination produces different outcomes.",
+              focusTarget: "sim.panel",
+            },
+            {
+              title: "Run Simulation",
+              body: "Click 'Run Simulation' to see a timeline of events: user actions, network requests, server processing, realtime delivery, cache updates, observability telemetry, and security checks. Watch how different toggle combinations affect the flow.",
+              focusTarget: "sim.panel",
+            },
+            {
+              title: "Review Metrics",
+              body: "After running the simulation, examine the metrics panel: latency, error rate, cache hit rate, and dropped messages (if applicable). Understand how your toggle choices impact these metrics.",
+              focusTarget: "metrics",
+            },
+            {
+              title: "Understand Trade-offs",
+              body: "Notice how different combinations create different trade-offs. For example: CSR enables optimistic updates but increases initial load; WebSocket provides low latency but requires connection management; CSP strict improves security but limits third-party scripts.",
+              focusTarget: "sim.panel",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see chronological records of architecture decisions and simulation events. This helps understand how system design choices affect behavior and outcomes.",
+              focusTarget: "eventlog",
+            },
+            {
+              title: "Apply to Your Scenario",
+              body: "Think about how the concepts demonstrated in the interactive simulation apply to your chosen scenario. Consider: rendering strategy for SEO vs interactivity, caching for performance vs freshness, realtime for collaboration vs efficiency, security for protection vs flexibility.",
+              focusTarget: "sim.panel",
+            },
+            {
+              title: "Design Integration",
+              body: "Consider how all these pieces fit together: rendering strategy + caching + state management + delivery + observability + security + deployment. Each scenario requires a different combination optimized for its specific requirements.",
+              focusTarget: "arch.map",
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "For your chosen scenario, justify the recommended rendering + caching choices. Explain why these choices fit the scenario's requirements.",
+              expectedAnswer:
+                "For E-commerce PDP/Checkout: SSR is recommended because product pages need SEO (search engines can crawl HTML), initial content is critical (users see products immediately), and dynamic pricing/inventory requires server-side rendering. CDN caching is recommended because product images and static assets are large and benefit from global distribution, reducing bandwidth costs and improving load times. For Dashboard: CSR is recommended because dashboards prioritize interactivity (users need to interact with charts/filters immediately), real-time updates are common (data refreshes frequently), and SEO is not required (dashboards are authenticated). APP-level caching is recommended because API responses benefit from caching to reduce server load while allowing real-time invalidation when needed.",
+              explanation:
+                "Rendering and caching choices depend on scenario requirements: SEO needs SSR, interactivity needs CSR. CDN for static assets, APP cache for API responses, BROWSER cache for offline support.",
+            },
+            {
+              prompt:
+                "Identify the main security/privacy risks for your scenario and explain how to mitigate them.",
+              expectedAnswer:
+                "For Chat/Collab: Main risks include XSS in message rendering (malicious scripts in messages), CSRF in message sending (unauthorized actions), message interception (data in transit), and PII in messages (personal information). Mitigations: Use strict CSP to prevent inline scripts and limit script sources, sanitize message content before rendering, use token-based auth with CSRF tokens, encrypt messages in transit (WSS) and at rest, implement message filtering/redaction for PII, use secure token storage (HTTP-only cookies), and implement rate limiting to prevent abuse. For E-commerce: Main risks include payment data exposure, XSS in checkout forms, CSRF in cart/payment actions, and session hijacking. Mitigations: Never store payment data on frontend, use PCI-compliant payment processors, strict CSP for checkout pages, CSRF tokens for state-changing actions, secure session management with HttpOnly cookies, and comprehensive input validation.",
+              explanation:
+                "Security risks vary by scenario. Chat systems focus on message security and XSS prevention. E-commerce focuses on payment security and checkout protection. Always use CSP, token-based auth, encryption, and input validation.",
+            },
+            {
+              prompt:
+                "Design a rollout strategy (feature flags/canary/rollback) for a risky change in your scenario (e.g., switching rendering strategy or enabling a new caching layer).",
+              expectedAnswer:
+                "For switching Dashboard from CSR to SSR: Phase 1 - Feature flag to enable SSR for 5% of users (internal team + beta users), monitor error rates and latency metrics, collect user feedback. Phase 2 - If metrics are good, increase to 25% of users, continue monitoring, ensure SEO improvements are measurable. Phase 3 - Gradual rollout to 50%, then 75%, then 100% over 1-2 weeks, monitoring for regressions. Rollback plan: Feature flag allows instant rollback to CSR if error rate increases >1% or latency increases >200ms. Canary deployment with automatic rollback triggers. Blue-green deployment for zero-downtime rollback. Monitoring: Track SSR vs CSR metrics separately (error rates, latency, SEO rankings, user engagement). Alert on anomalies. For enabling CDN caching for E-commerce: Phase 1 - Enable CDN for static assets only (images, CSS, JS), verify cache hit rates, monitor origin server load reduction. Phase 2 - Enable CDN for product pages with short TTL (5 minutes), monitor for stale content issues. Phase 3 - Gradually increase TTL and expand to more pages. Rollback: CDN can be disabled instantly via configuration, fallback to origin server. Cache purge available for emergency invalidation.",
+              explanation:
+                "Rollout strategy should be gradual with feature flags, monitoring, and rollback plans. Start small (5-25%), monitor metrics, gradually increase, and always have instant rollback capability. Measure success criteria before and during rollout.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 12 topic (capstone)");
+    } else {
+      console.log("✓ Resource 12 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);

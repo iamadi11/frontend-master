@@ -584,6 +584,91 @@ export const largeScaleUXLabConfigSchema = z.object({
   ),
 });
 
+// Resource 12: Capstone Builder
+export const capstoneBuilderConfigSchema = z.object({
+  demoType: z.literal("capstoneBuilder"),
+  defaults: z.object({
+    scenario: z.enum(["ECOMMERCE", "DASHBOARD", "CHAT_COLLAB", "MEDIA_UI"]),
+    view: z.enum(["ARCH_MAP", "INTERACTIVE_SIM"]),
+    emphasis: z.enum(["PERF", "RELIABILITY", "SECURITY", "DX"]),
+  }),
+  scenarios: z.array(
+    z.object({
+      id: z.enum(["ECOMMERCE", "DASHBOARD", "CHAT_COLLAB", "MEDIA_UI"]),
+      modules: z.array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          type: z.enum([
+            "UI",
+            "API",
+            "CACHE",
+            "EDGE",
+            "ANALYTICS",
+            "AUTH",
+            "REALTIME",
+          ]),
+        })
+      ),
+      flows: z.array(
+        z.object({
+          from: z.string(),
+          to: z.string(),
+          label: z.string(),
+          kind: z.enum(["DATA", "EVENT", "AUTH"]),
+        })
+      ),
+      tradeoffs: z.array(
+        z.object({
+          label: z.string(),
+          goodFor: z.array(z.string()),
+          risks: z.array(z.string()),
+        })
+      ),
+      recommendedChoices: z.object({
+        rendering: z.enum(["CSR", "SSR", "SSG", "ISR", "STREAMING"]),
+        caching: z.enum(["NONE", "BROWSER", "CDN", "APP"]),
+        state: z.string(),
+        delivery: z.string(),
+        observability: z.string(),
+        security: z.string(),
+        deployment: z.string(),
+      }),
+    })
+  ),
+  sim: z.object({
+    demoScenario: z.enum(["CHAT_COLLAB", "ECOMMERCE", "DASHBOARD", "MEDIA_UI"]),
+    toggles: z.object({
+      rendering: z.array(z.enum(["CSR", "SSR", "SSG", "ISR", "STREAMING"])),
+      caching: z.array(z.enum(["NONE", "BROWSER", "CDN", "APP"])),
+      realtime: z.array(z.enum(["NONE", "SSE", "WEBSOCKET"])),
+      optimistic: z.boolean(),
+      offline: z.boolean(),
+      sampling: z.number().min(0).max(1),
+      cspStrict: z.boolean(),
+    }),
+    rules: z.array(
+      z.object({
+        rendering: z.enum(["CSR", "SSR", "SSG", "ISR", "STREAMING"]).optional(),
+        caching: z.enum(["NONE", "BROWSER", "CDN", "APP"]).optional(),
+        realtime: z.enum(["NONE", "SSE", "WEBSOCKET"]).optional(),
+        optimistic: z.boolean().optional(),
+        offline: z.boolean().optional(),
+        sampling: z.number().optional(),
+        cspStrict: z.boolean().optional(),
+        simTimelineEvents: z.array(z.string()),
+        simMetrics: z.object({
+          latencyMs: z.number(),
+          errorRate: z.number(),
+          cacheHitRate: z.number(),
+          droppedMsgsPct: z.number().optional(),
+        }),
+        simNotes: z.array(z.string()),
+      })
+    ),
+  }),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
@@ -597,6 +682,7 @@ export const demoConfigSchema = z.discriminatedUnion("demoType", [
   securityPrivacyLabConfigSchema,
   realtimeSystemsLabConfigSchema,
   largeScaleUXLabConfigSchema,
+  capstoneBuilderConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -629,6 +715,7 @@ export type RealtimeSystemsLabConfig = z.infer<
   typeof realtimeSystemsLabConfigSchema
 >;
 export type LargeScaleUXLabConfig = z.infer<typeof largeScaleUXLabConfigSchema>;
+export type CapstoneBuilderConfig = z.infer<typeof capstoneBuilderConfigSchema>;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;
 export type TokenSet = z.infer<typeof tokenSetSchema>;
