@@ -6,8 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DemoShell } from "../DemoShell";
 import { EventLog, EventLogEntry } from "../EventLog";
 import { Spotlight, SpotlightTarget } from "../Spotlight";
-import { demoConfigSchema, type DemoConfig } from "../demoSchema";
-import { z } from "zod";
+import {
+  requirementsToArchitectureConfigSchema,
+  type RequirementsToArchitectureConfig,
+} from "../demoSchema";
 
 interface RequirementsToArchitectureDemoProps {
   demoConfig: unknown;
@@ -44,7 +46,12 @@ export function RequirementsToArchitectureDemo({
   // Validate and parse demo config
   const config = useMemo(() => {
     try {
-      return demoConfigSchema.parse(demoConfig);
+      // If demoType is missing but we have the right structure, add it
+      const configToValidate = demoConfig as any;
+      if (configToValidate && !configToValidate.demoType) {
+        configToValidate.demoType = "requirementsToArchitecture";
+      }
+      return requirementsToArchitectureConfigSchema.parse(configToValidate);
     } catch (error) {
       console.error("Invalid demo config:", error);
       return null;

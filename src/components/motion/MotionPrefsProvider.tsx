@@ -76,8 +76,20 @@ export function MotionPrefsProvider({ children }: { children: ReactNode }) {
 
 export function useMotionPrefs() {
   const context = useContext(MotionPrefsContext);
+
+  // During SSR or if provider not available, return default values
   if (context === undefined) {
-    throw new Error("useMotionPrefs must be used within MotionPrefsProvider");
+    // Check if we're in a browser environment
+    if (typeof window === "undefined") {
+      // SSR: return default (no reduced motion)
+      return { reduced: false, setReduced: () => {} };
+    }
+    // Client-side but provider missing: return default
+    console.warn(
+      "useMotionPrefs used outside MotionPrefsProvider, using defaults"
+    );
+    return { reduced: false, setReduced: () => {} };
   }
+
   return context;
 }

@@ -112,6 +112,7 @@ async function seed() {
 
     if (existingTopic.docs.length === 0) {
       const practiceDemoConfig = {
+        demoType: "requirementsToArchitecture",
         constraints: [
           {
             id: "traffic",
@@ -470,7 +471,479 @@ async function seed() {
       });
       console.log("✓ Created Resource 1 topic (foundations)");
     } else {
-      console.log("✓ Resource 1 topic already exists");
+      // Update existing topic to add demoType if missing
+      const existing = existingTopic.docs[0];
+      const needsUpdate =
+        !existing.practiceDemo ||
+        !existing.practiceDemo.demoType ||
+        existing.practiceDemo.demoType !== "requirementsToArchitecture";
+
+      if (needsUpdate && existing.practiceDemo) {
+        // Reconstruct the full config with demoType at the beginning
+        const updatedDemo = {
+          demoType: "requirementsToArchitecture",
+          constraints: existing.practiceDemo.constraints || [],
+          nodes: existing.practiceDemo.nodes || [],
+          rules: existing.practiceDemo.rules || [],
+        };
+        await payload.update({
+          collection: "topics",
+          id: existing.id,
+          data: {
+            practiceDemo: updatedDemo,
+          },
+        });
+        console.log("✓ Updated Resource 1 topic (added demoType)");
+      } else {
+        console.log("✓ Resource 1 topic already exists");
+      }
+    }
+
+    // Check if Resource 2 topic exists
+    const existingTopic2 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "rendering-strategies",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic2.docs.length === 0) {
+      const renderingStrategyDemoConfig = {
+        demoType: "renderingStrategyLab",
+        defaults: {
+          strategy: "CSR",
+          network: "FAST",
+          device: "DESKTOP",
+          dataFetch: "CLIENT",
+          cacheMode: "NONE",
+          revalidateSeconds: 0,
+        },
+        timelinePhases: ["REQUEST", "TTFB", "HTML", "JS", "HYDRATE", "DATA", "INTERACTIVE"],
+        rules: [
+          {
+            strategy: "CSR",
+            phaseDurations: {
+              REQUEST: 50,
+              TTFB: 100,
+              HTML: 200,
+              JS: 800,
+              HYDRATE: 300,
+              DATA: 500,
+              INTERACTIVE: 200,
+            },
+            notes: [
+              "HTML shell first; data arrives after JS; TTI shifts later on slow networks.",
+            ],
+            htmlPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root"></div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            domPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <main>Content loaded</main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            cacheEvents: ["Cache: MISS", "Fetching from server"],
+          },
+          {
+            strategy: "SSR",
+            phaseDurations: {
+              REQUEST: 50,
+              TTFB: 300,
+              HTML: 400,
+              JS: 600,
+              HYDRATE: 200,
+              DATA: 0,
+              INTERACTIVE: 100,
+            },
+            notes: [
+              "Server renders HTML with data; faster initial content; hydration required.",
+            ],
+            htmlPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <main>Server-rendered content</main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            domPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <main>Server-rendered content</main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            cacheEvents: ["Cache: MISS", "Server rendering", "HTML delivered"],
+          },
+          {
+            strategy: "SSG",
+            phaseDurations: {
+              REQUEST: 50,
+              TTFB: 50,
+              HTML: 100,
+              JS: 400,
+              HYDRATE: 150,
+              DATA: 0,
+              INTERACTIVE: 50,
+            },
+            notes: [
+              "Pre-rendered HTML; fastest TTFB; no server processing; instant content.",
+            ],
+            htmlPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <main>Static content</main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            domPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <main>Static content</main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            cacheEvents: ["Cache: HIT (CDN)", "Serving static HTML"],
+          },
+          {
+            strategy: "ISR",
+            cacheMode: "CDN",
+            phaseDurations: {
+              REQUEST: 50,
+              TTFB: 50,
+              HTML: 100,
+              JS: 400,
+              HYDRATE: 150,
+              DATA: 0,
+              INTERACTIVE: 50,
+            },
+            notes: [
+              "Cached HTML served; background revalidation may update later.",
+            ],
+            htmlPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <main>ISR cached content</main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            domPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <main>ISR cached content</main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            cacheEvents: [
+              "Cache: HIT (CDN)",
+              "Serving cached HTML",
+              "Background revalidation scheduled",
+            ],
+          },
+          {
+            strategy: "STREAMING",
+            phaseDurations: {
+              REQUEST: 50,
+              TTFB: 200,
+              HTML: 300,
+              JS: 400,
+              HYDRATE: 200,
+              DATA: 400,
+              INTERACTIVE: 100,
+            },
+            notes: [
+              "Streaming chunks; progressive rendering; content appears incrementally.",
+            ],
+            htmlPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <!-- Streaming... -->
+  </div>
+</body>
+</html>`,
+            domPreview: `<!DOCTYPE html>
+<html>
+<head><title>App</title></head>
+<body>
+  <div id="root">
+    <header>Welcome</header>
+    <main>Streamed content</main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>`,
+            cacheEvents: ["Cache: MISS", "Streaming response", "Chunks arriving"],
+          },
+        ],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Rendering Strategies & Data Lifecycles",
+          slug: "rendering-strategies",
+          order: 2,
+          difficulty: "beginner",
+          summary: "Learn how different rendering strategies (CSR, SSR, SSG, ISR, Streaming) affect performance, user experience, and data fetching patterns. Understand when to use each approach.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [{ text: "Rendering Strategies Overview" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Frontend rendering strategies determine when and where content is generated. Each strategy has trade-offs in performance, SEO, and user experience.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Client-Side Rendering (CSR)" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "CSR renders content in the browser after JavaScript loads. Fast initial HTML shell, but content appears after hydration. Best for interactive apps with minimal SEO needs.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Server-Side Rendering (SSR)" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "SSR generates HTML on the server for each request. Faster initial content, better SEO, but requires server processing. Good for dynamic content with SEO requirements.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Static Site Generation (SSG)" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "SSG pre-renders pages at build time. Fastest TTFB, excellent for CDN caching, but requires rebuilds for content updates. Ideal for mostly-static sites.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    { text: "Incremental Static Regeneration (ISR)" },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "ISR combines SSG benefits with on-demand updates. Pages are statically generated but can be revalidated in the background. Perfect for content that changes occasionally.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [{ text: "Streaming" }],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Streaming sends HTML in chunks as it's generated. Progressive rendering improves perceived performance. Content appears incrementally, reducing time to first content.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "Next.js: Data Fetching",
+              url: "https://nextjs.org/docs/app/building-your-application/data-fetching",
+              note: "Next.js patterns for rendering strategies (placeholder - verify content)",
+              claimIds: "rendering-strategies",
+            },
+            {
+              label: "Web.dev: Rendering on the Web",
+              url: "https://web.dev/rendering-on-the-web/",
+              note: "Overview of rendering strategies (placeholder - verify content)",
+              claimIds: "rendering-overview",
+            },
+            {
+              label: "MDN: Server-Side Rendering",
+              url: "https://developer.mozilla.org/en-US/docs/Glossary/SSR",
+              note: "SSR concepts (placeholder - verify content)",
+              claimIds: "ssr",
+            },
+          ],
+          practiceDemo: renderingStrategyDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore Rendering Strategies",
+              body: "Use the Strategy selector to switch between CSR, SSR, SSG, ISR, and Streaming. Watch how the timeline changes - notice when users first see content (the green marker).",
+              focusTarget: "controls.strategy",
+            },
+            {
+              title: "Observe Timeline Differences",
+              body: "Compare CSR vs SSR: CSR shows HTML shell first, then JS loads and data arrives. SSR shows HTML with data immediately, but requires hydration. SSG is fastest with pre-rendered content.",
+              focusTarget: "timeline",
+            },
+            {
+              title: "Understand HTML vs DOM",
+              body: "The diff view shows what the browser receives (HTML) vs what appears after hydration (DOM). Notice how CSR starts with minimal HTML, while SSR/SSG have content immediately.",
+              focusTarget: "diff",
+            },
+            {
+              title: "Experiment with Network Speed",
+              body: "Switch Network to 'Slow' and see how CSR's Time to Interactive (TTI) shifts significantly later. SSR and SSG are less affected by network speed for initial content.",
+              focusTarget: "timeline",
+            },
+            {
+              title: "Explore Caching",
+              body: "Change Cache Mode and observe the cache events panel. SSG and ISR benefit most from CDN caching. ISR shows background revalidation when revalidate seconds > 0.",
+              focusTarget: "cache",
+            },
+            {
+              title: "ISR Revalidation",
+              body: "Set Strategy to ISR and adjust the Revalidate slider. This controls how often cached pages are regenerated in the background. Lower values = fresher content but more server load.",
+              focusTarget: "cache",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see a chronological record of all strategy changes and their impacts. This helps you understand the decision-making process.",
+              focusTarget: "eventlog",
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt: "A news website needs to support high traffic (millions of daily visitors) and requires excellent SEO for article discovery. The content updates frequently (every few minutes). Which rendering strategy would you recommend and why?",
+              expectedAnswer: "ISR (Incremental Static Regeneration) with a short revalidation period (e.g., 60 seconds). This provides excellent SEO through pre-rendered HTML, handles high traffic efficiently via CDN caching, and allows content updates without full rebuilds. SSG would require constant rebuilds, while SSR would overload the server.",
+              explanation: "ISR combines the SEO and performance benefits of SSG with the ability to update content incrementally. The revalidation period balances freshness with server load. For high-traffic sites, CDN caching is essential, which ISR supports perfectly.",
+            },
+            {
+              prompt: "A marketing landing page is mostly static but needs to show personalized pricing based on user location. The pricing data changes rarely (maybe once per month). Choose between SSG and ISR and set an appropriate revalidation time.",
+              expectedAnswer: "ISR with revalidation set to a long period (e.g., 3600 seconds / 1 hour) or even longer. Since pricing changes rarely, you can use a long revalidation period. The personalization can be handled client-side after the static HTML loads, or via edge functions.",
+              explanation: "ISR is better than SSG here because you need some dynamic behavior (personalized pricing). A long revalidation period (1 hour or more) ensures the page is cached efficiently while still allowing updates when pricing changes. The personalization can be layered on top of the static HTML.",
+            },
+            {
+              prompt: "An interactive dashboard application needs real-time data updates and doesn't require SEO. Users expect immediate interactivity. Which strategy fits best?",
+              expectedAnswer: "CSR (Client-Side Rendering). Since SEO isn't needed and users expect immediate interactivity, CSR provides the best experience. The dashboard can fetch data client-side and update in real-time without server round-trips for rendering.",
+              explanation: "CSR is ideal for authenticated, interactive applications where SEO isn't a concern. The initial HTML shell loads quickly, then JavaScript takes over for all rendering and data fetching. This allows for real-time updates and smooth interactions without server-side rendering overhead.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 2 topic (rendering-strategies)");
+    } else {
+      console.log("✓ Resource 2 topic already exists");
     }
 
     console.log("\n✓ Seed script completed successfully");

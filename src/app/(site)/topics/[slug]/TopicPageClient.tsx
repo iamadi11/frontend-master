@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { RichTextRenderer } from "@/components/RichTextRenderer";
 import { RequirementsToArchitectureDemo } from "@/components/demo/demos/RequirementsToArchitectureDemo";
+import { RenderingStrategyLabDemo } from "@/components/demo/demos/RenderingStrategyLabDemo";
 import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 import { motion } from "framer-motion";
+import { demoConfigSchema } from "@/components/demo/demoSchema";
 
 type Topic = {
   id: string;
@@ -140,14 +142,50 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
         ) : (
           <div className="space-y-8">
             {/* Demo */}
-            {topic.practiceDemo && (
-              <Spotlight targetId={currentFocusTarget}>
-                <RequirementsToArchitectureDemo
-                  demoConfig={topic.practiceDemo}
-                  focusTarget={currentFocusTarget || undefined}
-                />
-              </Spotlight>
-            )}
+            {topic.practiceDemo &&
+              (() => {
+                // Determine demo type
+                const demoTypeResult = demoConfigSchema.safeParse(
+                  topic.practiceDemo
+                );
+                if (!demoTypeResult.success) {
+                  return (
+                    <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                      <p>Demo unavailable: Invalid configuration</p>
+                    </div>
+                  );
+                }
+
+                const demoType = demoTypeResult.data.demoType;
+
+                if (demoType === "requirementsToArchitecture") {
+                  return (
+                    <Spotlight targetId={currentFocusTarget}>
+                      <RequirementsToArchitectureDemo
+                        demoConfig={topic.practiceDemo}
+                        focusTarget={currentFocusTarget || undefined}
+                      />
+                    </Spotlight>
+                  );
+                }
+
+                if (demoType === "renderingStrategyLab") {
+                  return (
+                    <Spotlight targetId={currentFocusTarget}>
+                      <RenderingStrategyLabDemo
+                        demoConfig={topic.practiceDemo}
+                        focusTarget={currentFocusTarget || undefined}
+                      />
+                    </Spotlight>
+                  );
+                }
+
+                return (
+                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                    <p>Demo unavailable: Unknown demo type</p>
+                  </div>
+                );
+              })()}
 
             {/* Guided Steps */}
             {topic.practiceSteps && topic.practiceSteps.length > 0 && (

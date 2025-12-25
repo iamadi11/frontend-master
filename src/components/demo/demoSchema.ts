@@ -16,7 +16,9 @@ export const decisionNodeSchema = z.object({
   description: z.string().optional(),
 });
 
-export const demoConfigSchema = z.object({
+// Resource 1: Requirements to Architecture
+export const requirementsToArchitectureConfigSchema = z.object({
+  demoType: z.literal("requirementsToArchitecture"),
   constraints: z.array(constraintControlSchema),
   nodes: z.array(decisionNodeSchema),
   rules: z.array(
@@ -30,6 +32,46 @@ export const demoConfigSchema = z.object({
   ),
 });
 
+// Resource 2: Rendering Strategy Lab
+export const renderingStrategyLabConfigSchema = z.object({
+  demoType: z.literal("renderingStrategyLab"),
+  defaults: z.object({
+    strategy: z.enum(["CSR", "SSR", "SSG", "ISR", "STREAMING"]),
+    network: z.enum(["FAST", "SLOW"]),
+    device: z.enum(["DESKTOP", "MOBILE"]),
+    dataFetch: z.enum(["SERVER", "CLIENT", "MIXED"]),
+    cacheMode: z.enum(["NONE", "BROWSER", "CDN", "APP"]),
+    revalidateSeconds: z.number().min(0).max(3600),
+  }),
+  timelinePhases: z.array(z.string()),
+  rules: z.array(
+    z.object({
+      strategy: z.enum(["CSR", "SSR", "SSG", "ISR", "STREAMING"]).optional(),
+      network: z.enum(["FAST", "SLOW"]).optional(),
+      device: z.enum(["DESKTOP", "MOBILE"]).optional(),
+      dataFetch: z.enum(["SERVER", "CLIENT", "MIXED"]).optional(),
+      cacheMode: z.enum(["NONE", "BROWSER", "CDN", "APP"]).optional(),
+      phaseDurations: z.record(z.string(), z.number()),
+      notes: z.array(z.string()),
+      htmlPreview: z.string(),
+      domPreview: z.string(),
+      cacheEvents: z.array(z.string()),
+    })
+  ),
+});
+
+// Discriminated union for all demo types
+export const demoConfigSchema = z.discriminatedUnion("demoType", [
+  requirementsToArchitectureConfigSchema,
+  renderingStrategyLabConfigSchema,
+]);
+
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
+export type RequirementsToArchitectureConfig = z.infer<
+  typeof requirementsToArchitectureConfigSchema
+>;
+export type RenderingStrategyLabConfig = z.infer<
+  typeof renderingStrategyLabConfigSchema
+>;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;

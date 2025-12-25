@@ -21,14 +21,29 @@ export function RichTextRenderer({ content }: RichTextRendererProps) {
 
     switch (node.type) {
       case "heading":
-        const HeadingTag = `h${node.tag}` as keyof React.JSX.IntrinsicElements;
-        return (
-          <HeadingTag className="mt-6 mb-4 font-bold">
-            {node.children?.map((child: any, i: number) => (
-              <span key={i}>{renderNode(child)}</span>
-            ))}
-          </HeadingTag>
-        );
+        // node.tag is already "h1", "h2", etc. from Lexical
+        const tagName = (node.tag || "h1").toLowerCase();
+        const headingContent = node.children?.map((child: any, i: number) => (
+          <span key={i}>{renderNode(child)}</span>
+        ));
+
+        // Use explicit switch to avoid dynamic component name issues
+        switch (tagName) {
+          case "h1":
+            return <h1 className="mt-6 mb-4 font-bold">{headingContent}</h1>;
+          case "h2":
+            return <h2 className="mt-6 mb-4 font-bold">{headingContent}</h2>;
+          case "h3":
+            return <h3 className="mt-6 mb-4 font-bold">{headingContent}</h3>;
+          case "h4":
+            return <h4 className="mt-6 mb-4 font-bold">{headingContent}</h4>;
+          case "h5":
+            return <h5 className="mt-6 mb-4 font-bold">{headingContent}</h5>;
+          case "h6":
+            return <h6 className="mt-6 mb-4 font-bold">{headingContent}</h6>;
+          default:
+            return <h1 className="mt-6 mb-4 font-bold">{headingContent}</h1>;
+        }
       case "paragraph":
         return (
           <p className="mb-4">
