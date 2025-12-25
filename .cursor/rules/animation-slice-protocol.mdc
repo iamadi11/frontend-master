@@ -1,25 +1,25 @@
 ---
-description: "Animation work must be shipped as small slices: one topic at a time, limited files, clear DoD."
+description: "Prevents context overload for content-heavy + animations work."
 alwaysApply: false
 globs:
-  - "src/components/three/**"
   - "src/components/demo/**"
+  - "src/components/three/**"
+  - "src/components/theory/**"
+  - "scripts/**"
 ---
 
-# Animation Slice Protocol (Context-light)
+# ANIMATION SLICE PROTOCOL (Hard)
 
 ## One topic per slice
-- Only implement the requested topic’s 3D mode (or one discrete feature).
-- Do not implement other topics in the same pass.
+Animation/content implementation must cover ONLY one topic per slice.
 
-## Hard limits
-- Max 12 files changed per slice unless truly necessary.
-- No large refactors mixed with animation work.
-- Reuse primitives; only add new primitives if at least 2 future topics will reuse them.
+## Limits
+- Prefer <= 12 file changes per slice
+- Avoid big refactors in animation slices
 
 ## End-of-slice output (required)
-- Files changed list
-- How to test the demo (route + steps)
-- Reduced motion behavior
-- Perf notes (DPR, fallback)
-- Next step suggestion
+- files changed list
+- how to test (route + exact steps)
+- reduced motion summary
+- WebGL fallback behavior (if 3D)
+- next slice suggestion

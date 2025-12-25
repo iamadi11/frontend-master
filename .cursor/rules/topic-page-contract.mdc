@@ -1,32 +1,47 @@
 ---
-description: "Topic pages: enforce Theory + Practice structure and required sections."
+description: "Exact structure for content-heavy theory + learning animations + practice."
 alwaysApply: false
 globs:
   - "src/app/**/topics/**"
-  - "src/app/**/resources/**"
+  - "src/components/content/**"
+  - "src/components/theory/**"
 ---
 
-# Topic Page Contract
+# TOPIC PAGE CONTRACT (Content-Heavy + Animations)
 
-Every topic page MUST render exactly two primary sections/tabs:
-A) THEORY (detailed)
-B) PRACTICE (interactive)
+Each topic page MUST have exactly two primary tabs:
+A) THEORY
+B) PRACTICE
 
-## THEORY required headings
-- What you will learn
-- Prerequisites
-- Mental model (simple -> deep)
-- Core concepts
-- Design process (step-by-step)
-- Trade-offs (table)
-- Common mistakes
-- Mini case study
-- Interview Q&A
-- References (stored in CMS; rendered on-page)
+## THEORY required sections (must all exist)
+1) What you will learn
+2) Prerequisites
+3) Mental model (simple → deep)
+4) Core concepts (break into subsections)
+5) Design process (step-by-step)
+6) Trade-offs (table)
+7) Common mistakes
+8) Mini case study (realistic)
+9) Interview Q&A (concise answers)
+10) 2D/3D Mental Model (ties to practice demo)
+11) References (credibility only; not required)
 
-## PRACTICE required structure
-- Interactive demo + controls
-- Visualization (observable difference)
-- Timeline/event log ("what happened" + order)
-- Guided steps mode
-- Hands-on task + solution reveal + explanation
+## THEORY Animated Explanation Blocks (required)
+Each topic must include 2–6 blocks embedded within theory.
+Each block MUST include:
+- Title
+- Short explanation (2–8 lines)
+- Control (stepper/toggle/play) – user-triggered
+- “What to notice” bullets (3–6)
+- Reduced-motion equivalent (static/instant)
+- Link/anchor to the relevant Practice demo part (same page)
+
+Rules:
+- No autoplay
+- No infinite loops
+- Animation must teach (timeline/flow/boundary/trade-off)
+
+## Empty-state rule
+If Theory is missing/empty:
+- show explicit “Content missing in CMS” state
+- never blank or invisible content

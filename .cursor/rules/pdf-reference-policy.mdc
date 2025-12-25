@@ -1,33 +1,30 @@
 ---
-description: "Use local PDF/text extract as truth source without pasting large chunks; extract only what's needed per slice."
-alwaysApply: false
-globs:
-  - "scripts/**"
-  - "src/app/**/topics/**"
-  - "src/components/demo/**"
-  - "docs/**"
+description: "Use PDF as the truth source; build content from it without copying."
+alwaysApply: true
 ---
 
-# PDF Reference Policy (Accuracy without Context Bloat)
+# PDF REFERENCE POLICY (Curriculum Truth Source)
 
 ## Source of truth
-If present, treat these as authoritative:
-- docs/_source/frontend-system-design-curriculum.pdf
-- docs/_source/curriculum.txt
+`frontend_system_design_curriculum.pdf` defines:
+- the 12 topics and their order
+- the boundaries of each topic (what belongs / doesn’t belong)
+- the expected learning outcomes and core subtopics
 
-## How to use
-- Consult PDF/extract to verify definitions, trade-offs, case studies, practice demo requirements.
-- Summarize into CMS fields in your own words.
+## Mandatory workflow for ANY content/animation/demo work
+1) Verify the topic boundary from the PDF (or local text extract if present).
+2) Implement theory + animations + demos to match that boundary.
+3) Paraphrase and improve explanations; do NOT copy text.
 
-## Hard limits
-- Do NOT paste long PDF text into code, prompts, or repo files.
-- Do NOT generate entire curriculum in one go.
-- Extract the minimum needed for the current topic slice only.
+## No-copy rule
+- Do NOT paste large PDF text into:
+  - repo files (code/docs)
+  - CMS seed scripts
+  - CMS entries
+- If quoting is unavoidable, keep it <= 1–2 lines.
 
-## If unclear
-Mark "Needs verification" in CMS and add placeholder reference.
-
-## For animations and demos
-- Node labels, terminology, and topic ordering must match `docs/curriculum-index.md`.
-- Use `docs/_source/curriculum.txt` (or PDF) to verify domain terms and concept boundaries.
-- Never paste large PDF excerpts into code or CMS seed.
+## Coverage rule
+For each topic, coverage must match the PDF scope:
+- no missing subtopics
+- no extra subtopics outside scope
+If a PDF item can’t be located/confirmed, label “Needs verification”.

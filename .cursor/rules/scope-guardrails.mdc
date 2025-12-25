@@ -1,21 +1,20 @@
 ---
-description: "Always apply: prevent scope creep."
+description: "Hard boundaries + what is allowed for a content-heavy learning site."
 alwaysApply: true
 ---
 
-# Scope Guardrails (Hard boundaries)
+# SCOPE GUARDRAILS (Hard)
 
-## Do NOT add unless explicitly requested
-- Learner accounts/login, comments, likes/ratings
-- Payments/subscriptions
-- Gamification (points/badges/leaderboards/streaks)
-- Notifications/community/community feeds
-- Complex search/recommendations/personalization
-- Over-architecture/microservices
+## Allowed (always)
+- Content expansion and proofreading to become a go-to learning resource
+- Theory animations (teaching-first, user-triggered)
+- 2D/3D practice demos aligned to theory
+- CMS seeding/validation/audit for completeness of 12 topics
+- Code quality improvements + dead code removal
+- Remove any login/auth gating from public pages
 
-## Only build what supports learning
-- Topic pages (Theory + Practice)
-- CMS schema + rendering + interactive demos
-- Minimal navigation needed for learning flow
-- PWA/offline basics + performance fundamentals
-- Deployment hygiene for Vercel + MongoDB
+## Forbidden unless explicitly requested
+- accounts/auth, payments, comments/community
+- analytics integrations
+- gamification/leaderboards
+- unrelated large redesign during content tasks

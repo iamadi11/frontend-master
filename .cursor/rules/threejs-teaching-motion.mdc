@@ -1,47 +1,27 @@
 ---
-description: "Three.js/R3F demos must be teaching-first: user-triggered motion, focus guidance, reduced-motion safe, perf safe."
+description: "3D must teach; must be consistent with PDF/theory; must be user-triggered; must fallback."
 alwaysApply: false
 globs:
   - "src/components/three/**"
   - "src/components/demo/**"
-  - "src/app/**/topics/**"
 ---
 
-# Three.js Teaching Motion Policy
+# THREE.JS TEACHING MOTION (Strict)
 
 ## Purpose
-3D is allowed ONLY when it improves learning: make invisible systems visible via motion.
-No decorative 3D.
+3D exists only to teach a concept more clearly than 2D.
 
-## Motion triggers (required)
-Animations may run ONLY on:
-- user control changes
-- guided step change (next/prev)
-- deliberate hover/click micro-interactions
-No idle loops, no autoplay sequences while reading.
+## Rules (hard)
+- No idle loops; animations only on user trigger or step change
+- Must respect Reduce Motion:
+  - no camera travel/pulses/lerps in reduced motion
+  - use static emphasis instead
+- Must have WebGL failure fallback to 2D automatically
+- Cap DPR on mobile; keep geometry minimal
 
-## Focus guidance (required)
-- Use spotlight/focus patterns to guide attention.
-- Animate ONLY what changed (local transitions).
-- Provide "Before vs After" comparison animation when conceptually helpful.
-
-## Reduced motion (required)
-- Must respect prefers-reduced-motion AND in-UI Reduce Motion toggle.
-- Reduced motion mode must:
-  - disable camera movement and traveling pulses
-  - replace with static emphasis (outline/opacity) and instant state changes
-- Reduced motion must not hide any info.
-
-## Performance (required)
-- Target 60fps; cap DPR on mobile.
-- Avoid heavy postprocessing.
-- Use instancing if needed; prefer simple geometries/materials.
-- Provide a WebGL fallback: if canvas fails, show the existing 2D demo.
-
-## Accessibility & UX
-- Canvas must not hijack scroll.
-- Labels should be readable (DOM overlay ok).
-- 3D interactions must not block keyboard navigation to the rest of the page.
-
-## Scope boundary
-Do not add new routes, auth, analytics integrations, community features, or unrelated UI redesign in Three.js slices.
+## Alignment rule (hard)
+3D visuals must match:
+- PDF scope for that topic
+- CMS config outputs
+- Event Log causal narration
+- Theory 2D/3D Mental Model explanation

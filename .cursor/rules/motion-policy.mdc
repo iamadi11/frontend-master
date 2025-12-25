@@ -1,31 +1,26 @@
 ---
-description: "Always apply: heavy animations required, but only as teaching/focus motion; reduced-motion toggle required."
+description: "Heavy animation is allowed but must guide focus and improve learning."
 alwaysApply: true
 ---
 
-# Motion Policy (Heavy, Teaching-Only)
+# MOTION POLICY (Learning-first, Not Decorative)
 
-## Requirement
-Use heavy animation across the site and demos ONLY to:
-- teach (visualize system behavior)
-- guide focus (spotlight current panel/step)
-- explain state changes (timelines/diffs/transitions)
-
-No decorative motion.
-
-## Must-have
-- Respect prefers-reduced-motion
-- Provide an in-UI "Reduce motion" toggle (persisted)
-- Reduced motion must remain fully usable (static emphasis instead of motion)
-
-## Allowed teaching animations
-- Animated timelines (CSR/SSR/hydration/caching phases)
-- Animated diffs (before/after output, cache hit/miss)
-- Spotlight/highlight tied to user actions
-- Stepper/story transitions in Practice
-- 3D (Three.js / R3F) animations ONLY if they clarify system behavior; must be user-triggered and reduced-motion safe
+## Heavy motion requirement
+Use motion strongly where it improves understanding, but only for teaching:
+- timelines (request → render → hydrate)
+- flows (data/cache/auth)
+- boundaries (modules/edge/CDN)
+- trade-offs (before/after)
 
 ## Forbidden
-- Auto-looping animations without user action
-- Parallax/background motion competing with reading
-- Flashy effects not tied to learning
+- autoplay while reading
+- background loops
+- motion that competes with content readability
+
+## Trigger rule
+Animations only run on user actions:
+- play / next step / toggle / hover micro-interaction
+
+## Reduced motion (mandatory)
+Reduced motion must remain equally understandable:
+- replace movement with static emphasis, outlines, instant transitions

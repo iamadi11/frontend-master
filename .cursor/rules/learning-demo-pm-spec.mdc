@@ -1,21 +1,21 @@
 ---
-description: "Every new topic demo must start with a small PM spec: outcome, animation plan, success criteria, and risks."
+description: "For each demo/animation, define a PM-style teaching spec first."
 alwaysApply: false
 globs:
-  - "src/components/demo/demos/**"
+  - "src/components/demo/**"
   - "src/components/three/**"
-  - "scripts/seed.*"
+  - "src/components/theory/**"
 ---
 
-# Learning Demo PM Spec Rule
+# LEARNING DEMO PM SPEC (Required)
 
-Before implementing a new demo (2D or 3D), include a short spec in the PR/slice output (not in code comments):
-- Problem: what learners struggle with
-- User outcome: what they can do after the demo
-- Interaction model: controls + what user sees changing
-- Animation plan: list of purposeful animations (no decoration)
+Before implementing a NEW demo OR a new theory animation block set, define:
+- Problem (what learner struggles with)
+- Outcome (what learner can do after)
+- Interaction model (controls → visual change)
+- Animation plan (what animates and why)
 - Reduced motion behavior
-- Success criteria: measurable outcomes (completion, task correctness)
-- Risks: performance, confusion, accessibility
+- Success criteria (how we know it teaches)
+- Risks (perf, distraction, correctness)
 
-The implementation must match the spec.
+Implementation must match the spec.

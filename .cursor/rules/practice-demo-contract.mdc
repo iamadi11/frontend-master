@@ -1,29 +1,35 @@
 ---
-description: "Practice demos: CMS-driven config + Zod validation + teaching animations."
+description: "Practice demo must be learn-by-doing; 2D required; 3D optional; aligned to PDF + theory."
 alwaysApply: false
 globs:
-  - "src/modules/**"
   - "src/components/demo/**"
+  - "src/components/three/**"
   - "src/app/**/topics/**"
 ---
 
-# Practice Demo Contract
+# PRACTICE DEMO CONTRACT (Learn-by-Doing)
 
-## CMS-driven only
-- Practice demo behavior must come from CMS fields (demoConfig JSON + steps + tasks + references).
-- No hardcoded topic logic inside route files.
+## CMS-driven (mandatory)
+Practice demo behavior/content must come from CMS config.
+Hardcoding lesson text in route files is forbidden.
 
-## Minimum demo UX
-- Controls (tabs/toggles/sliders)
-- Visualization panel
-- Timeline/event log
-- Guided steps (Step 1..N)
-- Task + solution reveal + explanation
+## Validation (mandatory)
+- Validate config using Zod
+- If invalid/missing: show friendly fallback, never crash
 
-## Validation + fallback
-- Validate demoConfig with Zod at runtime.
-- If invalid/missing: show friendly fallback ("Demo unavailable") and do not crash.
+## Must include (all)
+- Controls
+- Visualization
+- Event Log (explains what happened and why)
+- Guided Steps
+- Tasks + Solution Reveal + Explanation
 
-## Teaching motion
-- Use heavy motion to visualize transitions/timelines/diffs.
-- Provide reduced-motion static alternative.
+## 2D baseline (mandatory)
+Every topic must have a working 2D demo.
+
+## 3D mode (optional but strict if present)
+- must improve clarity vs 2D
+- user-triggered only (no idle loops)
+- reduced-motion safe
+- WebGL fallback to 2D automatically
+- must match Theory 2D/3D Mental Model + Event Log narrative

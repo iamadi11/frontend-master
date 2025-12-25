@@ -1,24 +1,23 @@
 ---
-description: "Dependency discipline for R3F/Three.js: minimal libs, no heavy add-ons without need."
+description: "Keep 3D stack minimal and bundle-friendly."
 alwaysApply: false
 globs:
   - "package.json"
   - "src/components/three/**"
 ---
 
-# Three.js Dependency Policy
+# THREE.JS DEPS POLICY (Minimal)
 
-Allowed core deps:
+Allowed:
 - three
 - @react-three/fiber
-- @react-three/drei (optional, prefer minimal usage)
+- @react-three/drei (minimal use)
 
-Do NOT add:
-- postprocessing suites
+Forbidden unless explicitly requested:
 - physics engines
-- large shader libraries
-unless explicitly requested and justified by learning value.
+- postprocessing suites
+- heavy shader libs
 
-If adding a dep:
-- explain why it is essential
-- confirm it does not bloat the bundle significantly
+If proposing a new 3D dependency:
+- justify learning value
+- explain bundle/perf impact

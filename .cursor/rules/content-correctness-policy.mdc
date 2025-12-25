@@ -1,17 +1,29 @@
 ---
-description: "Correctness: no hallucinations; claim-to-reference mapping; on-site completeness."
-alwaysApply: false
-globs:
-  - "src/app/**/topics/**"
-  - "src/modules/**"
-  - "src/components/demo/**"
-  - "scripts/**"
-  - "docs/**"
+description: "Correctness + self-contained learning + consistency checks."
+alwaysApply: true
 ---
 
-# Content Correctness Policy
+# CONTENT CORRECTNESS (Strict, Content-Heavy)
 
-- Do not invent browser behaviors, standards, metrics, tool capabilities, or security properties.
-- If uncertain: label "Needs verification" and store placeholder reference in CMS.
-- Non-trivial claims must have references stored in CMS and rendered on the topic page.
-- Users should be able to learn without leaving the site (references are supplementary).
+## No hallucinations
+Do not invent:
+- browser/React/Next behavior
+- security guarantees
+- performance metric meaning
+If unsure:
+- label “Needs verification”
+- keep statements conservative
+
+## Self-contained learning (hard requirement)
+Users must not need external links to understand:
+- every core concept must be fully explained on-page
+- references are credibility only (optional reading)
+
+## Content must be explainable by animations/demos
+If a theory claim is made, ensure one of these exists:
+- a Theory Animated Explanation Block that illustrates it, OR
+- a Practice demo interaction that demonstrates it
+
+## Consistent vocabulary (mandatory)
+Use the same terms everywhere:
+Theory / Practice / Guided Steps / Tasks / Solution / Event Log / Animated Explanation / 2D / 3D

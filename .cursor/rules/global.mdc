@@ -1,30 +1,30 @@
 ---
-description: "Always apply: mission, topic flow, CMS-driven content, correctness-first, resumable slices, Vercel-safe."
+description: "Mission + workflow + learning-first guarantees."
 alwaysApply: true
 ---
 
-# Global Rules (Non-negotiable)
+# GLOBAL (Learning-First, Non-negotiable)
 
-## Mission
-Build a backend-driven Frontend System Design learning website.
-Every topic page MUST have exactly two primary sections:
-1) THEORY (very detailed, structured, reference-backed)
-2) PRACTICE (interactive learn-by-doing demos + hands-on tasks + solutions)
+## Mission (do not deviate)
+Build a public, backend-driven Frontend System Design learning website that is:
+- content-heavy (deep theory; complete coverage)
+- self-contained (user does NOT need external links to understand)
+- correct and grounded in `frontend_system_design_curriculum.pdf`
+- interactive (2D demos for every topic; 3D where it increases clarity)
+- Vercel-friendly (Next.js + Node, Payload CMS, MongoDB; secrets via env only)
 
-Users should not need other sites to learn. References are for credibility, not dependency.
+## Always-on constraints
+- Public learning pages require NO login:
+  `/`, `/topics`, `/topics/[slug]`
+- Keep changes small to prevent Cursor context overflow:
+  one topic OR one focused feature per slice
+- Every slice must end with:
+  1) files changed
+  2) what was verified (build + smoke test steps)
+  3) next slice
 
-## Non-negotiables
-- Next.js App Router + TypeScript + Tailwind. Vercel-friendly.
-- Payload CMS + MongoDB. Topic content must be CMS-driven (no hardcoded lessons in route files).
-- Correctness-first: do not invent facts. If unsure: label "Needs verification" + store placeholder reference in CMS.
-- Prefer Server Components; keep client JS minimal.
-- Secrets only via env vars; never expose secrets via NEXT_PUBLIC_.
-- If `docs/_source/curriculum.txt` or the PDF exists, use it to verify topic content (do not paste large chunks).
-
-## Resumable slice protocol (prevents context overflow)
-Implement in SMALL slices only (one feature chunk / one topic chunk).
-Each slice must end with:
-- files changed
-- Definition of Done checklist
-- next step
-Do NOT dump large curriculum text into repo; keep full content in CMS (seed minimal placeholders only).
+## Learning quality bar (always)
+Theory must be long-form and structured.
+Every major theory concept must be reinforced by:
+- a theory animation block (2D preferred) OR
+- a practice demo interaction (2D/3D)

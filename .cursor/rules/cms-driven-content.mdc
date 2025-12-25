@@ -1,16 +1,28 @@
 ---
-description: "CMS rule: all learning content from Payload; thin routes; server-only data layer; empty states; env safety."
+description: "CMS is the canonical store for content; code renders + validates."
 alwaysApply: false
 globs:
   - "payload.config.*"
   - "src/lib/**"
-  - "src/app/**/admin/**"
+  - "src/app/**"
   - "scripts/**"
 ---
 
-# CMS-driven Content Rule
+# CMS-DRIVEN CONTENT (Hard)
 
-- All Theory + Practice + References live in Payload CMS (MongoDB).
-- Next routes must be thin: fetch via server-only lib/data layer, then render.
-- Handle empty CMS state gracefully (no crashes).
-- Never leak secrets to client; NEXT_PUBLIC_ only for safe values (e.g., site URL).
+## Canonical storage
+All learning content must live in Payload CMS:
+- Theory (rich text + animation blocks config)
+- Practice demo config (controls, steps, tasks, solutions)
+- References (credibility only)
+
+## Thin routes
+Next routes must be thin:
+- fetch via server-only lib layer
+- render components
+- handle missing/invalid CMS content with explicit empty states
+Never silently render blank.
+
+## Secrets
+- never expose secrets to client
+- all secrets via env (no NEXT_PUBLIC for secrets)
