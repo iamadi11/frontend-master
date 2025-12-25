@@ -12,6 +12,7 @@ import { TestingStrategyLabDemo } from "@/components/demo/demos/TestingStrategyL
 import { ObservabilityLabDemo } from "@/components/demo/demos/ObservabilityLabDemo";
 import { SecurityPrivacyLabDemo } from "@/components/demo/demos/SecurityPrivacyLabDemo";
 import { RealtimeSystemsLabDemo } from "@/components/demo/demos/RealtimeSystemsLabDemo";
+import { LargeScaleUXLabDemo } from "@/components/demo/demos/LargeScaleUXLabDemo";
 import { Spotlight } from "@/components/demo/Spotlight";
 import { useMotionPrefs } from "@/components/motion/MotionPrefsProvider";
 import { motion } from "framer-motion";
@@ -269,6 +270,17 @@ export function TopicPageClient({ topic }: TopicPageClientProps) {
                   return (
                     <Spotlight targetId={currentFocusTarget}>
                       <RealtimeSystemsLabDemo
+                        demoConfig={topic.practiceDemo}
+                        focusTarget={currentFocusTarget || undefined}
+                      />
+                    </Spotlight>
+                  );
+                }
+
+                if (demoType === "largeScaleUXLab") {
+                  return (
+                    <Spotlight targetId={currentFocusTarget}>
+                      <LargeScaleUXLabDemo
                         demoConfig={topic.practiceDemo}
                         focusTarget={currentFocusTarget || undefined}
                       />

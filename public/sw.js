@@ -2132,11 +2132,11 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
     precacheEntries: [
       {
         revision: "4493551e9e718ddc90a80bcc6ed03d8e",
-        url: "/_next/static/NP159DAeqILdq07bOluba/_buildManifest.js",
+        url: "/_next/static/G9DtER2JYMcmFxpQBxJLf/_buildManifest.js",
       },
       {
         revision: "b6652df95db52feb4daf4eca35380933",
-        url: "/_next/static/NP159DAeqILdq07bOluba/_ssgManifest.js",
+        url: "/_next/static/G9DtER2JYMcmFxpQBxJLf/_ssgManifest.js",
       },
       {
         revision: null,
@@ -2184,7 +2184,7 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
       },
       {
         revision: null,
-        url: "/_next/static/chunks/app/(site)/topics/%5Bslug%5D/page-424a1372773c783e.js",
+        url: "/_next/static/chunks/app/(site)/topics/%5Bslug%5D/page-aaf8d137d86d472a.js",
       },
       {
         revision: null,
@@ -2239,7 +2239,7 @@ This is generally NOT safe. Learn more at https://bit.ly/wb-precache`);
         revision: null,
         url: "/_next/static/chunks/webpack-55b3a8aae8bb752e.js",
       },
-      { revision: null, url: "/_next/static/css/de02dec6a309780f.css" },
+      { revision: null, url: "/_next/static/css/3025463a61751fc2.css" },
       {
         revision: "9dda5cfc9a46f256d0e131bb535e46f8",
         url: "/_next/static/media/19cfc7226ec3afaa-s.woff2",

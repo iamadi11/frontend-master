@@ -527,6 +527,63 @@ export const realtimeSystemsLabConfigSchema = z.object({
   ),
 });
 
+// Resource 11: Large-scale UX Systems Lab
+export const largeScaleUXLabConfigSchema = z.object({
+  demoType: z.literal("largeScaleUXLab"),
+  defaults: z.object({
+    mode: z.enum([
+      "VIRTUALIZATION",
+      "PAGINATION_SCROLL",
+      "SEARCH_RACES",
+      "FORMS_AUTOSAVE",
+    ]),
+    // Virtualization
+    itemCount: z.number().min(100).max(50000),
+    renderMode: z.enum(["FULL_DOM", "VIRTUALIZED"]),
+    rowHeight: z.number().min(24).max(80),
+    overscan: z.number().min(0).max(20),
+    // Pagination vs Infinite
+    strategy: z.enum(["PAGINATION", "INFINITE_SCROLL"]),
+    pageSize: z.number().min(10).max(100),
+    totalItems: z.number().min(100).max(5000),
+    // Search races
+    queryLatencyMs: z.number().min(50).max(2000),
+    typingSpeed: z.enum(["SLOW", "FAST"]),
+    cancellation: z.enum(["NONE", "ABORT", "IGNORE_STALE"]),
+    // Forms/autosave
+    validationMode: z.enum(["ON_CHANGE", "ON_BLUR", "ON_SUBMIT"]),
+    autosave: z.boolean(),
+    autosaveIntervalMs: z.number().min(500).max(5000),
+    offline: z.boolean(),
+    recovery: z.boolean(),
+  }),
+  rules: z.array(
+    z.object({
+      mode: z
+        .enum([
+          "VIRTUALIZATION",
+          "PAGINATION_SCROLL",
+          "SEARCH_RACES",
+          "FORMS_AUTOSAVE",
+        ])
+        .optional(),
+      renderMode: z.enum(["FULL_DOM", "VIRTUALIZED"]).optional(),
+      strategy: z.enum(["PAGINATION", "INFINITE_SCROLL"]).optional(),
+      cancellation: z.enum(["NONE", "ABORT", "IGNORE_STALE"]).optional(),
+      validationMode: z.enum(["ON_CHANGE", "ON_BLUR", "ON_SUBMIT"]).optional(),
+      perfStats: z.object({
+        domNodes: z.number(),
+        renderCost: z.number(),
+        memoryScore: z.number(),
+      }),
+      uxNotes: z.array(z.string()),
+      searchEvents: z.array(z.string()),
+      autosaveEvents: z.array(z.string()),
+      eventLines: z.array(z.string()),
+    })
+  ),
+});
+
 // Discriminated union for all demo types
 export const demoConfigSchema = z.discriminatedUnion("demoType", [
   requirementsToArchitectureConfigSchema,
@@ -539,6 +596,7 @@ export const demoConfigSchema = z.discriminatedUnion("demoType", [
   observabilityLabConfigSchema,
   securityPrivacyLabConfigSchema,
   realtimeSystemsLabConfigSchema,
+  largeScaleUXLabConfigSchema,
 ]);
 
 export type DemoConfig = z.infer<typeof demoConfigSchema>;
@@ -570,6 +628,7 @@ export type SecurityPrivacyLabConfig = z.infer<
 export type RealtimeSystemsLabConfig = z.infer<
   typeof realtimeSystemsLabConfigSchema
 >;
+export type LargeScaleUXLabConfig = z.infer<typeof largeScaleUXLabConfigSchema>;
 export type ConstraintControl = z.infer<typeof constraintControlSchema>;
 export type DecisionNode = z.infer<typeof decisionNodeSchema>;
 export type TokenSet = z.infer<typeof tokenSetSchema>;

@@ -4100,6 +4100,452 @@ async function seed() {
       console.log("✓ Resource 10 topic already exists");
     }
 
+    // Check if Resource 11 topic exists
+    const existingTopic11 = await payload.find({
+      collection: "topics",
+      where: {
+        slug: {
+          equals: "large-scale-ux",
+        },
+      },
+      limit: 1,
+    });
+
+    if (existingTopic11.docs.length === 0) {
+      const largeScaleUXLabDemoConfig = {
+        demoType: "largeScaleUXLab",
+        defaults: {
+          mode: "VIRTUALIZATION",
+          itemCount: 1000,
+          renderMode: "FULL_DOM",
+          rowHeight: 40,
+          overscan: 5,
+          strategy: "PAGINATION",
+          pageSize: 20,
+          totalItems: 500,
+          queryLatencyMs: 500,
+          typingSpeed: "FAST",
+          cancellation: "NONE",
+          validationMode: "ON_CHANGE",
+          autosave: true,
+          autosaveIntervalMs: 2000,
+          offline: false,
+          recovery: true,
+        },
+        rules: [
+          {
+            mode: "VIRTUALIZATION",
+            renderMode: "FULL_DOM",
+            perfStats: {
+              domNodes: 1000,
+              renderCost: 100,
+              memoryScore: 90,
+            },
+            uxNotes: [],
+            searchEvents: [],
+            autosaveEvents: [],
+            eventLines: [
+              "Full DOM renders all items; performance degrades with large lists.",
+            ],
+          },
+          {
+            mode: "VIRTUALIZATION",
+            renderMode: "VIRTUALIZED",
+            perfStats: {
+              domNodes: 15,
+              renderCost: 1.5,
+              memoryScore: 100,
+            },
+            uxNotes: [],
+            searchEvents: [],
+            autosaveEvents: [],
+            eventLines: [
+              "Virtualization reduces DOM nodes; overscan improves scroll smoothness but increases work.",
+            ],
+          },
+          {
+            mode: "PAGINATION_SCROLL",
+            strategy: "PAGINATION",
+            perfStats: {
+              domNodes: 20,
+              renderCost: 2,
+              memoryScore: 100,
+            },
+            uxNotes: [
+              "Pagination: navigable, stable URLs, easier 'where am I'",
+              "Users can jump to specific pages",
+              "Footer access is straightforward",
+            ],
+            searchEvents: [],
+            autosaveEvents: [],
+            eventLines: [
+              "Pagination provides predictable navigation and stable URLs.",
+            ],
+          },
+          {
+            mode: "PAGINATION_SCROLL",
+            strategy: "INFINITE_SCROLL",
+            perfStats: {
+              domNodes: 100,
+              renderCost: 10,
+              memoryScore: 95,
+            },
+            uxNotes: [
+              "Infinite scroll: engagement, but harder footer access/position",
+              "Back navigation challenges require state restoration",
+              "Scroll position must be preserved",
+            ],
+            searchEvents: [],
+            autosaveEvents: [],
+            eventLines: [
+              "Infinite scroll needs state restoration for back navigation.",
+            ],
+          },
+          {
+            mode: "SEARCH_RACES",
+            cancellation: "NONE",
+            perfStats: {
+              domNodes: 0,
+              renderCost: 0,
+              memoryScore: 100,
+            },
+            uxNotes: [],
+            searchEvents: [
+              "Request 1 sent",
+              "Request 2 sent (overwrites Request 1)",
+              "Request 1 completes last (stale response overwrites UI)",
+            ],
+            autosaveEvents: [],
+            eventLines: [
+              "Without cancellation, stale responses can overwrite newer results.",
+            ],
+          },
+          {
+            mode: "SEARCH_RACES",
+            cancellation: "ABORT",
+            perfStats: {
+              domNodes: 0,
+              renderCost: 0,
+              memoryScore: 100,
+            },
+            uxNotes: [],
+            searchEvents: [
+              "Request 1 sent",
+              "Request 2 sent, Request 1 aborted",
+              "Request 2 completes (only latest result shown)",
+            ],
+            autosaveEvents: [],
+            eventLines: [
+              "Abort prevents wasted work; ignore-stale prevents UI regression but still costs network.",
+            ],
+          },
+          {
+            mode: "SEARCH_RACES",
+            cancellation: "IGNORE_STALE",
+            perfStats: {
+              domNodes: 0,
+              renderCost: 0,
+              memoryScore: 100,
+            },
+            uxNotes: [],
+            searchEvents: [
+              "Request 1 sent",
+              "Request 2 sent",
+              "Request 2 completes first (shown)",
+              "Request 1 completes (ignored as stale)",
+            ],
+            autosaveEvents: [],
+            eventLines: [
+              "Ignore-stale prevents UI regression but still costs network bandwidth.",
+            ],
+          },
+          {
+            mode: "FORMS_AUTOSAVE",
+            validationMode: "ON_CHANGE",
+            perfStats: {
+              domNodes: 0,
+              renderCost: 0,
+              memoryScore: 100,
+            },
+            uxNotes: [],
+            searchEvents: [],
+            autosaveEvents: ["Draft saved"],
+            eventLines: [
+              "OnChange validation gives immediate feedback but can be noisy.",
+            ],
+          },
+          {
+            mode: "FORMS_AUTOSAVE",
+            validationMode: "ON_BLUR",
+            perfStats: {
+              domNodes: 0,
+              renderCost: 0,
+              memoryScore: 100,
+            },
+            uxNotes: [],
+            searchEvents: [],
+            autosaveEvents: ["Draft saved"],
+            eventLines: [
+              "OnBlur validation reduces noise but delays feedback.",
+            ],
+          },
+          {
+            mode: "FORMS_AUTOSAVE",
+            validationMode: "ON_SUBMIT",
+            perfStats: {
+              domNodes: 0,
+              renderCost: 0,
+              memoryScore: 100,
+            },
+            uxNotes: [],
+            searchEvents: [],
+            autosaveEvents: ["Draft saved"],
+            eventLines: [
+              "OnSubmit validation is least intrusive but provides no early feedback.",
+            ],
+          },
+        ],
+      };
+
+      await payload.create({
+        collection: "topics",
+        data: {
+          title: "Large-scale UX Systems",
+          slug: "large-scale-ux",
+          order: 11,
+          difficulty: "intermediate",
+          summary:
+            "Learn virtualization, pagination vs infinite scroll, search race conditions, and form validation with autosave for large-scale UX systems.",
+          theory: {
+            root: {
+              children: [
+                {
+                  children: [
+                    {
+                      text: "Large-scale UX Systems",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h1",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Large-scale UX systems require careful handling of virtualization, pagination strategies, search race conditions, and form validation with autosave. This resource covers performance optimization, UX trade-offs, and resilience patterns for handling large datasets and user interactions.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Virtualization",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Virtualization renders only visible items plus an overscan buffer, dramatically reducing DOM nodes and memory usage. Full DOM rendering creates all items upfront, which degrades performance with large lists. Virtualization trades initial render cost for scroll smoothness through overscan. Choose virtualization for lists with 1000+ items, especially on mobile devices.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Pagination vs Infinite Scroll",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Pagination provides predictable navigation, stable URLs, and easier 'where am I' context. Users can jump to specific pages and footer access is straightforward. Infinite scroll increases engagement and feels seamless but requires state restoration for back navigation and makes footer access challenging. Choose pagination for admin tables and search results. Choose infinite scroll for social feeds and discovery interfaces.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Search Race Conditions",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "When users type quickly, multiple search requests are in flight. Without cancellation, stale responses can overwrite newer results, causing UI regression. AbortController cancels previous requests, preventing wasted work. Ignore-stale checks request order and ignores older responses, preventing UI regression but still consuming network bandwidth. Use abort for most cases; use ignore-stale if you need to track all requests for analytics.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Forms: Validation and Autosave",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "heading",
+                  tag: "h2",
+                  version: 1,
+                },
+                {
+                  children: [
+                    {
+                      text: "Validation modes: OnChange provides immediate feedback but can be noisy. OnBlur reduces noise but delays feedback. OnSubmit is least intrusive but provides no early feedback. Autosave reduces data loss by periodically saving drafts. Offline mode queues saves and replays them when connection is restored. Recovery restores drafts after page refresh using localStorage or IndexedDB. Combine autosave with offline queue and recovery for resilient form experiences.",
+                    },
+                  ],
+                  direction: "ltr",
+                  format: "",
+                  indent: 0,
+                  type: "paragraph",
+                  version: 1,
+                },
+              ],
+              direction: "ltr",
+              format: "",
+              indent: 0,
+              type: "root",
+              version: 1,
+            },
+          },
+          references: [
+            {
+              label: "React Window Documentation",
+              url: "https://github.com/bvaughn/react-window",
+              note: "Virtualization library for React (placeholder - verify content)",
+              claimIds: "virtualization",
+            },
+            {
+              label: "MDN: AbortController",
+              url: "https://developer.mozilla.org/en-US/docs/Web/API/AbortController",
+              note: "MDN documentation on AbortController (placeholder - verify content)",
+              claimIds: "abort",
+            },
+            {
+              label: "Web.dev: Form Best Practices",
+              url: "https://web.dev/sign-up-form-best-practices/",
+              note: "Form validation and autosave patterns (placeholder - verify content)",
+              claimIds: "forms",
+            },
+          ],
+          practiceDemo: largeScaleUXLabDemoConfig,
+          practiceSteps: [
+            {
+              title: "Explore Virtualization",
+              body: "Switch to Virtualization mode. Adjust item count from 100 to 50,000. Toggle between Full DOM and Virtualized render modes. Watch the performance panel: Full DOM shows all items as DOM nodes (performance degrades), while Virtualized shows only visible + overscan items (consistent performance). Adjust overscan to see how it affects rendered count. Overscan improves scroll smoothness but increases work.",
+              focusTarget: "virtual.list",
+            },
+            {
+              title: "Compare Pagination vs Infinite Scroll",
+              body: "Switch to Pagination vs Infinite Scroll mode. Try Pagination strategy: use page controls to navigate. Notice stable URLs, predictable navigation, and easy footer access. Switch to Infinite Scroll: click 'Load More' to see incremental loading. Notice engagement benefits but consider back navigation challenges. Read UX notes panel for trade-offs.",
+              focusTarget: "scroll.strategy",
+            },
+            {
+              title: "Understand Search Race Conditions",
+              body: "Switch to Search Races mode. Set cancellation to 'None' and click 'Type Demo Query'. Watch how multiple requests are sent and stale responses can overwrite newer results. Set cancellation to 'Abort': previous requests are canceled, only latest completes. Set to 'Ignore Stale': responses arrive but stale ones are ignored. Watch the timeline visualization to understand request lifecycle.",
+              focusTarget: "search.timeline",
+            },
+            {
+              title: "Test Form Validation Modes",
+              body: "Switch to Forms & Autosave mode. Try different validation modes: OnChange (immediate feedback, can be noisy), OnBlur (less noise, delayed feedback), OnSubmit (no early feedback). Type in form fields to see when errors appear. Notice the trade-off between feedback immediacy and noise.",
+              focusTarget: "form.panel",
+            },
+            {
+              title: "Explore Autosave and Offline",
+              body: "Enable autosave and adjust interval. Watch autosave timeline events. Enable offline mode: saves are queued. Disable offline: queued saves replay automatically. Enable recovery: simulate page refresh (draft should restore). This demonstrates resilient form experiences that prevent data loss.",
+              focusTarget: "form.panel",
+            },
+            {
+              title: "Review Event Log",
+              body: "Scroll through the event log to see chronological records of virtualization changes, pagination/infinite scroll behavior, search race handling, and form validation/autosave events. This helps understand how large-scale UX decisions affect user experience.",
+              focusTarget: "eventlog",
+            },
+          ],
+          practiceTasks: [
+            {
+              prompt:
+                "Pick virtualization settings for 50k rows on mobile; justify overscan/row height.",
+              expectedAnswer:
+                "For 50k rows on mobile, I would use Virtualized render mode with overscan of 3-5 and row height of 40-48px. Mobile devices have limited memory and processing power, so virtualization is essential (reduces DOM nodes from 50k to ~15-20). Overscan of 3-5 provides smooth scrolling without excessive work (renders ~10-15 items instead of just visible ~8). Row height of 40-48px balances content visibility with scroll performance (smaller = more items visible but more scrolling, larger = less scrolling but fewer items visible). Full DOM would create 50k DOM nodes, causing severe performance degradation and potential crashes on mobile.",
+              explanation:
+                "Virtualization is essential for large lists on mobile. Overscan balances smoothness with performance. Row height affects visible content and scroll behavior.",
+            },
+            {
+              prompt:
+                "Choose pagination vs infinite for admin table vs social feed; explain.",
+              expectedAnswer:
+                "For an admin table, I would use Pagination because: users need to navigate to specific records (pagination allows page jumping), stable URLs enable bookmarking/sharing specific pages, footer access is straightforward (pagination controls don't interfere), and predictable navigation helps with data management tasks. For a social feed, I would use Infinite Scroll because: it increases engagement (seamless content discovery), users don't need to navigate to specific posts (no page jumping needed), and it feels more natural for content consumption. However, infinite scroll requires state restoration for back navigation (store scroll position and loaded items) and makes footer access challenging (need 'back to top' button).",
+              explanation:
+                "Pagination suits structured data navigation (admin tables). Infinite scroll suits content consumption (social feeds). Each has trade-offs in navigation and state management.",
+            },
+            {
+              prompt:
+                "Fix search race: choose abort vs ignore-stale; explain.",
+              expectedAnswer:
+                "I would use Abort cancellation strategy. When a new search query is typed, cancel the previous request using AbortController. This prevents wasted network bandwidth and server resources, ensures only the latest result is shown (prevents stale overwrites), and is simpler to implement than ignore-stale. Ignore-stale still sends all requests (wastes bandwidth) and requires tracking request order/comparison logic. Abort is the standard approach for search debouncing and race condition handling. Implementation: create AbortController for each request, abort previous controller when new request starts, handle AbortError in catch block.",
+              explanation:
+                "Abort cancellation is the standard approach for search race conditions. It prevents wasted work and ensures only latest results are shown. Ignore-stale is more complex and still wastes bandwidth.",
+            },
+            {
+              prompt:
+                "Design autosave + recovery for long form.",
+              expectedAnswer:
+                "I would implement: Autosave every 2-3 seconds (balance between frequency and server load), save to localStorage immediately (client-side persistence), send to server in background (non-blocking), offline queue (store saves in IndexedDB when offline, replay on reconnect), and recovery on page load (check localStorage/IndexedDB for draft, restore form state). Validation: use OnBlur mode (less noisy than OnChange, provides feedback before submit). Conflict handling: if server has newer version, show merge UI or 'server version is newer' warning. This ensures users don't lose work even with network issues, page refreshes, or browser crashes.",
+              explanation:
+                "Autosave with offline queue and recovery prevents data loss. OnBlur validation balances feedback with noise. Conflict handling manages concurrent edits.",
+            },
+          ],
+        },
+      });
+      console.log("✓ Created Resource 11 topic (large-scale-ux)");
+    } else {
+      console.log("✓ Resource 11 topic already exists");
+    }
+
     console.log("\n✓ Seed script completed successfully");
   } catch (error) {
     console.error("Error seeding database:", error);
