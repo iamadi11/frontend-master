@@ -49,6 +49,9 @@ export function RealtimeSystemsLabDemo({
 }: RealtimeSystemsLabDemoProps) {
   const { reduced } = useMotionPrefs();
   const [viewMode, setViewMode] = useState<"2D" | "3D">("2D");
+  const [cameraPreset, setCameraPreset] = useState<
+    "overview" | "closeup" | "side"
+  >("overview");
   const [protocol, setProtocol] = useState<Protocol>("SSE");
   const [network, setNetwork] = useState<Network>("STABLE");
   const [msgRatePerSec, setMsgRatePerSec] = useState(10);
@@ -1133,6 +1136,8 @@ export function RealtimeSystemsLabDemo({
         onPacketDrop={() => {
           // Optional: handle packet drop
         }}
+        cameraPreset={cameraPreset}
+        onCameraPresetChange={setCameraPreset}
       />
     </ThreeCanvasShell>
   );
